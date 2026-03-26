@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+</head>
+<body>
+<script>
+// 【重要】請填入你在第一步「部署」完畢後複製的網址
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec'; 
+
+const STAFF=[
+  {name:'令 Ling'},{name:'曜 Yao'},{name:'澈 Che'},{name:'源 Yuan'},
+  {name:'鍛 Duan'},{name:'書 Shu'},{name:'柏 Bo'},{name:'獺 Ta'}
+];
+
+// ... (中間的日期工具函數保持不變) ...
+
+// 修正後的 callGAS 函數，支援跨網域 fetch
+async function callGAS(fn, ...args) {
+  let url = GAS_URL;
+  if (fn === 'getTodaySlotsData') {
+    url += `?action=today`;
+  } else if (fn === 'getStaffSlotsData') {
+    url += `?action=staff&staff=${encodeURIComponent(args[0])}`;
+  } else if (fn === 'ping') {
+    url += `?action=ping`;
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('網路錯誤');
+  const data = await response.json();
+  if (data && data.error) throw new Error(data.error);
+  return data;
+}
+
+// ... (後續的動畫與資料載入邏輯保持不變) ...
+
+function initApp(){
+  if(typeof liff!=='undefined'){
+    liff.init({liffId:'2009610906-9zraEtAy'}) // 你的 LIFF ID
+      .catch(e=>console.log('LIFF skip: '+e.message));
+  }
+  
+  // 測試連線並開始載入
+  callGAS('ping')
+    .then(()=>{
+      document.getElementById('db').style.display='none';
+      loadToday();
+      buildStaffTabs();
+      loadStaff(STAFF[0].name);
+    })
+    .catch(e=>{
+      document.getElementById('db').textContent = '連線失敗，請檢查 GAS 部署設定';
+    });
+}
+initApp();
+</script>
+</body>
+</html>
