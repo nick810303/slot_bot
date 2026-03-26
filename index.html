@@ -14,9 +14,9 @@
   --bg:#fff;--bg2:#f7f7f7;--bg3:#f2f2f2;--line:#e8e8e8;
   --black:#111;--red:#D94F4F;--red-bg:rgba(217,79,79,.07);
   --gray:#999;--gray2:#bbb;
-  --d120:#C4857A;--d120-bg:rgba(196,133,122,.1);
-  --d90:#A8906E;--d90-bg:rgba(168,144,110,.1);
-  --d60:#D4A882;--d60-bg:rgba(212,168,130,.1);
+  --d120:#C4857A;--d120-bg:rgba(196,133,122,.1);--d120-border:rgba(196,133,122,.3);
+  --d90:#A8906E; --d90-bg:rgba(168,144,110,.1); --d90-border:rgba(168,144,110,.3);
+  --d60:#D4A882; --d60-bg:rgba(212,168,130,.1); --d60-border:rgba(212,168,130,.3);
 }
 html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-family:'Noto Sans TC',sans-serif}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
@@ -40,38 +40,45 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{width:0}
 
-/* hero */
-.hero{padding:10px 0 10px;border-bottom:1px solid var(--line);margin-bottom:12px}
-.hero-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:.04em;margin-bottom:4px}
-.hero-title{font-size:17px;font-weight:500;line-height:1.25;margin-bottom:3px}
-.hero-title.full{color:var(--red)}
-.hero-sub{font-size:12px;color:var(--gray);line-height:1.5}
-.sold-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-.sold-pill{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(217,79,79,.2);padding:2px 7px;border-radius:4px}
+/* date header */
+.date-header{
+  padding:10px 0 10px;border-bottom:1px solid var(--line);margin-bottom:14px;
+}
+.date-header-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:.04em}
 
-.list-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.07em;margin-bottom:6px}
-.slot-list{display:flex;flex-direction:column;gap:4px}
-.slot-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer;transition:background .12s}
-.slot-row:active{background:var(--bg2)}
-.slot-time{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--black);width:48px;flex-shrink:0}
-.slot-staff{font-size:12px;color:var(--black);flex:1}
-.slot-dur{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
-.slot-dur.d120{color:var(--d120);background:var(--d120-bg);border:1px solid rgba(196,133,122,.25)}
-.slot-dur.d90{color:var(--d90);background:var(--d90-bg);border:1px solid rgba(168,144,110,.25)}
-.slot-dur.d60{color:var(--d60);background:var(--d60-bg);border:1px solid rgba(212,168,130,.25)}
+/* duration cards — 2列排列 */
+.dur-grid{display:flex;flex-direction:column;gap:8px}
 
-.next-card{padding:10px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer;transition:background .12s}
-.next-card:active{background:var(--bg2)}
-.next-eyebrow{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);margin-bottom:5px}
-.next-time-row{display:flex;align-items:baseline;gap:10px}
-.next-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black)}
-.next-staff{font-size:12px;color:var(--black)}
-.next-dur{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-top:5px;display:inline-block}
-.next-dur.d120{color:var(--d120);background:var(--d120-bg);border:1px solid rgba(196,133,122,.25)}
-.next-dur.d90{color:var(--d90);background:var(--d90-bg);border:1px solid rgba(168,144,110,.25)}
-.next-dur.d60{color:var(--d60);background:var(--d60-bg);border:1px solid rgba(212,168,130,.25)}
+.dur-card{
+  border:1px solid var(--line);border-radius:10px;
+  padding:12px 14px;cursor:pointer;
+  transition:background .12s;position:relative;overflow:hidden;
+}
+.dur-card:active{background:var(--bg2)}
+.dur-card.d120{border-left:3px solid var(--d120)}
+.dur-card.d90 {border-left:3px solid var(--d90)}
+.dur-card.d60 {border-left:3px solid var(--d60)}
 
-/* staff */
+.dur-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dur-label{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px}
+.dur-label.d120{color:var(--d120);background:var(--d120-bg);border:1px solid var(--d120-border)}
+.dur-label.d90 {color:var(--d90); background:var(--d90-bg); border:1px solid var(--d90-border)}
+.dur-label.d60 {color:var(--d60); background:var(--d60-bg); border:1px solid var(--d60-border)}
+
+.dur-avail-badge{
+  font-family:'DM Mono',monospace;font-size:10px;
+  padding:2px 8px;border-radius:4px;
+}
+.dur-avail-badge.today{background:#edf7f1;color:#2a9d5c;border:1px solid rgba(42,157,92,.25)}
+.dur-avail-badge.future{background:var(--bg2);color:var(--gray);border:1px solid var(--line)}
+.dur-avail-badge.none{background:var(--red-bg);color:var(--red);border:1px solid rgba(217,79,79,.2)}
+
+.dur-card-body{display:flex;align-items:baseline;gap:10px}
+.dur-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black)}
+.dur-staff{font-size:12px;color:var(--gray)}
+.dur-date-hint{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);margin-top:4px}
+
+/* staff pane */
 .staff-tabs-wrap{overflow-x:auto;padding:8px 16px 0;display:flex;gap:5px;-ms-overflow-style:none;scrollbar-width:none}
 .staff-tabs-wrap::-webkit-scrollbar{display:none}
 .stab{flex-shrink:0;padding:4px 11px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap}
@@ -81,7 +88,7 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
 .staff-panel::-webkit-scrollbar{width:0}
 
 .sp-status{font-size:12px;line-height:1.55;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.sp-status .ok{color:var(--black);font-weight:500}
+.sp-status .ok{color:#2a9d5c;font-weight:500}
 .sp-status .na{color:var(--red);font-weight:500}
 .sp-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.07em;margin-bottom:6px}
 .sp-date-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
@@ -94,37 +101,20 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
 .sp-time-card:active{background:var(--bg2)}
 .sp-big-time{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--black);line-height:1}
 .sp-dur{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-top:6px;display:inline-block}
-.sp-dur.d120{color:var(--d120);background:var(--d120-bg);border:1px solid rgba(196,133,122,.25)}
-.sp-dur.d90{color:var(--d90);background:var(--d90-bg);border:1px solid rgba(168,144,110,.25)}
-.sp-dur.d60{color:var(--d60);background:var(--d60-bg);border:1px solid rgba(212,168,130,.25)}
+.sp-dur.d120{color:var(--d120);background:var(--d120-bg);border:1px solid var(--d120-border)}
+.sp-dur.d90 {color:var(--d90); background:var(--d90-bg); border:1px solid var(--d90-border)}
+.sp-dur.d60 {color:var(--d60); background:var(--d60-bg); border:1px solid var(--d60-border)}
 
-/* ── 載入動畫 ── */
-.scanning{
-  display:flex;flex-direction:column;align-items:center;
-  padding:28px 0 20px;gap:16px;
-}
-.scan-avatar{
-  width:52px;height:52px;border-radius:50%;
-  background:var(--bg2);border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;
-  animation:bob 1.8s ease-in-out infinite;
-}
+/* scanning */
+.scanning{display:flex;flex-direction:column;align-items:center;padding:28px 0 20px;gap:14px}
+.scan-avatar{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:20px;animation:bob 1.8s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.scan-msg{
-  font-size:13px;color:var(--black);font-weight:500;
-  text-align:center;line-height:1.5;
-  animation:fadein .3s ease;
-}
-@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.scan-sub{
-  font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);
-  letter-spacing:.05em;text-align:center;
-}
+.scan-msg{font-size:13px;color:var(--black);font-weight:500;text-align:center;transition:opacity .2s}
+.scan-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.05em;text-align:center;margin-top:3px;transition:opacity .2s}
 .prog-track{width:80%;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
 .prog-bar{height:100%;width:0%;background:var(--black);border-radius:2px;transition:width 2s cubic-bezier(.4,0,.2,1)}
 
-.note{font-size:10px;color:var(--gray2);margin-top:10px;line-height:1.7}
+.note{font-size:10px;color:var(--gray2);margin-top:12px;line-height:1.7}
 
 /* footer */
 .footer{flex-shrink:0;padding:6px 16px max(6px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#fff}
@@ -197,6 +187,8 @@ const STAFF=[
 let activeStaff=0;
 let scanTimer=null;
 
+const GAS_URL='https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec';
+
 // ── 日期工具 ──
 function parseDate(str){
   const n=new Date();
@@ -206,11 +198,11 @@ function parseDate(str){
 }
 function daysFromNow(d){const t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000)}
 function wd(d){return['日','一','二','三','四','五','六'][d.getDay()]}
-function daysLabel(d){
-  if(d===0) return '今天';
-  if(d===1) return '明天';
-  if(d===2) return '後天';
-  return d+'天後';
+function daysLabel(n){
+  if(n===0) return '今天';
+  if(n===1) return '明天';
+  if(n===2) return '後天';
+  return n+'天後';
 }
 function dateMeta(str,todayFull){
   const d=parseDate(str);const days=daysFromNow(d);
@@ -228,22 +220,26 @@ function durClass(dur){
   if(!dur) return '';
   if(dur.includes('120')) return 'd120';
   if(dur.includes('90'))  return 'd90';
-  if(dur.includes('60'))  return 'd60';
-  return '';
+  return 'd60';
 }
-function durLabel(dur){
+function durName(dur){
   if(!dur) return dur;
-  if(dur.includes('120')) return '泰空經典 120min';
-  if(dur.includes('90'))  return '泰空調和 90min';
-  if(dur.includes('60'))  return '泰空輕行 60min';
-  return dur;
+  if(dur.includes('120')) return '泰空經典';
+  if(dur.includes('90'))  return '泰空調和';
+  return '泰空輕行';
+}
+function durMin(dur){
+  if(!dur) return '';
+  if(dur.includes('120')) return '120min';
+  if(dur.includes('90'))  return '90min';
+  return '60min';
 }
 
-const GAS_URL='https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec';
-
+// ── Debug ──
 function dbg(msg){const el=document.getElementById('db');if(el){el.style.display='block';el.textContent=msg;}}
 function dbgHide(){const el=document.getElementById('db');if(el)el.style.display='none';}
 
+// ── Alert ──
 function showAlert(){document.getElementById('alert').classList.add('show')}
 function closeAlert(){document.getElementById('alert').classList.remove('show')}
 function handleMask(e){if(e.target.id==='alert')closeAlert()}
@@ -255,6 +251,7 @@ function goBooking(){
   }else{location.href=url;}
 }
 
+// ── Tabs ──
 function switchTab(id,btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -262,6 +259,7 @@ function switchTab(id,btn){
   document.getElementById('pane-'+id).classList.add('active');
 }
 
+// ── GAS 呼叫 ──
 function callGAS(fn,...args){
   return new Promise((res,rej)=>{
     let url=GAS_URL;
@@ -304,24 +302,20 @@ function scanHTML(msgs){
     if(scanTimer) clearInterval(scanTimer);
     scanTimer=setInterval(()=>{
       step=Math.min(step+1,msgs.length-1);
-      const pct=15+((step/(msgs.length-1))*70);
-      bar.style.width=pct+'%';
-      // fade message
-      msgEl.style.opacity='0';
-      subEl.style.opacity='0';
+      bar.style.width=(15+(step/(msgs.length-1))*70)+'%';
+      msgEl.style.opacity='0';subEl.style.opacity='0';
       setTimeout(()=>{
         msgEl.textContent=msgs[step].msg;
         subEl.textContent=msgs[step].sub;
-        msgEl.style.opacity='1';
-        subEl.style.opacity='1';
+        msgEl.style.opacity='1';subEl.style.opacity='1';
       },200);
     },2200);
   },80);
   return`<div class="scanning" id="${id}">
     <div class="scan-avatar">🤖</div>
     <div>
-      <div class="scan-msg" style="transition:opacity .2s"></div>
-      <div class="scan-sub" style="margin-top:4px;transition:opacity .2s"></div>
+      <div class="scan-msg"></div>
+      <div class="scan-sub"></div>
     </div>
     <div class="prog-track"><div class="prog-bar"></div></div>
   </div>`;
@@ -331,58 +325,70 @@ function stopScan(){
   document.querySelectorAll('.prog-bar').forEach(b=>{b.style.transition='width .3s ease';b.style.width='100%';});
 }
 
-// ── 今日時段 ──
+// ── 今日時段（各時長一張卡）──
 async function loadToday(){
   const el=document.getElementById('today-content');
   el.innerHTML=scanHTML(TODAY_MSGS);
   let d;
   try{d=await callGAS('getTodaySlotsData');}
-  catch(e){stopScan();el.innerHTML=`<div style="padding:16px 0;font-size:12px;color:#D94F4F">❌ 無法取得資料，請重新整理</div>`;return;}
+  catch(e){
+    stopScan();
+    el.innerHTML=`<div style="padding:16px 0;font-size:12px;color:#D94F4F">❌ 無法取得資料，請重新整理</div>`;
+    return;
+  }
   stopScan();
   if(!d){el.innerHTML=`<div style="padding:16px 0;font-size:12px;color:var(--gray)">近期暫無可用時段</div>`;return;}
 
-  if(!d.hasToday){
-    const s=d.slots&&d.slots[0];
-    const meta=s?dateMeta(s.date,true):{label:'',wd:'',badge:''};
-    el.innerHTML=`
-      <div class="hero">
-        <div class="hero-date">${todayFullStr()}</div>
-        <div class="hero-title full">今日已全滿</div>
-        <div class="hero-sub">所有時段均已預約</div>
-      </div>
-      ${s?`<div class="list-label">最早可預約</div>
-      <div class="next-card" onclick="showAlert()">
-        <div class="next-eyebrow">${meta.label}　星期${meta.wd}　${meta.badge}</div>
-        <div class="next-time-row">
-          <div class="next-time">${s.time}</div>
-          <div class="next-staff">${s.staff!=='─'?s.staff:''}</div>
-        </div>
-        <div class="next-dur ${durClass(s.duration)}">${durLabel(s.duration)}</div>
-      </div>`:''}
-      <div class="note">AI 即時抓取。本系統與預約系統不連動，實際以預約系統為準。</div>`;
-    return;
-  }
+  const DURS=['120min','90min','60min'];
+  const cards=DURS.map(dur=>{
+    const slot=d.byDuration&&d.byDuration[dur];
+    const cls=durClass(dur);
+    const name=durName(dur);
+    const min=durMin(dur);
 
-  const avail=['120min','90min','60min'].filter(x=>!(d.soldOut||[]).includes(x));
-  const soldDesc=(d.soldOut||[]).length?`${d.soldOut.map(durLabel).join('、')} 已滿。`:'';
-  const sub=`${soldDesc}${avail.map(durLabel).join('、')} 仍可預約。`;
-  const soldPills=(d.soldOut||[]).map(x=>`<span class="sold-pill">${durLabel(x)} 已滿</span>`).join('');
-  const rows=(d.slots||[]).map(s=>`
-    <div class="slot-row" onclick="showAlert()">
-      <div class="slot-time">${s.time}</div>
-      <div class="slot-staff">${s.staff!=='─'?s.staff:'—'}</div>
-      <div class="slot-dur ${durClass(s.duration)}">${durLabel(s.duration)}</div>
-    </div>`).join('');
+    if(!slot){
+      // 這個時長完全無資料
+      return `<div class="dur-card ${cls}">
+        <div class="dur-card-top">
+          <span class="dur-label ${cls}">${name} ${min}</span>
+          <span class="dur-avail-badge none">暫無資料</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray2)">─</div>
+      </div>`;
+    }
+
+    const slotDate=parseDate(slot.date);
+    const days=daysFromNow(slotDate);
+    const weekday=wd(slotDate);
+
+    const availBadge=slot.hasToday
+      ?`<span class="dur-avail-badge today">今日有空</span>`
+      :`<span class="dur-avail-badge future">今日已滿</span>`;
+
+    const dateHint=slot.hasToday
+      ?''
+      :`<div class="dur-date-hint">${slot.date} 星期${weekday} · ${daysLabel(days)}</div>`;
+
+    const staffStr=slot.staff&&slot.staff!=='─'?slot.staff:'';
+
+    return `<div class="dur-card ${cls}" onclick="showAlert()">
+      <div class="dur-card-top">
+        <span class="dur-label ${cls}">${name} ${min}</span>
+        ${availBadge}
+      </div>
+      <div class="dur-card-body">
+        <div class="dur-time">${slot.time}</div>
+        ${staffStr?`<div class="dur-staff">${staffStr}</div>`:''}
+      </div>
+      ${dateHint}
+    </div>`;
+  }).join('');
 
   el.innerHTML=`
-    <div class="hero">
-      <div class="hero-date">${todayFullStr()}</div>
-      <div class="hero-title">今日還有空位</div>
-      <div class="hero-sub">${sub}</div>
-      ${soldPills?`<div class="sold-pills">${soldPills}</div>`:''}
+    <div class="date-header">
+      <div class="date-header-text">${todayFullStr()}</div>
     </div>
-    <div class="list-label">最早 3 個可約時段</div>
-    <div class="slot-list">${rows}</div>
+    <div class="dur-grid">${cards}</div>
     <div class="note">AI 即時抓取。本系統與預約系統不連動，實際以預約系統為準。</div>`;
 }
 
@@ -433,7 +439,7 @@ async function loadStaff(name){
     </div>
     <div class="sp-time-card" onclick="showAlert()">
       <div class="sp-big-time">${d.time}</div>
-      <div class="sp-dur ${durClass(d.duration)}">${durLabel(d.duration)}</div>
+      <div class="sp-dur ${durClass(d.duration)}">${durName(d.duration)} ${durMin(d.duration)}</div>
     </div>
     <div class="note">AI 即時抓取。本系統與預約系統不連動，實際以預約系統為準。</div>`;
 }
