@@ -1,58 +1,191 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>小泰空位查詢</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  color-scheme:light;
+  --bg:#fff;--bg2:#f7f7f7;--bg3:#f2f2f2;--line:#e8e8e8;
+  --black:#111;--red:#D94F4F;--red-bg:rgba(217,79,79,.07);
+  --gray:#999;--gray2:#bbb;
+  --d120:#C4857A;--d120-bg:rgba(196,133,122,.1);
+  --d90:#A8906E;--d90-bg:rgba(168,144,110,.1);
+  --d60:#D4A882;--d60-bg:rgba(212,168,130,.1);
+}
+html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-family:'Noto Sans TC',sans-serif}
+.app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
+.handle{flex-shrink:0;padding:6px 0 0;display:flex;justify-content:center}
+.handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
+.hd{flex-shrink:0;padding:8px 16px 0}
+.hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hd-name{font-size:12px;color:var(--gray)}
+.hd-live{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;color:#2a9d5c}
+.live-dot{width:5px;height:5px;border-radius:50%;background:#2a9d5c;animation:p 2.5s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.2}}
+.tabs{display:flex;background:var(--bg2);border-radius:8px;padding:2px;gap:2px}
+.tab{flex:1;padding:6px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:6px;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--bg);color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.body{flex:1;overflow:hidden;position:relative;margin-top:8px}
+.pane{position:absolute;inset:0;overflow-y:auto;padding:0 16px 10px;opacity:0;pointer-events:none;transition:opacity .15s}
+.pane.active{opacity:1;pointer-events:all}
+.hero{padding:10px 0 10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.hero-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:.04em;margin-bottom:4px}
+.hero-title{font-size:17px;font-weight:500;line-height:1.25;margin-bottom:3px}
+.hero-title.full{color:var(--red)}
+.hero-sub{font-size:12px;color:var(--gray);line-height:1.5}
+.sold-pill{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(217,79,79,.2);padding:2px 7px;border-radius:4px}
+.slot-list{display:flex;flex-direction:column;gap:4px}
+.slot-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer}
+.slot-time{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;width:48px}
+.slot-staff{font-size:12px;flex:1}
+.slot-dur{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
+.slot-dur.d120{color:var(--d120);background:var(--d120-bg);border:1px solid rgba(196,133,122,.25)}
+.staff-tabs-wrap{overflow-x:auto;padding:8px 16px 0;display:flex;gap:5px}
+.stab{flex-shrink:0;padding:4px 11px;border-radius:20px;border:1px solid var(--line);background:transparent;font-size:11px;color:var(--gray);cursor:pointer}
+.stab.active{background:var(--black);color:#fff}
+.scanning{display:flex;flex-direction:column;gap:10px;padding:20px 0}
+.prog-track{width:100%;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.prog-bar{height:100%;width:0%;background:var(--black);transition:width 1.6s ease}
+.step-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2)}
+.footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;background:#fff}
+.ft-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2)}
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:none;align-items:flex-end;z-index:100}
+.mask.show{display:flex}
+.sheet{width:100%;background:#fff;border-radius:14px 14px 0 0;padding:24px;border-top:3px solid var(--red)}
+.sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--black);color:#fff;font-size:13px;border:none;cursor:pointer}
+</style>
 </head>
 <body>
-<script>
-// 【重要】請填入你在第一步「部署」完畢後複製的網址
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec'; 
 
+<div id="db" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;font-family:monospace;font-size:11px;padding:5px 10px;background:#fff3cd;color:#333;border-bottom:2px solid #ffc107">載入中...</div>
+
+<div class="app">
+  <div class="handle"><div class="handle-bar"></div></div>
+  <div class="hd">
+    <div class="hd-top">
+      <div class="hd-name">小泰空位查詢機器人</div>
+      <div class="hd-live"><div class="live-dot"></div>LIVE</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('today',this)">今日 / 最早時段</button>
+      <button class="tab" onclick="switchTab('staff',this)">指定師傅</button>
+    </div>
+  </div>
+  <div class="body">
+    <div class="pane active" id="pane-today"><div id="today-content"></div></div>
+    <div class="pane" id="pane-staff" style="padding:0;display:flex;flex-direction:column">
+      <div class="staff-tabs-wrap" id="staff-tabs"></div>
+      <div class="staff-panel" style="padding:10px 16px" id="staff-panel"></div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="ft-note">AI 抓取 · 非預約系統</div>
+    <div style="font-size:10px;color:var(--red);text-decoration:underline" onclick="showAlert()">免責聲明</div>
+  </div>
+</div>
+
+<div class="mask" id="alert">
+  <div class="sheet">
+    <div style="font-size:10px;color:var(--red);margin-bottom:12px">DISCLAIMER</div>
+    <div style="font-size:16px;font-weight:500;margin-bottom:14px">本機器人無法直接預約</div>
+    <div style="font-size:13px;color:var(--gray);line-height:1.8;margin-bottom:22px">請記下時段與師傅，點擊下方前往預約系統。</div>
+    <button class="sheet-btn" onclick="goBooking()">前往預約系統</button>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--gray2)" onclick="closeAlert()">關閉</div>
+  </div>
+</div>
+
+<script>
+// 【核心設定】
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec'; 
 const STAFF=[
   {name:'令 Ling'},{name:'曜 Yao'},{name:'澈 Che'},{name:'源 Yuan'},
   {name:'鍛 Duan'},{name:'書 Shu'},{name:'柏 Bo'},{name:'獺 Ta'}
 ];
 
-// ... (中間的日期工具函數保持不變) ...
+// --- 工具函數 ---
+function wd(d){return['日','一','二','三','四','五','六'][d.getDay()]}
+function durClass(dur){return dur?.includes('120')?'d120':dur?.includes('90')?'d90':'d60'}
+function durLabel(dur){return dur?.includes('120')?'泰空經典 120min':dur?.includes('90')?'泰空調和 90min':'泰空輕行 60min'}
 
-// 修正後的 callGAS 函數，支援跨網域 fetch
-async function callGAS(fn, ...args) {
-  let url = GAS_URL;
-  if (fn === 'getTodaySlotsData') {
-    url += `?action=today`;
-  } else if (fn === 'getStaffSlotsData') {
-    url += `?action=staff&staff=${encodeURIComponent(args[0])}`;
-  } else if (fn === 'ping') {
-    url += `?action=ping`;
-  }
-
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('網路錯誤');
-  const data = await response.json();
-  if (data && data.error) throw new Error(data.error);
-  return data;
+// --- 通訊函數 ---
+async function callGAS(action, staffName = ''){
+  let url = `${GAS_URL}?action=${action}`;
+  if(staffName) url += `&staff=${encodeURIComponent(staffName)}`;
+  const r = await fetch(url);
+  return r.json();
 }
 
-// ... (後續的動畫與資料載入邏輯保持不變) ...
-
-function initApp(){
-  if(typeof liff!=='undefined'){
-    liff.init({liffId:'2009610906-9zraEtAy'}) // 你的 LIFF ID
-      .catch(e=>console.log('LIFF skip: '+e.message));
-  }
-  
-  // 測試連線並開始載入
-  callGAS('ping')
-    .then(()=>{
-      document.getElementById('db').style.display='none';
-      loadToday();
-      buildStaffTabs();
-      loadStaff(STAFF[0].name);
-    })
-    .catch(e=>{
-      document.getElementById('db').textContent = '連線失敗，請檢查 GAS 部署設定';
-    });
+// --- 介面控制 ---
+function switchTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
 }
-initApp();
+function showAlert(){document.getElementById('alert').classList.add('show')}
+function closeAlert(){document.getElementById('alert').classList.remove('show')}
+function goBooking(){window.open('https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu','_blank')}
+
+// --- 資料載入 ---
+async function loadToday(){
+  const el = document.getElementById('today-content');
+  el.innerHTML = '<div class="scanning"><div class="prog-track"><div class="prog-bar" style="width:60%"></div></div><div class="step-text">抓取空位資料...</div></div>';
+  const d = await callGAS('today');
+  if(!d.hasToday){
+    el.innerHTML = `<div class="hero"><div class="hero-title full">今日已全滿</div></div>`;
+    return;
+  }
+  const rows = d.slots.map(s=>`
+    <div class="slot-row" onclick="showAlert()">
+      <div class="slot-time">${s.time}</div>
+      <div class="slot-staff">${s.staff}</div>
+      <div class="slot-dur ${durClass(s.duration)}">${durLabel(s.duration)}</div>
+    </div>`).join('');
+  el.innerHTML = `<div class="hero"><div class="hero-title">今日還有空位</div></div><div class="slot-list">${rows}</div>`;
+}
+
+async function loadStaff(name){
+  const el = document.getElementById('staff-panel');
+  el.innerHTML = '<div class="step-text">查詢中...</div>';
+  const d = await callGAS('staff', name);
+  el.innerHTML = `
+    <div style="margin-bottom:10px">${name} 最早可約：</div>
+    <div class="slot-row" onclick="showAlert()">
+      <div class="slot-time">${d.time}</div>
+      <div style="flex:1;font-size:12px">${d.date}</div>
+      <div class="slot-dur d120">120min</div>
+    </div>`;
+}
+
+function buildStaffTabs(){
+  const wrap = document.getElementById('staff-tabs');
+  STAFF.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.className = 'stab' + (i===0?' active':'');
+    b.textContent = s.name;
+    b.onclick = ()=>{
+      document.querySelectorAll('.stab').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      loadStaff(s.name);
+    };
+    wrap.appendChild(b);
+  });
+}
+
+// --- 初始化 ---
+function init(){
+  liff.init({liffId:'2009610906-9zraEtAy'}).catch(console.error);
+  loadToday();
+  buildStaffTabs();
+  loadStaff(STAFF[0].name);
+}
+init();
 </script>
 </body>
 </html>
