@@ -4,115 +4,66 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>空位查詢</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   color-scheme:light;
-  --bg:#fff;
-  --bg2:#f6f6f6;
-  --line:#e8e8e8;
-  --black:#111;
-  --red:#D94F4F;
-  --red-bg:rgba(217,79,79,.07);
-  --gray:#999;
-  --gray2:#bbb;
-  --d120:#C4857A;
-  --d120-bg:rgba(196,133,122,.1);
-  --d90:#A8906E;
-  --d90-bg:rgba(168,144,110,.1);
-  --d60:#D4A882;
-  --d60-bg:rgba(212,168,130,.1);
+  --bg:#fff;--bg2:#f7f7f7;--bg3:#f2f2f2;--line:#e8e8e8;
+  --black:#111;--red:#D94F4F;--red-bg:rgba(217,79,79,.07);
+  --gray:#999;--gray2:#bbb;
+  --d120:#C4857A;--d120-bg:rgba(196,133,122,.1);
+  --d90:#A8906E;--d90-bg:rgba(168,144,110,.1);
+  --d60:#D4A882;--d60-bg:rgba(212,168,130,.1);
 }
 html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-family:'Noto Sans TC',sans-serif}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
 
-/* handle */
 .handle{flex-shrink:0;padding:6px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
 
-/* header */
 .hd{flex-shrink:0;padding:8px 16px 0}
 .hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .hd-name{font-size:12px;color:var(--gray)}
-.hd-live{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:#2a9d5c}
+.hd-live{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;color:#2a9d5c}
 .live-dot{width:5px;height:5px;border-radius:50%;background:#2a9d5c;animation:p 2.5s ease-in-out infinite}
 @keyframes p{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* tabs */
 .tabs{display:flex;background:var(--bg2);border-radius:8px;padding:2px;gap:2px}
-.tab{
-  flex:1;padding:8px 0;border:none;background:transparent;
-  font-family:'Noto Sans TC',sans-serif;font-size:12px;
-  color:var(--gray);border-radius:6px;cursor:pointer;transition:all .15s;
-}
-.tab.active{background:var(--bg);color:var(--black);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.tab{flex:1;padding:6px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:6px;cursor:pointer;transition:all .15s}
+.tab.active{background:var(--bg);color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 
-/* body */
 .body{flex:1;overflow:hidden;position:relative;margin-top:8px}
 .pane{position:absolute;inset:0;overflow-y:auto;padding:0 16px 10px;opacity:0;pointer-events:none;transition:opacity .15s}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{width:0}
 
-/* ── TODAY ── */
-
-/* status hero */
+/* hero */
 .hero{padding:10px 0 10px;border-bottom:1px solid var(--line);margin-bottom:12px}
-.hero-date{
-  /* 日期：灰色輔助 */
-  font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);
-  letter-spacing:.04em;margin-bottom:4px;
-}
-.hero-title{
-  /* 狀態：黑色、大、主角 */
-  font-size:17px;font-weight:500;line-height:1.25;margin-bottom:3px;
-}
+.hero-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);letter-spacing:.04em;margin-bottom:4px}
+.hero-title{font-size:17px;font-weight:500;line-height:1.25;margin-bottom:3px}
 .hero-title.full{color:var(--red)}
-.hero-sub{
-  /* 說明：灰色輔助 */
-  font-size:12px;color:var(--gray);line-height:1.5;
-}
-/* 已滿 pill */
+.hero-sub{font-size:12px;color:var(--gray);line-height:1.5}
 .sold-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-.sold-pill{
-  font-family:'DM Mono',monospace;font-size:10px;
-  color:var(--red);background:var(--red-bg);
-  border:1px solid rgba(217,79,79,.2);
-  padding:2px 7px;border-radius:4px;
-}
+.sold-pill{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);background:var(--red-bg);border:1px solid rgba(217,79,79,.2);padding:2px 7px;border-radius:4px}
 
-/* slot list */
-.list-label{
-  font-family:'DM Mono',monospace;font-size:10px;
-  color:var(--gray2);letter-spacing:.07em;margin-bottom:6px;
-}
+.list-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.07em;margin-bottom:6px}
 .slot-list{display:flex;flex-direction:column;gap:4px}
-.slot-row{
-  display:flex;align-items:center;gap:12px;
-  padding:8px 12px;border-radius:8px;border:1px solid var(--line);
-  cursor:pointer;transition:background .12s;
-}
+.slot-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer;transition:background .12s}
 .slot-row:active{background:var(--bg2)}
-/* 時間：最重要，黑色大字 */
 .slot-time{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--black);width:48px;flex-shrink:0}
-/* 師傅名：黑色，正常大小 */
 .slot-staff{font-size:12px;color:var(--black);flex:1}
-/* 時長：灰色輔助 */
 .slot-dur{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px}
 .slot-dur.d120{color:var(--d120);background:var(--d120-bg);border:1px solid rgba(196,133,122,.25)}
 .slot-dur.d90{color:var(--d90);background:var(--d90-bg);border:1px solid rgba(168,144,110,.25)}
 .slot-dur.d60{color:var(--d60);background:var(--d60-bg);border:1px solid rgba(212,168,130,.25)}
 
-/* 全滿 next card */
-.next-card{
-  padding:10px 12px;border-radius:8px;border:1px solid var(--line);
-  cursor:pointer;transition:background .12s;
-}
+.next-card{padding:10px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer;transition:background .12s}
 .next-card:active{background:var(--bg2)}
 .next-eyebrow{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);margin-bottom:5px}
-.next-time-row{display:flex;align-items:baseline;gap:12px}
-/* 最早時間：黑色大字 */
+.next-time-row{display:flex;align-items:baseline;gap:10px}
 .next-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black)}
 .next-staff{font-size:12px;color:var(--black)}
 .next-dur{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-top:5px;display:inline-block}
@@ -120,55 +71,26 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
 .next-dur.d90{color:var(--d90);background:var(--d90-bg);border:1px solid rgba(168,144,110,.25)}
 .next-dur.d60{color:var(--d60);background:var(--d60-bg);border:1px solid rgba(212,168,130,.25)}
 
-/* ── STAFF ── */
-.staff-tabs-wrap{
-  overflow-x:auto;padding:8px 16px 0;display:flex;gap:5px;
-  -ms-overflow-style:none;scrollbar-width:none;
-}
+/* staff */
+.staff-tabs-wrap{overflow-x:auto;padding:8px 16px 0;display:flex;gap:5px;-ms-overflow-style:none;scrollbar-width:none}
 .staff-tabs-wrap::-webkit-scrollbar{display:none}
-.stab{
-  flex-shrink:0;padding:4px 11px;border-radius:20px;
-  border:1px solid var(--line);background:transparent;
-  font-family:'Noto Sans TC',sans-serif;font-size:11px;
-  color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;
-}
+.stab{flex-shrink:0;padding:4px 11px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap}
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
 
 .staff-panel{padding:10px 16px 12px;overflow-y:auto;flex:1}
 .staff-panel::-webkit-scrollbar{width:0}
 
-/* 狀態一行 */
-.sp-status{
-  font-size:12px;line-height:1.55;
-  margin-bottom:10px;padding-bottom:10px;
-  border-bottom:1px solid var(--line);
-}
+.sp-status{font-size:12px;line-height:1.55;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .sp-status .ok{color:var(--black);font-weight:500}
 .sp-status .na{color:var(--red);font-weight:500}
-
 .sp-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.07em;margin-bottom:6px}
-
-/* 日期行 */
 .sp-date-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:6px}
-/* 日期：黑色，重要 */
 .sp-date{font-size:15px;font-weight:500;color:var(--black)}
-/* 星期幾：灰色輔助 */
 .sp-wd{font-size:11px;color:var(--gray)}
-/* 幾天後 badge */
-.sp-badge{
-  font-family:'DM Mono',monospace;font-size:10px;
-  background:var(--black);color:#fff;
-  padding:2px 9px;border-radius:4px;letter-spacing:.03em;
-}
+.sp-badge{font-family:'DM Mono',monospace;font-size:10px;background:var(--black);color:#fff;padding:2px 7px;border-radius:4px;letter-spacing:.03em}
 .sp-badge.today{background:var(--bg2);color:var(--gray);border:1px solid var(--line)}
-/* 今日已滿 badge */
 .sp-badge.full{background:var(--red-bg);color:var(--red);border:1px solid rgba(217,79,79,.2)}
-
-/* 時間卡 */
-.sp-time-card{
-  padding:10px 12px;border-radius:8px;border:1px solid var(--line);
-  cursor:pointer;transition:background .12s;
-}
+.sp-time-card{padding:10px 12px;border-radius:8px;border:1px solid var(--line);cursor:pointer;transition:background .12s}
 .sp-time-card:active{background:var(--bg2)}
 .sp-big-time{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--black);line-height:1}
 .sp-dur{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;margin-top:6px;display:inline-block}
@@ -176,68 +98,59 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
 .sp-dur.d90{color:var(--d90);background:var(--d90-bg);border:1px solid rgba(168,144,110,.25)}
 .sp-dur.d60{color:var(--d60);background:var(--d60-bg);border:1px solid rgba(212,168,130,.25)}
 
-/* scan */
-.scanning{display:flex;align-items:center;gap:8px;padding:12px 0}
-.sc-t{flex:1;height:1px;background:var(--line);overflow:hidden}
-.sc-t::after{content:'';display:block;height:100%;width:28%;background:var(--gray2);animation:sc .9s ease-in-out infinite}
-@keyframes sc{0%{transform:translateX(-200%)}100%{transform:translateX(500%)}}
-.sc-l{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.06em;white-space:nowrap}
+/* ── 載入動畫 ── */
+.scanning{
+  display:flex;flex-direction:column;align-items:center;
+  padding:28px 0 20px;gap:16px;
+}
+.scan-avatar{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--bg2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  animation:bob 1.8s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.scan-msg{
+  font-size:13px;color:var(--black);font-weight:500;
+  text-align:center;line-height:1.5;
+  animation:fadein .3s ease;
+}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.scan-sub{
+  font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);
+  letter-spacing:.05em;text-align:center;
+}
+.prog-track{width:80%;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.prog-bar{height:100%;width:0%;background:var(--black);border-radius:2px;transition:width 2s cubic-bezier(.4,0,.2,1)}
 
-/* note */
-.note{font-size:11px;color:var(--gray2);margin-top:18px;line-height:1.8}
+.note{font-size:10px;color:var(--gray2);margin-top:10px;line-height:1.7}
 
 /* footer */
-.footer{
-  flex-shrink:0;padding:6px 16px max(6px,env(safe-area-inset-bottom));
-  border-top:1px solid var(--line);
-  display:flex;align-items:center;justify-content:space-between;
-}
+.footer{flex-shrink:0;padding:6px 16px max(6px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#fff}
 .ft-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2)}
-.ft-disclaimer{
-  font-family:'DM Mono',monospace;font-size:10px;color:var(--red);
-  cursor:pointer;text-decoration:underline;text-underline-offset:3px;
-}
+.ft-disclaimer{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
-/* ── Alert sheet ── */
-.mask{
-  position:fixed;inset:0;background:rgba(0,0,0,.22);
-  display:flex;align-items:flex-end;justify-content:center;
-  z-index:100;opacity:0;pointer-events:none;transition:opacity .18s;
-}
+/* alert */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
 .mask.show{opacity:1;pointer-events:all}
-.sheet{
-  width:100%;max-width:480px;background:var(--bg);
-  border-radius:14px 14px 0 0;
-  padding:24px 24px max(22px,env(safe-area-inset-bottom));
-  transform:translateY(14px);transition:transform .2s;
-  border-top:3px solid var(--red);
-}
+.sheet{width:100%;max-width:480px;background:#fff;border-radius:14px 14px 0 0;padding:24px 24px max(22px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;border-top:3px solid var(--red)}
 .mask.show .sheet{transform:translateY(0)}
-.sheet-tag{
-  font-family:'DM Mono',monospace;font-size:10px;
-  color:var(--red);letter-spacing:.09em;margin-bottom:12px;
-}
-.sheet-title{font-size:16px;font-weight:500;line-height:1.5;margin-bottom:10px;color:var(--black)}
-.sheet-body{font-size:13px;color:var(--gray);line-height:1.85;margin-bottom:22px}
+.sheet-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:.09em;margin-bottom:12px}
+.sheet-title{font-size:16px;font-weight:500;line-height:1.5;margin-bottom:4px;color:var(--black)}
+.sheet-body{font-size:13px;color:var(--gray);line-height:1.85;margin-bottom:16px}
 .sheet-body b{color:var(--black);font-weight:500}
-.sheet-btn{
-  width:100%;padding:13px;border-radius:9px;
-  background:var(--black);color:#fff;
-  font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;
-  border:none;cursor:pointer;transition:opacity .13s;
-}
+.sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--black);color:#fff;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer}
 .sheet-btn:active{opacity:.8}
-.sheet-close{
-  display:block;text-align:center;margin-top:12px;
-  font-size:12px;color:var(--gray2);cursor:pointer;padding:4px;
-}
+.sheet-close{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--gray2);cursor:pointer;padding:4px}
 </style>
 </head>
 <body>
+
+<div id="db" style="position:fixed;top:0;left:0;right:0;z-index:9999;font-family:monospace;font-size:11px;padding:5px 10px;background:#fff3cd;color:#333;border-bottom:2px solid #ffc107">載入中...</div>
+
 <div class="app">
-
   <div class="handle"><div class="handle-bar"></div></div>
-
   <div class="hd">
     <div class="hd-top">
       <div class="hd-name">小泰空位查詢機器人</div>
@@ -245,10 +158,9 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
     </div>
     <div class="tabs">
       <button class="tab active" onclick="switchTab('today',this)">今日 / 最早時段</button>
-      <button class="tab" onclick="switchTab('staff',this)">指定師傅</button>
+      <button class="tab" onclick="switchTab('staff',this)">指定老師</button>
     </div>
   </div>
-
   <div class="body">
     <div class="pane active" id="pane-today">
       <div id="today-content"></div>
@@ -258,20 +170,19 @@ html,body{height:100%;overflow:hidden;background:#fff!important;color:#111;font-
       <div class="staff-panel" id="staff-panel"></div>
     </div>
   </div>
-
   <div class="footer">
     <div class="ft-note">AI 抓取 · 非預約系統</div>
     <div class="ft-disclaimer" onclick="showAlert()">免責聲明</div>
   </div>
 </div>
 
-<!-- Alert -->
 <div class="mask" id="alert" onclick="handleMask(event)">
   <div class="sheet">
     <div class="sheet-tag">DISCLAIMER</div>
-    <div class="sheet-title">無法從本查詢機器人新增預約</div><div style="font-size:12px;color:var(--gray);margin:-6px 0 10px;line-height:1.6">本系統與預約系統並不互相連動</div>
+    <div class="sheet-title">本機器人無法直接新增預約</div>
     <div class="sheet-body">
-      小泰空小編為解決客立樂查詢介面不便而開發此工具。資料由 AI 即時抓取，<b>僅供參考</b>，實際空位及預約請前往預約系統。
+      此工具由小泰空小編開發，AI 即時抓取空位資訊供參考。<br><br>
+      看到合適時段後，請<b>記下時段與老師</b>，點下方按鈕前往預約系統完成預約。
     </div>
     <button class="sheet-btn" onclick="goBooking()">前往預約系統</button>
     <span class="sheet-close" onclick="closeAlert()">關閉</span>
@@ -284,6 +195,7 @@ const STAFF=[
   {name:'鍛 Duan'},{name:'書 Shu'},{name:'柏 Bo'},{name:'獺 Ta'}
 ];
 let activeStaff=0;
+let scanTimer=null;
 
 // ── 日期工具 ──
 function parseDate(str){
@@ -294,69 +206,24 @@ function parseDate(str){
 }
 function daysFromNow(d){const t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000)}
 function wd(d){return['日','一','二','三','四','五','六'][d.getDay()]}
+function daysLabel(d){
+  if(d===0) return '今天';
+  if(d===1) return '明天';
+  if(d===2) return '後天';
+  return d+'天後';
+}
 function dateMeta(str,todayFull){
-  const d=parseDate(str);
-  const days=daysFromNow(d);
+  const d=parseDate(str);const days=daysFromNow(d);
   let badge;
-  if(days===0){
-    badge=`<span class="sp-badge today">今天</span>`;
-  } else if(todayFull){
-    badge=`<span class="sp-badge full">今日已滿</span><span class="sp-badge" style="margin-left:4px">${days}天後</span>`;
-  } else {
-    badge=`<span class="sp-badge">${days}天後</span>`;
-  }
+  if(days===0) badge=`<span class="sp-badge today">今天</span>`;
+  else if(todayFull) badge=`<span class="sp-badge full">今日已滿</span><span class="sp-badge" style="margin-left:4px">${daysLabel(days)}</span>`;
+  else badge=`<span class="sp-badge">${daysLabel(days)}</span>`;
   return{days,wd:wd(d),badge,label:days===0?`今日（${str}）`:str};
 }
 function todayFullStr(){
   const n=new Date();
   return`${n.getMonth()+1}月${n.getDate()}日　星期${wd(n)}`;
 }
-
-// ── Alert ──
-function showAlert(){document.getElementById('alert').classList.add('show')}
-function closeAlert(){document.getElementById('alert').classList.remove('show')}
-function handleMask(e){if(e.target.id==='alert')closeAlert()}
-
-// ── Tabs ──
-function switchTab(id,btn){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById('pane-'+id).classList.add('active');
-}
-
-// ── API ──
-function callGAS(fn,...args){
-  return new Promise((res,rej)=>{
-    if(typeof google!=='undefined'&&google.script){
-      google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args);
-    }else setTimeout(()=>res(mock(fn,...args)),700);
-  });
-}
-function mock(fn,arg){
-  if(fn==='getTodaySlotsData') return {
-    hasToday:true,todayLabel:'3月26日',soldOut:['120min'],
-    slots:[
-      {date:'3月26日',time:'14:00',staff:'澈 Che',duration:'90min'},
-      {date:'3月26日',time:'14:30',staff:'令 Ling',duration:'90min'},
-      {date:'3月26日',time:'15:00',staff:'鍛 Duan',duration:'60min'}
-    ]
-  };
-  if(fn==='getStaffSlotsData'){
-    const m={
-      '令 Ling':{todayFull:true,date:'4月3日',time:'11:00',duration:'120min'},
-      '曜 Yao':{todayFull:false,date:'3月26日',time:'16:30',duration:'120min'},
-      '澈 Che':{todayFull:false,date:'3月26日',time:'14:00',duration:'120min'},
-      '源 Yuan':{todayFull:false,date:'3月26日',time:'17:00',duration:'120min'},
-      '鍛 Duan':{todayFull:false,date:'3月26日',time:'15:30',duration:'120min'},
-      '書 Shu':{todayFull:true,date:'3月28日',time:'13:00',duration:'120min'},
-      '柏 Bo':{todayFull:true,date:'3月29日',time:'10:30',duration:'120min'},
-      '獺 Ta':{todayFull:true,date:'4月1日',time:'14:00',duration:'120min'}
-    };
-    return m[arg]||{todayFull:true,date:'暫無',time:'--:--',duration:'120min'};
-  }
-}
-
 function durClass(dur){
   if(!dur) return '';
   if(dur.includes('120')) return 'd120';
@@ -371,35 +238,121 @@ function durLabel(dur){
   if(dur.includes('60'))  return '泰空輕行 60min';
   return dur;
 }
-function scanHTML(){
-  return`<div class="scanning"><div class="sc-t"></div><div class="sc-l">查詢中</div><div class="sc-t"></div></div>`;
+
+const GAS_URL='https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec';
+
+function dbg(msg){const el=document.getElementById('db');if(el){el.style.display='block';el.textContent=msg;}}
+function dbgHide(){const el=document.getElementById('db');if(el)el.style.display='none';}
+
+function showAlert(){document.getElementById('alert').classList.add('show')}
+function closeAlert(){document.getElementById('alert').classList.remove('show')}
+function handleMask(e){if(e.target.id==='alert')closeAlert()}
+function goBooking(){
+  const url='https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu';
+  closeAlert();
+  if(typeof liff!=='undefined'&&liff.isInClient()){
+    liff.openWindow({url,external:false});
+  }else{location.href=url;}
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+}
+
+function callGAS(fn,...args){
+  return new Promise((res,rej)=>{
+    let url=GAS_URL;
+    if(fn==='getTodaySlotsData') url+='?action=today';
+    else if(fn==='getStaffSlotsData') url+=`?action=staff&staff=${encodeURIComponent(args[0])}`;
+    else if(fn==='ping') url+='?action=ping';
+    fetch(url)
+      .then(r=>r.json())
+      .then(data=>{if(data&&data.error)rej(new Error(data.error));else res(data);})
+      .catch(rej);
+  });
+}
+
+// ── 載入動畫 ──
+const TODAY_MSGS=[
+  {msg:'正在掃描今日空位…',sub:'連線中，請稍候 🔍'},
+  {msg:'比對所有老師時段中…',sub:'快好了，再等一下 ✨'},
+  {msg:'整理最新資料…',sub:'馬上就來 📋'},
+  {msg:'即將顯示結果…',sub:'感謝耐心等待 🙏'},
+];
+const STAFF_MSGS=[
+  {msg:'查詢老師時段中…',sub:'即時連線預約系統 🔍'},
+  {msg:'比對可預約時間…',sub:'快好了 ✨'},
+  {msg:'即將顯示結果…',sub:'感謝耐心等待 🙏'},
+];
+
+function scanHTML(msgs){
+  const id='sr'+Date.now();
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    const msgEl=el.querySelector('.scan-msg');
+    const subEl=el.querySelector('.scan-sub');
+    const bar=el.querySelector('.prog-bar');
+    let step=0;
+    msgEl.textContent=msgs[0].msg;
+    subEl.textContent=msgs[0].sub;
+    bar.getBoundingClientRect();
+    bar.style.width='15%';
+    if(scanTimer) clearInterval(scanTimer);
+    scanTimer=setInterval(()=>{
+      step=Math.min(step+1,msgs.length-1);
+      const pct=15+((step/(msgs.length-1))*70);
+      bar.style.width=pct+'%';
+      // fade message
+      msgEl.style.opacity='0';
+      subEl.style.opacity='0';
+      setTimeout(()=>{
+        msgEl.textContent=msgs[step].msg;
+        subEl.textContent=msgs[step].sub;
+        msgEl.style.opacity='1';
+        subEl.style.opacity='1';
+      },200);
+    },2200);
+  },80);
+  return`<div class="scanning" id="${id}">
+    <div class="scan-avatar">🤖</div>
+    <div>
+      <div class="scan-msg" style="transition:opacity .2s"></div>
+      <div class="scan-sub" style="margin-top:4px;transition:opacity .2s"></div>
+    </div>
+    <div class="prog-track"><div class="prog-bar"></div></div>
+  </div>`;
+}
+function stopScan(){
+  if(scanTimer){clearInterval(scanTimer);scanTimer=null;}
+  document.querySelectorAll('.prog-bar').forEach(b=>{b.style.transition='width .3s ease';b.style.width='100%';});
 }
 
 // ── 今日時段 ──
 async function loadToday(){
   const el=document.getElementById('today-content');
-  el.innerHTML=scanHTML();
+  el.innerHTML=scanHTML(TODAY_MSGS);
   let d;
   try{d=await callGAS('getTodaySlotsData');}
-  catch(e){
-    el.innerHTML=`<div class="hero"><div class="hero-title">無法取得資料</div><div class="hero-sub">請稍後再試</div></div>`;
-    return;
-  }
+  catch(e){stopScan();el.innerHTML=`<div style="padding:16px 0;font-size:12px;color:#D94F4F">❌ 無法取得資料，請重新整理</div>`;return;}
+  stopScan();
+  if(!d){el.innerHTML=`<div style="padding:16px 0;font-size:12px;color:var(--gray)">近期暫無可用時段</div>`;return;}
 
-  // 全滿
   if(!d.hasToday){
     const s=d.slots&&d.slots[0];
-    const{label,wd:w,badge}=s?dateMeta(s.date,true):{label:'',wd:'',badge:''};
+    const meta=s?dateMeta(s.date,true):{label:'',wd:'',badge:''};
     el.innerHTML=`
       <div class="hero">
         <div class="hero-date">${todayFullStr()}</div>
-        <div class="hero-title full">今日已全滿 🈵</div>
+        <div class="hero-title full">今日已全滿</div>
         <div class="hero-sub">所有時段均已預約</div>
       </div>
-      ${s?`
-      <div class="list-label">最早可預約</div>
+      ${s?`<div class="list-label">最早可預約</div>
       <div class="next-card" onclick="showAlert()">
-        <div class="next-eyebrow">${label}　星期${w}　${badge}</div>
+        <div class="next-eyebrow">${meta.label}　星期${meta.wd}　${meta.badge}</div>
         <div class="next-time-row">
           <div class="next-time">${s.time}</div>
           <div class="next-staff">${s.staff!=='─'?s.staff:''}</div>
@@ -410,12 +363,10 @@ async function loadToday(){
     return;
   }
 
-  // 有空位
   const avail=['120min','90min','60min'].filter(x=>!(d.soldOut||[]).includes(x));
   const soldDesc=(d.soldOut||[]).length?`${d.soldOut.map(durLabel).join('、')} 已滿。`:'';
   const sub=`${soldDesc}${avail.map(durLabel).join('、')} 仍可預約。`;
   const soldPills=(d.soldOut||[]).map(x=>`<span class="sold-pill">${durLabel(x)} 已滿</span>`).join('');
-
   const rows=(d.slots||[]).map(s=>`
     <div class="slot-row" onclick="showAlert()">
       <div class="slot-time">${s.time}</div>
@@ -448,7 +399,7 @@ function buildStaffTabs(){
   });
 }
 function selectStaff(i,btn){
-  if(activeStaff===i)return;
+  if(activeStaff===i) return;
   activeStaff=i;
   document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -459,16 +410,15 @@ function selectStaff(i,btn){
 // ── 師傅結果 ──
 async function loadStaff(name){
   const el=document.getElementById('staff-panel');
-  el.innerHTML=scanHTML();
+  el.innerHTML=scanHTML(STAFF_MSGS);
   let d;
   try{d=await callGAS('getStaffSlotsData',name);}
-  catch(e){el.innerHTML=`<div class="sp-status">無法取得資料</div>`;return;}
+  catch(e){stopScan();el.innerHTML=`<div style="padding:16px 0;font-size:12px;color:#D94F4F">❌ 無法取得資料</div>`;return;}
+  stopScan();
 
   const{label,wd:w,badge}=dateMeta(d.date,d.todayFull);
   const n=new Date();
-  const todayWd=['日','一','二','三','四','五','六'][n.getDay()];
-  const todayStr=`${n.getMonth()+1}月${n.getDate()}日 星期${todayWd}`;
-
+  const todayStr=`${n.getMonth()+1}月${n.getDate()}日 星期${wd(n)}`;
   const statusHTML=d.todayFull
     ?`今日（${todayStr}）<span class="na">已全滿</span>，以下為最早可約時段`
     :`今日（${todayStr}）<span class="ok">有空位</span>，以下為最早可約時段`;
@@ -488,21 +438,29 @@ async function loadStaff(name){
     <div class="note">AI 即時抓取。本系統與預約系統不連動，實際以預約系統為準。</div>`;
 }
 
-// ── 前往預約系統 ──
-function goBooking(){
-  const url='https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu';
-  closeAlert();
-  if(typeof liff!=='undefined'&&liff.isInClient()){
-    liff.openWindow({url,external:false});
-  } else {
-    location.href=url;
-  }
-}
-
 // ── 初始化 ──
-loadToday();
-buildStaffTabs();
-loadStaff(STAFF[0].name);
+function initApp(){
+  dbg('連線中...');
+  if(typeof liff!=='undefined'){
+    liff.init({liffId:'2009610906-9zraEtAy'})
+      .then(()=>dbg('LIFF OK'))
+      .catch(e=>dbg('LIFF skip: '+e.message));
+  }
+  fetch(GAS_URL+'?action=ping')
+    .then(r=>r.json())
+    .then(()=>{
+      dbgHide();
+      loadToday();
+      buildStaffTabs();
+      loadStaff(STAFF[0].name);
+    })
+    .catch(e=>{
+      dbg('連線失敗: '+e.message);
+      document.getElementById('today-content').innerHTML=
+        `<div style="padding:16px 0;font-size:12px;color:#D94F4F">❌ 伺服器連線失敗，請重新整理</div>`;
+    });
+}
+initApp();
 </script>
 </body>
 </html>
