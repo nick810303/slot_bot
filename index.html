@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>空位查詢 v2</title>
+<title>空位查詢</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -20,35 +20,44 @@
 html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC',sans-serif;color:var(--black)}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
 
-.handle{flex-shrink:0;padding:6px 0 0;display:flex;justify-content:center}
+/* ── handle ── */
+.handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
 
-.hd{flex-shrink:0;padding:8px 16px 0}
-.hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.hd-name{font-size:12px;color:var(--gray)}
+/* ── header ── */
+.hd{flex-shrink:0;padding:5px 14px 0}
+.hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.hd-name{font-size:11px;color:var(--gray)}
 .hd-live{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
 
-.tabs{display:flex;background:var(--bg2);border-radius:8px;padding:2px;gap:2px}
-.tab{flex:1;padding:6px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:6px;cursor:pointer;transition:all .15s}
+/* ── tab bar ── */
+.tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px}
+.tab{flex:1;padding:5px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
 .tab.active{background:#fff;color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 
-/* ── filter: no label, 3 pills fill full row ── */
+/* ── filter rows wrapper ── */
+.filters{flex-shrink:0;border-bottom:1px solid #ebebeb;background:var(--bg3)}
+
+/* duration filter row */
 .filter-bar{
-  flex-shrink:0;
-  padding:7px 14px 8px;
-  border-bottom:1px solid #ebebeb;
-  background:var(--bg3);
-  display:flex;
-  gap:6px;
+  display:flex;gap:5px;
+  padding:5px 14px 5px;
 }
-.filter-pill{
-  flex:1;                       /* equal width, fill row */
-  display:flex;align-items:center;justify-content:center;
+/* branch filter row — hidden until v3, keeps space reserved */
+.branch-bar{
+  display:none;   /* → change to flex when ready */
   gap:5px;
-  padding:5px 0;
-  border-radius:6px;
+  padding:0 14px 5px;
+}
+
+.filter-pill{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;
+  padding:4px 0;
+  border-radius:5px;
   border:1.5px solid #e0e0e0;
   background:#fff;
   cursor:pointer;
@@ -57,7 +66,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .filter-pill.on-120{border-color:var(--d120);background:var(--d120-bg)}
 .filter-pill.on-90 {border-color:var(--d90); background:var(--d90-bg)}
 .filter-pill.on-60 {border-color:var(--d60); background:var(--d60-bg)}
-.pill-box{width:12px;height:12px;border-radius:3px;border:1.5px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.pill-box{width:11px;height:11px;border-radius:2px;border:1.5px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
 .filter-pill.on-120 .pill-box{border-color:var(--d120);background:var(--d120)}
 .filter-pill.on-90  .pill-box{border-color:var(--d90); background:var(--d90)}
 .filter-pill.on-60  .pill-box{border-color:var(--d60); background:var(--d60)}
@@ -65,32 +74,33 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .filter-pill.on-120 .pill-check,
 .filter-pill.on-90  .pill-check,
 .filter-pill.on-60  .pill-check{display:block}
-.pill-text{font-family:'DM Mono',monospace;font-size:10.5px;color:#aaa;line-height:1;white-space:nowrap;transition:color .15s}
+.pill-text{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;line-height:1;white-space:nowrap;transition:color .15s}
 .filter-pill.on-120 .pill-text{color:var(--d120);font-weight:500}
 .filter-pill.on-90  .pill-text{color:var(--d90); font-weight:500}
 .filter-pill.on-60  .pill-text{color:var(--d60); font-weight:500}
 
-/* body */
+/* ── body ── */
 .body{flex:1;overflow:hidden;position:relative}
-.pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:10px}
+.pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:6px}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{display:none}
 
-/* status bar — larger text */
-.status-bar{display:flex;align-items:center;gap:7px;padding:9px 16px 8px}
+/* ── status bar ── */
+.status-bar{display:flex;align-items:center;gap:6px;padding:6px 14px 4px}
 .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.status-text{font-size:14px;font-weight:500;line-height:1.4}
+.status-text{font-size:13px;font-weight:500;line-height:1.3}
 
-.sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 16px 7px}
+/* sec label merged tighter */
+.sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
 
-/* card row */
-.card-row{display:flex;gap:7px;padding:0 14px}
+/* ── card row ── */
+.card-row{display:flex;gap:6px;padding:0 12px}
 
 /* ── cards ── */
 .card{flex:1 1 0;min-width:0;cursor:pointer}
 .card-inner{
-  height:168px;
-  background:#f5f5f5;          /* default grey */
+  height:148px;               /* ↓ from 168 */
+  background:#f5f5f5;
   border:1px solid #e2e2e2;
   border-radius:8px;
   overflow:hidden;
@@ -100,55 +110,45 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 }
 .card-inner:active{background:#ececec}
 
-/* ── teacher banner — top strip ── */
+/* teacher banner */
 .card-teacher-banner{
   flex-shrink:0;
-  padding:5px 8px 5px 8px;
+  padding:4px 7px;
   display:flex;align-items:center;justify-content:space-between;
-  /* background assigned per-card via inline style */
 }
-.card-teacher-name{
-  font-size:12px;font-weight:500;
-  color:#fff;
-  letter-spacing:.02em;
-  line-height:1;
-}
-.card-rank{
-  font-family:'DM Mono',monospace;font-size:9px;
-  color:rgba(255,255,255,.65);
-  letter-spacing:.03em;
-}
+.card-teacher-name{font-size:11px;font-weight:500;color:#fff;letter-spacing:.02em;line-height:1}
+.card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
 
-/* ── card body (below banner) ── */
+/* card body */
 .card-body{
   flex:1;
-  padding:7px 8px 7px;
+  padding:5px 7px 5px;
   display:flex;flex-direction:column;
   background:#f5f5f5;
 }
 
-.card-near-row{display:flex;align-items:center;gap:4px;margin-bottom:1px;flex-shrink:0}
-.near-badge{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;padding:1px 6px;border-radius:3px;line-height:1.6}
+.card-near-row{display:flex;align-items:center;gap:3px;margin-bottom:1px;flex-shrink:0}
+.near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;line-height:1.5}
 .near-badge.today{background:var(--black);color:#fff}
 .near-badge.other{background:#e0e0e0;color:#444}
-.full-badge{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;line-height:1.6;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
+.full-badge{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
 
-.card-date-row{display:flex;align-items:baseline;gap:4px;margin-bottom:4px;flex-shrink:0}
-.card-mmdd{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#333}
-.card-wd{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray)}
+.card-date-row{display:flex;align-items:baseline;gap:3px;margin-bottom:3px;flex-shrink:0}
+.card-mmdd{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#333}
+.card-wd{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray)}
 
-.card-time{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:1;margin-bottom:5px;flex-shrink:0}
+.card-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:1;margin-bottom:4px;flex-shrink:0}
 
-.card-div{height:1px;background:#e0e0e0;flex-shrink:0;margin-bottom:5px}
+.card-div{height:1px;background:#e0e0e0;flex-shrink:0;margin-bottom:4px}
 
 .card-durs{display:flex;flex-wrap:wrap;gap:3px;flex:1;align-content:flex-start;overflow:hidden}
-.dur-pill{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:1.5px 5px;border-radius:3px;line-height:1.5;white-space:nowrap;display:inline-block}
+.dur-pill{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;white-space:nowrap;display:inline-block}
 .dur-pill.d120{color:var(--d120);background:rgba(196,133,122,.13);border:1px solid var(--d120-bdr)}
 .dur-pill.d90 {color:var(--d90); background:rgba(168,144,110,.13);border:1px solid var(--d90-bdr)}
 .dur-pill.d60 {color:var(--d60); background:rgba(212,168,130,.13);border:1px solid var(--d60-bdr)}
 
 .card-empty{flex:1 1 0;min-width:0}
-.card-empty-inner{height:168px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.card-empty-inner{height:148px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .card-empty-line{width:14px;height:1px;background:#e8e8e8}
 
 @keyframes flipin{from{opacity:0;transform:perspective(500px) rotateY(-70deg)}to{opacity:1;transform:perspective(500px) rotateY(0deg)}}
@@ -156,14 +156,16 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .flip-2{animation:flipin .4s cubic-bezier(.4,0,.2,1) .11s both}
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
 
-.note{font-size:10px;color:var(--gray2);padding:10px 14px 0;line-height:1.7}
+.note{font-size:10px;color:var(--gray2);padding:6px 14px 0;line-height:1.6}
 
-.stab-wrap{display:flex;gap:5px;padding:8px 16px 10px;overflow-x:auto;scrollbar-width:none}
+/* ── staff tabs ── */
+.stab-wrap{display:flex;gap:5px;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
 .stab-wrap::-webkit-scrollbar{display:none}
-.stab{flex-shrink:0;padding:4px 11px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap}
+.stab{flex-shrink:0;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap}
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
 
-.footer{flex-shrink:0;padding:6px 16px max(6px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#fff}
+/* ── footer ── */
+.footer{flex-shrink:0;padding:4px 14px max(4px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#fff}
 .ft-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2)}
 .ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
@@ -206,7 +208,8 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     </div>
   </div>
 
-  <div class="filter-bar">
+  <div class="filters">
+    <div class="filter-bar">
     <button class="filter-pill on-120" id="pill-120" onclick="toggleDur(120)">
       <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <span class="pill-text">120min 泰空經典</span>
@@ -219,7 +222,10 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
       <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <span class="pill-text">60min 泰空輕行</span>
     </button>
-  </div>
+    </div><!-- /filter-bar -->
+    <!-- 分店 filter v3：把 branch-bar 的 display:none 改 flex 即可 -->
+    <div class="branch-bar" id="branch-bar"></div>
+  </div><!-- /filters -->
 
   <div class="body">
     <div class="pane active" id="pane-today">
