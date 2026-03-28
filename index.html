@@ -151,6 +151,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .card-empty-inner{height:148px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .card-empty-line{width:14px;height:1px;background:#e8e8e8}
 
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes flipin{from{opacity:0;transform:perspective(500px) rotateY(-70deg)}to{opacity:1;transform:perspective(500px) rotateY(0deg)}}
 .flip-1{animation:flipin .4s cubic-bezier(.4,0,.2,1) both}
 .flip-2{animation:flipin .4s cubic-bezier(.4,0,.2,1) .11s both}
@@ -289,7 +290,8 @@ const STAFF_LIST = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Sh
 // ── 狀態 ──────────────────────────────────────────────────────
 let selectedDurs = [60, 90, 120];
 let activeStaff  = '令 Ling';
-let currentSlots = [];
+let currentTab   = 'today';
+const tabSlots   = { today: [], staff: [] };
 
 // 快取：避免切 tab 重複打 API
 const cache = { today: null, staff: {} };
@@ -326,7 +328,7 @@ function showScanning(rowId, statusId) {
   document.getElementById(statusId).innerHTML = '';
   document.getElementById(rowId).innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;gap:12px;width:100%">
-      <div style="font-size:20px;animation:bob 1.8s ease-in-out infinite">🤖</div>
+      <div style="width:48px;height:48px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:20px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
       <div id="smsg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_MSGS[0]}</div>
       <div style="width:70%;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
         <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 2s cubic-bezier(.4,0,.2,1)"></div>
@@ -363,6 +365,7 @@ function toggleDur(d) {
 
 // ── Tab 切換 ──────────────────────────────────────────────────
 function switchTab(id, btn) {
+  currentTab = id;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
@@ -456,22 +459,33 @@ async function loadToday() {
 }
 
 function renderTodayFromData(data) {
-  // GAS 已回傳所有時段，前端根據目前 selectedDurs 再 filter
-  const tk = todayKey();
-  const filtered = (data.slots || [])
+  // GAS 回傳所有老師的所有時段（已按日期+時間排序）
+  // 1. 依 selectedDurs 過濾（每筆至少要有一個選中的時長）
+  // 2. 每位老師只取最早符合的那一筆（因為不同 filter 組合下「最早」會不同）
+  // 3. 結果再排序，取 top3 不同老師
+  const allSlots = (data.slots || [])
     .map(s => ({ ...s, durations: s.durations.filter(d => selectedDurs.includes(d)) }))
     .filter(s => s.durations.length > 0);
 
-  const status = computeTodayStatus(filtered);
+  // 每位老師取最早一筆（allSlots 已按時間排序，第一次出現即最早）
+  const seenTeachers = new Set();
+  const earliestPerTeacher = allSlots.filter(s => {
+    if (seenTeachers.has(s.teacher)) return false;
+    seenTeachers.add(s.teacher);
+    return true;
+  });
+
+  // 再排序（因為不同老師的最早符合時段順序可能不同）
+  earliestPerTeacher.sort((a, b) => {
+    if (a.dateKey !== b.dateKey) return a.dateKey < b.dateKey ? -1 : 1;
+    return a.time < b.time ? -1 : 1;
+  });
+
+  const status = computeTodayStatus(earliestPerTeacher);
   renderStatus('status-today', status.text, status.color);
 
-  // 取 3 位不同老師
-  const seen = new Set();
-  const top3 = filtered.filter(s => {
-    if(seen.has(s.teacher)) return false; seen.add(s.teacher); return true;
-  }).slice(0,3);
-
-  currentSlots = top3;
+  const top3 = earliestPerTeacher.slice(0, 3);
+  tabSlots.today = top3;
   paintCards('cards-today', top3);
 }
 
@@ -504,15 +518,16 @@ function renderStaffFromData(data) {
   const status = computeStaffStatus(filtered);
   renderStatus('status-staff', status.text, status.color);
 
-  currentSlots = filtered;
+  tabSlots.staff = filtered;
   paintCards('cards-staff', filtered);
 }
 
 // ── Bottom sheet ──────────────────────────────────────────────
 function openSheet(slotIndex) {
   const wrap = document.getElementById('slot-summary-wrap');
-  if (slotIndex !== null && currentSlots[slotIndex]) {
-    const slot = currentSlots[slotIndex];
+  const slots = tabSlots[currentTab] || [];
+  if (slotIndex !== null && slots[slotIndex]) {
+    const slot = slots[slotIndex];
     const { mmdd, wd, nearLabel } = dateMeta(slot.dateKey);
     const pills = slot.durations.map(d =>
       `<span class="slot-dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
