@@ -353,6 +353,22 @@ function stopScanning() {
   if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
 }
 
+// 資料到了先閃骨架卡片（~400ms），再 flip 進真實卡片
+function showSkeletonThenRender(containerId, renderFn) {
+  const row = document.getElementById(containerId);
+  if (!row) { renderFn(); return; }
+  // 插入骨架，三欄 flex
+  row.innerHTML = `<div id="skel-flash" style="width:100%;display:flex;gap:6px;opacity:0;transition:opacity .25s ease">
+    ${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}
+  </div>`;
+  setTimeout(() => {
+    const w = document.getElementById('skel-flash');
+    if (w) w.style.opacity = '1';
+  }, 20);
+  // 短暫停留後換真實卡片
+  setTimeout(() => { renderFn(); }, 450);
+}
+
 // ── Filter ────────────────────────────────────────────────────
 function toggleDur(d) {
   if(selectedDurs.includes(d) && selectedDurs.length===1) return;
@@ -451,7 +467,8 @@ async function loadToday() {
     const data = await callGAS({ action:'today' });
     cache.today = data;
     stopScanning();
-    renderTodayFromData(data);
+    // 先切到骨架卡片，給使用者「快好了」的視覺回饋，再 flip 進真實卡片
+    showSkeletonThenRender('cards-today', () => renderTodayFromData(data));
   } catch(e) {
     stopScanning();
     renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
@@ -496,7 +513,7 @@ async function loadStaff(name) {
     const data = await callGAS({ action:'staff', staff:name });
     cache.staff[name] = data;
     stopScanning();
-    renderStaffFromData(data);
+    showSkeletonThenRender('cards-staff', () => renderStaffFromData(data));
   } catch(e) {
     stopScanning();
     document.getElementById('cards-staff').innerHTML =
