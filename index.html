@@ -302,41 +302,45 @@ const SCAN_STEPS = [
 ];
 let scanTimer = null;
 
+// containerId = card-row div
+// 策略：骨架卡片立刻顯示，掃描動畫以 position:absolute overlay 疊在 pane 上
+// 資料到 → overlay 淡出 → 直接 flip 真實卡片（不用等動畫跑完）
 function showScanning(containerId, statusId) {
   document.getElementById(statusId).innerHTML = '';
-  // 用 width:100% 讓 scan UI 撐滿 card-row 的 flex 容器
-  document.getElementById(containerId).innerHTML = `
-    <div id="scan-ui" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:22px 0 16px;gap:14px;transition:opacity .3s ease">
-      <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
-      <div style="text-align:center">
-        <div id="scan-msg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
-        <div id="scan-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
-      </div>
-      <div style="width:70%;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-        <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
-      </div>
+
+  // 1. 骨架卡片立刻填入 card-row
+  document.getElementById(containerId).innerHTML =
+    `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
+
+  // 2. 掃描 overlay 插入 pane（card-row 的父層）
+  const pane = document.getElementById(containerId).closest('.pane');
+  if (!pane) return;
+  pane.style.position = 'relative';
+
+  // 移除舊的 overlay（如果有）
+  const old = pane.querySelector('#scan-overlay');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'scan-overlay';
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(255,255,255,.82);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);transition:opacity .35s ease;z-index:5';
+  overlay.innerHTML = `
+    <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
+    <div style="text-align:center">
+      <div id="scan-msg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
+      <div id="scan-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
+    </div>
+    <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
+      <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
+  pane.appendChild(overlay);
   setTimeout(() => { const b=document.getElementById('sbar'); if(b) b.style.width='10%'; }, 80);
 
+  // 3. 輪播訊息
   let step = 0;
   if (scanTimer) clearInterval(scanTimer);
   scanTimer = setInterval(() => {
-    step++;
-    if (step >= SCAN_STEPS.length) {
-      clearInterval(scanTimer); scanTimer = null;
-      const ui = document.getElementById('scan-ui');
-      if (ui) ui.style.opacity = '0';
-      setTimeout(() => {
-        const row = document.getElementById(containerId);
-        if (!row) return;
-        // 骨架卡片用 flex row 包起來，確保三欄並排
-        row.innerHTML = `<div id="skel-fade" style="width:100%;display:flex;gap:6px;opacity:0;transition:opacity .35s ease">
-          ${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}
-        </div>`;
-        setTimeout(() => { const w=document.getElementById('skel-fade'); if(w) w.style.opacity='1'; }, 30);
-      }, 300);
-      return;
-    }
+    step = Math.min(step + 1, SCAN_STEPS.length - 1);
     const s = SCAN_STEPS[step];
     const msg = document.getElementById('scan-msg');
     const av  = document.getElementById('scan-av');
@@ -351,22 +355,17 @@ function showScanning(containerId, statusId) {
 
 function stopScanning() {
   if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+  // overlay 淡出
+  const overlay = document.getElementById('scan-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 380);
+  }
 }
 
-// 資料到了先閃骨架卡片（~400ms），再 flip 進真實卡片
 function showSkeletonThenRender(containerId, renderFn) {
-  const row = document.getElementById(containerId);
-  if (!row) { renderFn(); return; }
-  // 插入骨架，三欄 flex
-  row.innerHTML = `<div id="skel-flash" style="width:100%;display:flex;gap:6px;opacity:0;transition:opacity .25s ease">
-    ${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}
-  </div>`;
-  setTimeout(() => {
-    const w = document.getElementById('skel-flash');
-    if (w) w.style.opacity = '1';
-  }, 20);
-  // 短暫停留後換真實卡片
-  setTimeout(() => { renderFn(); }, 450);
+  // overlay 已移除，直接 render（骨架卡片已在，flipin 動畫會蓋掉它）
+  renderFn();
 }
 
 // ── Filter ────────────────────────────────────────────────────
