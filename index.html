@@ -312,18 +312,25 @@ function showScanning(containerId, statusId) {
   document.getElementById(containerId).innerHTML =
     `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
 
-  // 2. 掃描 overlay 插入 pane（card-row 的父層）
-  const pane = document.getElementById(containerId).closest('.pane');
-  if (!pane) return;
-  pane.style.position = 'relative';
+  // 2. 掃描 overlay 包在 card-row 的同一個父層 wrapper 裡
+  //    用 relative wrapper 讓 overlay 只蓋住卡片區域，不影響 stab-wrap 等其他元素
+  const cardRow = document.getElementById(containerId);
+  const parent  = cardRow.parentNode;
 
-  // 移除舊的 overlay（如果有）
-  const old = pane.querySelector('#scan-overlay');
-  if (old) old.remove();
+  // 移除舊的 wrapper/overlay（如果有）
+  const oldWrapper = parent.querySelector('#scan-wrapper');
+  if (oldWrapper) oldWrapper.replaceWith(cardRow);
+
+  // 建立 relative wrapper 包住 card-row
+  const wrapper = document.createElement('div');
+  wrapper.id = 'scan-wrapper';
+  wrapper.style.cssText = 'position:relative';
+  cardRow.parentNode.insertBefore(wrapper, cardRow);
+  wrapper.appendChild(cardRow);
 
   const overlay = document.createElement('div');
   overlay.id = 'scan-overlay';
-  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(255,255,255,.82);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);transition:opacity .35s ease;z-index:5';
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;transition:opacity .35s ease;z-index:5;min-height:180px';
   overlay.innerHTML = `
     <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
     <div style="text-align:center">
