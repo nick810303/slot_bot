@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>空位查詢</title>
+<title>空位查詢 v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -166,9 +166,9 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
 
 /* ── footer ── */
-.footer{flex-shrink:0;padding:4px 14px max(4px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:#fff}
-.ft-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2)}
-.ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff}
+.ft-note{font-size:9.5px;color:var(--gray2);line-height:1.5;flex:1}
+.ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 
 /* sheet */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
@@ -233,19 +233,17 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
       <div class="status-bar" id="status-today"></div>
       <div class="sec-label">最早可約 · 3 位不同老師</div>
       <div class="card-row" id="cards-today"></div>
-      <p class="note">AI 即時抓取。本系統與預約系統不連動，實際以預約系統為準。</p>
     </div>
     <div class="pane" id="pane-staff">
       <div class="stab-wrap" id="staff-tabs"></div>
       <div class="status-bar" id="status-staff"></div>
       <div class="sec-label">最早可約 3 筆</div>
       <div class="card-row" id="cards-staff"></div>
-      <p class="note">AI 即時抓取。本系統與預約系統不連動，實際以預約系統為準。</p>
     </div>
   </div>
 
   <div class="footer">
-    <div class="ft-note">AI 抓取 · 非預約系統</div>
+    <div class="ft-note">AI 即時抓取。本系統與預約系統互相獨立，實際以預約系統為準。</div>
     <div class="ft-disc" onclick="openSheet(null)">免責聲明</div>
   </div>
 </div>
@@ -257,7 +255,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     <div id="slot-summary-wrap"></div>
     <div class="sheet-body">
       此工具由小泰空小編開發，AI 即時抓取空位資訊供參考。<br><br>
-      看到合適時段後，請<b>記下時段與老師</b>，點下方按鈕前往預約系統完成預約。
+      看到合適時段後，請依序<b>記下老師、時段與日期</b>，點下方按鈕前往預約系統完成預約。
     </div>
     <button class="sheet-btn" onclick="goBooking()">前往預約系統</button>
     <span class="sheet-close" onclick="closeSheet()">關閉</span>
@@ -321,7 +319,14 @@ function callGAS(params) {
 }
 
 // ── 載入動畫 ──────────────────────────────────────────────────
-const SCAN_MSGS = ['正在掃描空位…','比對老師時段中…','整理最新資料…','即將顯示結果…'];
+const SCAN_MSGS = [
+  '🤖 機器人出動中…',
+  '📡 連線預約系統中…',
+  '🔍 掃描所有老師時段…',
+  '⚙️ 比對可預約時間…',
+  '📋 整理資料中，快好了…',
+  '✨ 即將顯示結果！',
+];
 let scanTimer = null;
 
 function showScanning(rowId, statusId) {
@@ -384,7 +389,7 @@ function computeTodayStatus(slots) {
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
     if (!fut) return { text:'近期暫無可預約時段', color:'var(--red)' };
-    return { text:`今日完全預滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
+    return { text:`今日已滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
   if (todaySlots.length <= 3) return { text:`今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
   return { text:'今日有多個時段可預約', color:'var(--green)' };
@@ -459,15 +464,13 @@ async function loadToday() {
 }
 
 function renderTodayFromData(data) {
-  // GAS 回傳所有老師的所有時段（已按日期+時間排序）
-  // 1. 依 selectedDurs 過濾（每筆至少要有一個選中的時長）
-  // 2. 每位老師只取最早符合的那一筆（因為不同 filter 組合下「最早」會不同）
-  // 3. 結果再排序，取 top3 不同老師
+  // filter 只決定「哪張卡片出現」，卡片上的 tag 永遠顯示該時段全部時長
+  // 1. 只用 selectedDurs 判斷這筆是否符合（hasMatch），原始 durations 不動
+  // 2. 每位老師取最早符合的那一筆
+  // 3. 排序後取 top3
   const allSlots = (data.slots || [])
-    .map(s => ({ ...s, durations: s.durations.filter(d => selectedDurs.includes(d)) }))
-    .filter(s => s.durations.length > 0);
+    .filter(s => s.durations.some(d => selectedDurs.includes(d))); // 資格判斷，不修改 durations
 
-  // 每位老師取最早一筆（allSlots 已按時間排序，第一次出現即最早）
   const seenTeachers = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
     if (seenTeachers.has(s.teacher)) return false;
@@ -475,7 +478,6 @@ function renderTodayFromData(data) {
     return true;
   });
 
-  // 再排序（因為不同老師的最早符合時段順序可能不同）
   earliestPerTeacher.sort((a, b) => {
     if (a.dateKey !== b.dateKey) return a.dateKey < b.dateKey ? -1 : 1;
     return a.time < b.time ? -1 : 1;
@@ -510,10 +512,10 @@ async function loadStaff(name) {
 }
 
 function renderStaffFromData(data) {
+  // 同樣：filter 只決定哪筆出現，durations 保持原樣顯示
   const filtered = (data.slots || [])
-    .map(s => ({ ...s, durations: s.durations.filter(d => selectedDurs.includes(d)) }))
-    .filter(s => s.durations.length > 0)
-    .slice(0,3);
+    .filter(s => s.durations.some(d => selectedDurs.includes(d)))
+    .slice(0, 3);
 
   const status = computeStaffStatus(filtered);
   renderStatus('status-staff', status.text, status.color);
