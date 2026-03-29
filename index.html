@@ -182,11 +182,13 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
   <div class="body">
     <div class="pane active" id="pane-today">
       <div class="status-bar" id="status-today"></div>
+      <div class="sec-label" id="label-today">最早可約 · 3 位不同老師</div>
       <div class="card-row" id="cards-today"></div>
     </div>
     <div class="pane" id="pane-staff">
       <div class="stab-wrap" id="staff-tabs"></div>
       <div class="status-bar" id="status-staff"></div>
+      <div class="sec-label">最早可約 3 筆</div>
       <div class="card-row" id="cards-staff"></div>
     </div>
   </div>
@@ -204,7 +206,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     <div id="slot-summary-wrap"></div>
     <div class="sheet-body">
       此工具由小泰空小編開發，AI 即時抓取空位資訊供參考。<br><br>
-      機器人只抓取最早的 3 個時段，其餘時間請使用預約系統查看。<br><br>
       看到合適時段後，請依序<b>記下方案、老師、日期與時段</b>，點下方按鈕前往預約系統完成預約。
     </div>
     <button class="sheet-btn" onclick="goBooking()">前往預約系統</button>
@@ -301,22 +302,48 @@ const SCAN_STEPS = [
 ];
 let scanTimer = null;
 
-
-// 顯示 scan 動畫（整個 card-row 都是 scan UI）
+// containerId = card-row div
+// 策略：骨架卡片立刻顯示，掃描動畫以 position:absolute overlay 疊在 pane 上
+// 資料到 → overlay 淡出 → 直接 flip 真實卡片（不用等動畫跑完）
 function showScanning(containerId, statusId) {
   document.getElementById(statusId).innerHTML = '';
-  document.getElementById(containerId).innerHTML = `
-    <div id="scan-ui" style="width:100%;display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;gap:14px">
-      <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
-      <div style="text-align:center">
-        <div id="scan-msg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
-        <div id="scan-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
-      </div>
-      <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-        <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
-      </div>
+
+  // 1. 骨架卡片立刻填入 card-row
+  document.getElementById(containerId).innerHTML =
+    `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
+
+  // 2. 掃描 overlay 包在 card-row 的同一個父層 wrapper 裡
+  //    用 relative wrapper 讓 overlay 只蓋住卡片區域，不影響 stab-wrap 等其他元素
+  const cardRow = document.getElementById(containerId);
+  const parent  = cardRow.parentNode;
+
+  // 移除舊的 wrapper/overlay（如果有）
+  const oldWrapper = parent.querySelector('#scan-wrapper');
+  if (oldWrapper) oldWrapper.replaceWith(cardRow);
+
+  // 建立 relative wrapper 包住 card-row
+  const wrapper = document.createElement('div');
+  wrapper.id = 'scan-wrapper';
+  wrapper.style.cssText = 'position:relative';
+  cardRow.parentNode.insertBefore(wrapper, cardRow);
+  wrapper.appendChild(cardRow);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'scan-overlay';
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;transition:opacity .35s ease;z-index:5;min-height:180px';
+  overlay.innerHTML = `
+    <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
+    <div style="text-align:center">
+      <div id="scan-msg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
+      <div id="scan-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
+    </div>
+    <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
+      <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
+  wrapper.appendChild(overlay);
   setTimeout(() => { const b=document.getElementById('sbar'); if(b) b.style.width='10%'; }, 80);
+
+  // 3. 輪播訊息
   let step = 0;
   if (scanTimer) clearInterval(scanTimer);
   scanTimer = setInterval(() => {
@@ -335,19 +362,18 @@ function showScanning(containerId, statusId) {
 
 function stopScanning() {
   if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+  // overlay 淡出
+  const overlay = document.getElementById('scan-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 380);
+  }
 }
 
-// 資料到：先閃骨架（~300ms），再 flipin 真實卡片
 function showSkeletonThenRender(containerId, renderFn) {
-  const row = document.getElementById(containerId);
-  if (!row) { renderFn(); return; }
-  row.innerHTML = `<div style="width:100%;display:flex;gap:6px;opacity:0;transition:opacity .25s" id="skel-flash">
-    ${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}
-  </div>`;
-  requestAnimationFrame(() => { const w=document.getElementById('skel-flash'); if(w) w.style.opacity='1'; });
-  setTimeout(renderFn, 350);
+  // overlay 已移除，直接 render（骨架卡片已在，flipin 動畫會蓋掉它）
+  renderFn();
 }
-
 
 // ── Filter ────────────────────────────────────────────────────
 function toggleDur(d) {
@@ -380,22 +406,22 @@ function computeTodayStatus(slots) {
   const todaySlots = slots.filter(s => s.dateKey === tk);
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
-    if (!fut) return { text:'近期暫無符合的時段 — 每月 25 日 13:00 開放下月預約', color:'var(--red)' };
-    return { text:'今日已滿 — 以下未來最早 3 個時段', color:'var(--red)' };
+    if (!fut) return { text:'近期暫無可預約時段', color:'var(--red)' };
+    return { text:`今日已滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
-  if (todaySlots.length === 1) return { text:'今日最後 1 個時段！', color:'var(--red)' };
-  if (todaySlots.length <= 3) return { text:`今日僅剩 ${todaySlots.length} 個時段 — 以下 3 個最早時段`, color:'var(--red)' };
-  return { text:'今日仍有空位 — 以下 3 個最早時段', color:'var(--green)' };
+  if (todaySlots.length <= 3) return { text:`今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
+  return { text:'今日有多個時段可預約', color:'var(--green)' };
 }
 
 function computeStaffStatus(slots) {
   const tk = todayKey();
   const todayOk = slots.filter(s => s.dateKey === tk);
-  if (slots.length === 0) return { text:`${activeStaff} 近期暫無時段 — 每月 25 日 13:00 開放下月預約`, color:'var(--red)' };
-  if (todayOk.length === 0) return { text:`${activeStaff} 今日已滿 — 以下未來最早 3 個時段`, color:'var(--red)' };
-  if (todayOk.length === 1) return { text:`${activeStaff} 今日最後 1 個時段！`, color:'var(--red)' };
-  if (todayOk.length <= 3) return { text:`${activeStaff} 今日僅剩 ${todayOk.length} 個時段 — 以下 3 個最早時段`, color:'var(--red)' };
-  return { text:`${activeStaff} 今日仍有空位 — 以下 3 個最早時段`, color:'var(--green)' };
+  if (slots.length === 0) return { text:`${activeStaff} 近期暫無可預約時段`, color:'var(--red)' };
+  if (todayOk.length === 0) {
+    const next = slots[0];
+    return { text:`今日已滿，${activeStaff} 最早空位在${dateMeta(next.dateKey).nearLabel}`, color:'var(--red)' };
+  }
+  return { text:`${activeStaff} 今日有 ${todayOk.length} 個空位`, color:'var(--green)' };
 }
 
 // ── Card HTML ─────────────────────────────────────────────────
