@@ -340,7 +340,7 @@ function showScanning(containerId, statusId) {
     <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
       <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
-  pane.appendChild(overlay);
+  wrapper.appendChild(overlay);
   setTimeout(() => { const b=document.getElementById('sbar'); if(b) b.style.width='10%'; }, 80);
 
   // 3. 輪播訊息
