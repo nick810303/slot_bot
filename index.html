@@ -20,11 +20,9 @@
 html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC',sans-serif;color:var(--black)}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
 
-/* ── handle ── */
 .handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
 
-/* ── header ── */
 .hd{flex-shrink:0;padding:5px 14px 0}
 .hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .hd-name{font-size:11px;color:var(--gray)}
@@ -32,37 +30,15 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* ── tab bar ── */
 .tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px}
 .tab{flex:1;padding:5px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
 .tab.active{background:#fff;color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 
-/* ── filter rows wrapper ── */
 .filters{flex-shrink:0;border-bottom:1px solid #ebebeb;background:var(--bg3)}
+.filter-bar{display:flex;gap:5px;padding:5px 14px 5px}
+.branch-bar{display:none;gap:5px;padding:0 14px 5px}
 
-/* duration filter row */
-.filter-bar{
-  display:flex;gap:5px;
-  padding:5px 14px 5px;
-}
-/* branch filter row — hidden until v3, keeps space reserved */
-.branch-bar{
-  display:none;   /* → change to flex when ready */
-  gap:5px;
-  padding:0 14px 5px;
-}
-
-.filter-pill{
-  flex:1;
-  display:flex;align-items:center;justify-content:center;
-  gap:4px;
-  padding:4px 0;
-  border-radius:5px;
-  border:1.5px solid #e0e0e0;
-  background:#fff;
-  cursor:pointer;
-  transition:all .15s;
-}
+.filter-pill{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;cursor:pointer;transition:all .15s}
 .filter-pill.on-120{border-color:var(--d120);background:var(--d120-bg)}
 .filter-pill.on-90 {border-color:var(--d90); background:var(--d90-bg)}
 .filter-pill.on-60 {border-color:var(--d60); background:var(--d60-bg)}
@@ -71,61 +47,37 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .filter-pill.on-90  .pill-box{border-color:var(--d90); background:var(--d90)}
 .filter-pill.on-60  .pill-box{border-color:var(--d60); background:var(--d60)}
 .pill-check{display:none}
-.filter-pill.on-120 .pill-check,
-.filter-pill.on-90  .pill-check,
-.filter-pill.on-60  .pill-check{display:block}
+.filter-pill.on-120 .pill-check,.filter-pill.on-90 .pill-check,.filter-pill.on-60 .pill-check{display:block}
 .pill-text{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;line-height:1;white-space:nowrap;transition:color .15s}
 .filter-pill.on-120 .pill-text{color:var(--d120);font-weight:500}
 .filter-pill.on-90  .pill-text{color:var(--d90); font-weight:500}
 .filter-pill.on-60  .pill-text{color:var(--d60); font-weight:500}
 
-/* ── body ── */
 .body{flex:1;overflow:hidden;position:relative}
 .pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:6px}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{display:none}
 
-/* ── status bar ── */
 .status-bar{display:flex;align-items:center;gap:6px;padding:6px 14px 4px}
 .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .status-text{font-size:13px;font-weight:500;line-height:1.3}
 
-/* sec label merged tighter */
 .sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
 
-/* ── card row ── */
 .card-row{display:flex;gap:6px;padding:0 12px}
 
-/* ── cards ── */
 .card{flex:1 1 0;min-width:0;cursor:pointer}
 .card-inner{
-  height:148px;               /* ↓ from 168 */
-  background:#f5f5f5;
-  border:1px solid #e2e2e2;
-  border-radius:8px;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  transition:background .12s;
-  position:relative;
+  height:148px;background:#f5f5f5;border:1px solid #e2e2e2;border-radius:8px;
+  overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;
 }
 .card-inner:active{background:#ececec}
 
-/* teacher banner */
-.card-teacher-banner{
-  flex-shrink:0;
-  padding:4px 7px;
-  display:flex;align-items:center;justify-content:space-between;
-}
+.card-teacher-banner{flex-shrink:0;padding:4px 7px;display:flex;align-items:center;justify-content:space-between}
 .card-teacher-name{font-size:11px;font-weight:500;color:#fff;letter-spacing:.02em;line-height:1}
 .card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
 
-/* card body */
-.card-body{
-  flex:1;
-  padding:5px 7px 5px;
-  display:flex;flex-direction:column;
-  background:#f5f5f5;
-}
+.card-body{flex:1;padding:5px 7px 5px;display:flex;flex-direction:column;background:#f5f5f5}
 
 .card-near-row{display:flex;align-items:center;gap:3px;margin-bottom:1px;flex-shrink:0}
 .near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;line-height:1.5}
@@ -138,9 +90,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .card-wd{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray)}
 
 .card-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:1;margin-bottom:4px;flex-shrink:0}
-
 .card-div{height:1px;background:#e0e0e0;flex-shrink:0;margin-bottom:4px}
-
 .card-durs{display:flex;flex-wrap:wrap;gap:3px;flex:1;align-content:flex-start;overflow:hidden}
 .dur-pill{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;white-space:nowrap;display:inline-block}
 .dur-pill.d120{color:var(--d120);background:rgba(196,133,122,.13);border:1px solid var(--d120-bdr)}
@@ -151,26 +101,28 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .card-empty-inner{height:148px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .card-empty-line{width:14px;height:1px;background:#e8e8e8}
 
+/* ── skeleton card ── */
+.card-skeleton .card-inner{cursor:default;animation:none}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skel-banner{height:26px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0}
+.skel-line{border-radius:3px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite}
+
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes skelsh{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes flipin{from{opacity:0;transform:perspective(500px) rotateY(-70deg)}to{opacity:1;transform:perspective(500px) rotateY(0deg)}}
 .flip-1{animation:flipin .4s cubic-bezier(.4,0,.2,1) both}
 .flip-2{animation:flipin .4s cubic-bezier(.4,0,.2,1) .11s both}
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
 
-.note{font-size:10px;color:var(--gray2);padding:6px 14px 0;line-height:1.6}
-
-/* ── staff tabs ── */
 .stab-wrap{display:flex;gap:5px;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
 .stab-wrap::-webkit-scrollbar{display:none}
 .stab{flex-shrink:0;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap}
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
 
-/* ── footer ── */
 .footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff}
 .ft-note{font-size:9.5px;color:var(--gray2);line-height:1.5;flex:1}
 .ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 
-/* sheet */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
 .mask.show{opacity:1;pointer-events:all}
 .sheet{width:100%;max-width:480px;background:#fff;border-radius:14px 14px 0 0;padding:24px 24px max(22px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;border-top:3px solid var(--red)}
@@ -211,27 +163,26 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 
   <div class="filters">
     <div class="filter-bar">
-    <button class="filter-pill on-120" id="pill-120" onclick="toggleDur(120)">
-      <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <span class="pill-text">120min 泰空經典</span>
-    </button>
-    <button class="filter-pill on-90" id="pill-90" onclick="toggleDur(90)">
-      <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <span class="pill-text">90min 泰空調和</span>
-    </button>
-    <button class="filter-pill on-60" id="pill-60" onclick="toggleDur(60)">
-      <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <span class="pill-text">60min 泰空輕行</span>
-    </button>
-    </div><!-- /filter-bar -->
-    <!-- 分店 filter v3：把 branch-bar 的 display:none 改 flex 即可 -->
+      <button class="filter-pill on-120" id="pill-120" onclick="toggleDur(120)">
+        <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="pill-text">120min 泰空經典</span>
+      </button>
+      <button class="filter-pill on-90" id="pill-90" onclick="toggleDur(90)">
+        <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="pill-text">90min 泰空調和</span>
+      </button>
+      <button class="filter-pill on-60" id="pill-60" onclick="toggleDur(60)">
+        <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="pill-text">60min 泰空輕行</span>
+      </button>
+    </div>
     <div class="branch-bar" id="branch-bar"></div>
-  </div><!-- /filters -->
+  </div>
 
   <div class="body">
     <div class="pane active" id="pane-today">
       <div class="status-bar" id="status-today"></div>
-      <div class="sec-label">最早可約 · 3 位不同老師</div>
+      <div class="sec-label" id="label-today">最早可約 · 3 位不同老師</div>
       <div class="card-row" id="cards-today"></div>
     </div>
     <div class="pane" id="pane-staff">
@@ -264,11 +215,9 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-// ── 設定 ──────────────────────────────────────────────────────
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzOq_KPdSh_jRKSyg4-GMf-Z-AtrJLc1cH1yTVDNJVd2uo92cbe-wasenTlx6tz2DMXKQ/exec';
 const LIFF_ID = '2009610906-9zraEtAy';
 
-// ── 常數 ──────────────────────────────────────────────────────
 const WD = ['日','一','二','三','四','五','六'];
 
 const TEACHER_COLOR = {
@@ -285,24 +234,21 @@ const DUR_CONFIG = {
 
 const STAFF_LIST = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Shu','柏 Bo','獺 Ta'];
 
-// ── 狀態 ──────────────────────────────────────────────────────
 let selectedDurs = [60, 90, 120];
 let activeStaff  = '令 Ling';
 let currentTab   = 'today';
 const tabSlots   = { today: [], staff: [] };
-
-// 快取：避免切 tab 重複打 API
-const cache = { today: null, staff: {} };
+const cache      = { today: null, staff: {} };
 
 // ── 日期工具 ──────────────────────────────────────────────────
 function dateMeta(dateKey) {
   const [y,m,d] = dateKey.split('-').map(Number);
-  const date  = new Date(y, m-1, d);
-  const now   = new Date();
-  const base  = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const diff  = Math.round((date - base) / 86400000);
-  const mmdd  = `${date.getMonth()+1}月${date.getDate()}日`;
-  const wd    = `週${WD[date.getDay()]}`;
+  const date = new Date(y, m-1, d);
+  const now  = new Date();
+  const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = Math.round((date - base) / 86400000);
+  const mmdd = `${date.getMonth()+1}月${date.getDate()}日`;
+  const wd   = `週${WD[date.getDay()]}`;
   const nearLabel = diff===0?'今日':diff===1?'明天':diff===2?'後天':`${diff}天後`;
   return { mmdd, wd, nearLabel, diff };
 }
@@ -318,42 +264,92 @@ function callGAS(params) {
   return fetch(GAS_URL + '?' + qs).then(r => r.json());
 }
 
-// ── 載入動畫 ──────────────────────────────────────────────────
-const SCAN_MSGS = [
-  '🤖 機器人出動中…',
-  '📡 連線預約系統中…',
-  '🔍 掃描所有老師時段…',
-  '⚙️ 比對可預約時間…',
-  '📋 整理資料中，快好了…',
-  '✨ 即將顯示結果！',
+// ── 預熱 GAS（頁面載入立刻 ping，讓 GAS container 提前暖好）──
+function warmupGAS() {
+  fetch(GAS_URL + '?action=ping').catch(() => {});
+}
+
+// ── Skeleton 佔位卡片 ─────────────────────────────────────────
+function skeletonCardHTML() {
+  return `
+  <div class="card card-skeleton">
+    <div class="card-inner">
+      <div class="skel-banner"></div>
+      <div class="card-body">
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <div class="skel-line" style="width:36px;height:16px"></div>
+          <div class="skel-line" style="width:48px;height:16px"></div>
+        </div>
+        <div class="skel-line" style="width:60px;height:13px;margin-bottom:5px"></div>
+        <div class="skel-line" style="width:70px;height:28px;margin-bottom:6px"></div>
+        <div style="height:1px;background:#e8e8e8;margin-bottom:5px"></div>
+        <div style="display:flex;gap:3px">
+          <div class="skel-line" style="width:38px;height:14px"></div>
+          <div class="skel-line" style="width:32px;height:14px"></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── 載入動畫：掃描機器人 → 骨架卡片 ────────────────────────
+const SCAN_STEPS = [
+  {av:'🤖', msg:'機器人出動中…',      sub:'SCANNING',   pct:10},
+  {av:'📡', msg:'連線預約系統中…',     sub:'CONNECTING', pct:28},
+  {av:'🔍', msg:'掃描所有老師時段…',   sub:'FETCHING',   pct:52},
+  {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING', pct:75},
+  {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING',    pct:92},
 ];
 let scanTimer = null;
 
-function showScanning(rowId, statusId) {
+function showScanning(containerId, statusId) {
   document.getElementById(statusId).innerHTML = '';
-  document.getElementById(rowId).innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;gap:12px;width:100%">
-      <div style="width:48px;height:48px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:20px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
-      <div id="smsg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_MSGS[0]}</div>
+  document.getElementById(containerId).innerHTML = `
+    <div id="scan-ui" style="display:flex;flex-direction:column;align-items:center;padding:22px 0 16px;gap:14px;transition:opacity .3s ease">
+      <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
+      <div style="text-align:center">
+        <div id="scan-msg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
+        <div id="scan-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
+      </div>
       <div style="width:70%;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-        <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 2s cubic-bezier(.4,0,.2,1)"></div>
+        <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
       </div>
     </div>`;
-  setTimeout(() => { const b=document.getElementById('sbar'); if(b)b.style.width='20%'; }, 80);
+  setTimeout(() => { const b=document.getElementById('sbar'); if(b) b.style.width='10%'; }, 80);
+
   let step = 0;
   if (scanTimer) clearInterval(scanTimer);
   scanTimer = setInterval(() => {
-    step = Math.min(step+1, SCAN_MSGS.length-1);
-    const b=document.getElementById('sbar'); if(b)b.style.width=(20+(step/(SCAN_MSGS.length-1))*70)+'%';
-    const m=document.getElementById('smsg');
-    if(m){m.style.opacity='0';setTimeout(()=>{m.textContent=SCAN_MSGS[step];m.style.opacity='1';},200);}
+    step++;
+    if (step >= SCAN_STEPS.length) {
+      clearInterval(scanTimer); scanTimer = null;
+      // 淡出掃描 UI，淡入骨架卡片
+      const ui = document.getElementById('scan-ui');
+      if (ui) ui.style.opacity = '0';
+      setTimeout(() => {
+        const row = document.getElementById(containerId);
+        if (!row) return;
+        row.innerHTML = `<div id="skel-fade" style="opacity:0;transition:opacity .35s ease">
+          ${skeletonCardHTML() + skeletonCardHTML() + skeletonCardHTML()}
+        </div>`;
+        setTimeout(() => { const w=document.getElementById('skel-fade'); if(w) w.style.opacity='1'; }, 30);
+      }, 300);
+      return;
+    }
+    const s = SCAN_STEPS[step];
+    const msg = document.getElementById('scan-msg');
+    const av  = document.getElementById('scan-av');
+    const sub = document.getElementById('scan-sub');
+    const bar = document.getElementById('sbar');
+    if (msg) { msg.style.opacity='0'; setTimeout(()=>{ msg.textContent=s.msg; msg.style.opacity='1'; },180); }
+    if (av)  { av.style.transform='scale(.85)'; setTimeout(()=>{ av.textContent=s.av; av.style.transform='scale(1)'; av.style.transition='transform .2s'; },170); }
+    if (sub) sub.textContent = s.sub;
+    if (bar) bar.style.width = s.pct + '%';
   }, 2000);
 }
 
 function stopScanning() {
-  if(scanTimer){clearInterval(scanTimer);scanTimer=null;}
-  const b=document.getElementById('sbar');
-  if(b){b.style.transition='width .3s ease';b.style.width='100%';}
+  if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
 }
 
 // ── Filter ────────────────────────────────────────────────────
@@ -363,12 +359,11 @@ function toggleDur(d) {
   [120,90,60].forEach(x => {
     document.getElementById('pill-'+x).className = 'filter-pill'+(selectedDurs.includes(x)?' on-'+x:'');
   });
-  // filter 變更直接用快取重算，不重打 API
   if(cache.today) renderTodayFromData(cache.today);
   if(cache.staff[activeStaff]) renderStaffFromData(cache.staff[activeStaff]);
 }
 
-// ── Tab 切換 ──────────────────────────────────────────────────
+// ── Tab ───────────────────────────────────────────────────────
 function switchTab(id, btn) {
   currentTab = id;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -458,18 +453,15 @@ async function loadToday() {
     renderTodayFromData(data);
   } catch(e) {
     stopScanning();
+    renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
     document.getElementById('cards-today').innerHTML =
       `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
   }
 }
 
 function renderTodayFromData(data) {
-  // filter 只決定「哪張卡片出現」，卡片上的 tag 永遠顯示該時段全部時長
-  // 1. 只用 selectedDurs 判斷這筆是否符合（hasMatch），原始 durations 不動
-  // 2. 每位老師取最早符合的那一筆
-  // 3. 排序後取 top3
   const allSlots = (data.slots || [])
-    .filter(s => s.durations.some(d => selectedDurs.includes(d))); // 資格判斷，不修改 durations
+    .filter(s => s.durations.some(d => selectedDurs.includes(d)));
 
   const seenTeachers = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
@@ -512,7 +504,6 @@ async function loadStaff(name) {
 }
 
 function renderStaffFromData(data) {
-  // 同樣：filter 只決定哪筆出現，durations 保持原樣顯示
   const filtered = (data.slots || [])
     .filter(s => s.durations.some(d => selectedDurs.includes(d)))
     .slice(0, 3);
@@ -578,10 +569,15 @@ function buildStaffTabs() {
 
 // ── Init ──────────────────────────────────────────────────────
 function init() {
-  // LIFF 初始化（失敗不影響功能）
+  // 1. 預熱 GAS（立刻 ping，讓 GAS container 提前暖好）
+  warmupGAS();
+
+  // 2. LIFF 初始化
   if (typeof liff !== 'undefined') {
     liff.init({ liffId: LIFF_ID }).catch(() => {});
   }
+
+  // 3. 建立 UI 並開始載入
   buildStaffTabs();
   loadToday();
   loadStaff(STAFF_LIST[0]);
