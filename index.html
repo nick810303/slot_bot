@@ -366,7 +366,8 @@ function showScanning(containerId, statusId) {
 
   const overlay = document.createElement('div');
   overlay.id = overlayId;
-  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;transition:opacity .35s ease;z-index:5;min-height:180px';
+  // 初始 opacity:0 → 骨架卡片先短暫可見 → 150ms 後 overlay 淡入
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;transition:opacity .35s ease;z-index:5;min-height:180px;opacity:0';
   overlay.innerHTML = `
     <div id="${avId}" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
     <div style="text-align:center">
@@ -377,7 +378,9 @@ function showScanning(containerId, statusId) {
       <div id="${barId}" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
   wrapper.appendChild(overlay);
-  setTimeout(() => { const b=document.getElementById(barId); if(b) b.style.width='10%'; }, 80);
+  // 骨架卡片先顯示 150ms，再讓 overlay 淡入
+  setTimeout(() => { const o=document.getElementById(overlayId); if(o) o.style.opacity='1'; }, 150);
+  setTimeout(() => { const b=document.getElementById(barId); if(b) b.style.width='10%'; }, 230);
 
   let step = 0;
   if (scanTimers[containerId]) clearInterval(scanTimers[containerId]);
