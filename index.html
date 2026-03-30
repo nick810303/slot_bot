@@ -16,6 +16,12 @@
   --d120:#C4857A;--d120-bg:rgba(196,133,122,.10);--d120-bdr:rgba(196,133,122,.28);
   --d90:#A8906E; --d90-bg:rgba(168,144,110,.10); --d90-bdr:rgba(168,144,110,.28);
   --d60:#D4A882; --d60-bg:rgba(212,168,130,.10); --d60-bdr:rgba(212,168,130,.28);
+  /* ── 培訓新師代表色 #ADC99A ── */
+  --tr:      #ADC99A;
+  --tr-dark: #7A9B6A;
+  --tr-bg:   rgba(173,201,154,.10);
+  --tr-bdr:  rgba(173,201,154,.35);
+  --tr-text: #5C7A50;
 }
 html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC',sans-serif;color:var(--black)}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
@@ -36,7 +42,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 
 .filters{flex-shrink:0;border-bottom:1px solid #ebebeb;background:var(--bg3)}
 .filter-bar{display:flex;gap:5px;padding:5px 14px 5px}
-.branch-bar{display:none;gap:5px;padding:0 14px 5px}
 
 .filter-pill{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;cursor:pointer;transition:all .15s}
 .filter-pill.on-120{border-color:var(--d120);background:var(--d120-bg)}
@@ -73,9 +78,22 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 }
 .card-inner:active{background:#ececec}
 
+/* ── banner ── */
 .card-teacher-banner{flex-shrink:0;padding:4px 7px;display:flex;align-items:center;justify-content:space-between}
 .card-teacher-name{font-size:11px;font-weight:500;color:#fff;letter-spacing:.02em;line-height:1}
+.banner-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
+
+/* 培訓新師 badge（放在 rank 左側）*/
+.trainee-badge{
+  font-family:'Noto Sans TC',sans-serif;
+  font-size:7.5px;font-weight:500;
+  padding:1px 4px;border-radius:2px;
+  background:rgba(255,255,255,.20);
+  color:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.28);
+  line-height:1.5;white-space:nowrap;flex-shrink:0;
+}
 
 .card-body{flex:1;padding:5px 7px 5px;display:flex;flex-direction:column;background:#f5f5f5}
 
@@ -88,7 +106,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .card-date-row{display:flex;align-items:baseline;gap:3px;margin-bottom:3px;flex-shrink:0}
 .card-mmdd{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#333}
 .card-wd{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray)}
-
 .card-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:1;margin-bottom:4px;flex-shrink:0}
 .card-div{height:1px;background:#e0e0e0;flex-shrink:0;margin-bottom:4px}
 .card-durs{display:flex;flex-wrap:wrap;gap:3px;flex:1;align-content:flex-start;overflow:hidden}
@@ -101,28 +118,47 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .card-empty-inner{height:148px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .card-empty-line{width:14px;height:1px;background:#e8e8e8}
 
-/* ── skeleton card ── */
-.card-skeleton .card-inner{cursor:default;animation:none}
+/* ── skeleton ── */
+.card-skeleton .card-inner{cursor:default}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .skel-banner{height:26px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0}
 .skel-line{border-radius:3px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite}
 
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes skelsh{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes flipin{from{opacity:0;transform:perspective(500px) rotateY(-70deg)}to{opacity:1;transform:perspective(500px) rotateY(0deg)}}
 .flip-1{animation:flipin .4s cubic-bezier(.4,0,.2,1) both}
 .flip-2{animation:flipin .4s cubic-bezier(.4,0,.2,1) .11s both}
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
 
-.stab-wrap{display:flex;gap:5px;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
-.stab-wrap::-webkit-scrollbar{display:none}
-.stab{flex-shrink:0;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap}
+/* ── staff tabs ── */
+.stab-group-wrap{display:flex;align-items:center;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
+.stab-group-wrap::-webkit-scrollbar{display:none}
+.stab-group-label{
+  flex-shrink:0;
+  font-family:'DM Mono',monospace;font-size:8.5px;
+  color:var(--tr-text);letter-spacing:.04em;
+  background:var(--tr-bg);border:1px solid var(--tr-bdr);
+  padding:3px 7px;border-radius:4px;
+  white-space:nowrap;align-self:center;line-height:1.4;
+}
+.stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
+.stab{
+  flex-shrink:0;padding:3px 10px;border-radius:20px;
+  border:1px solid var(--line);background:transparent;
+  font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);
+  cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;
+}
+.stab:last-child{margin-right:0}
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
+.stab.tr-pill{border-color:var(--tr-bdr);color:var(--tr-text)}
+.stab.tr-pill.active{background:var(--tr-dark);border-color:var(--tr-dark);color:#fff}
 
+/* ── footer ── */
 .footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff}
 .ft-note{font-size:9.5px;color:var(--gray2);line-height:1.5;flex:1}
 .ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 
+/* ── bottom sheet ── */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
 .mask.show{opacity:1;pointer-events:all}
 .sheet{width:100%;max-width:480px;background:#fff;border-radius:14px 14px 0 0;padding:24px 24px max(22px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;border-top:3px solid var(--red)}
@@ -176,7 +212,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
         <span class="pill-text">60min 泰空輕行</span>
       </button>
     </div>
-    <div class="branch-bar" id="branch-bar"></div>
   </div>
 
   <div class="body">
@@ -186,7 +221,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
       <div class="card-row" id="cards-today"></div>
     </div>
     <div class="pane" id="pane-staff">
-      <div class="stab-wrap" id="staff-tabs"></div>
+      <div class="stab-group-wrap" id="staff-tabs"></div>
       <div class="status-bar" id="status-staff"></div>
       <div class="sec-label">最早可約 3 筆</div>
       <div class="card-row" id="cards-staff"></div>
@@ -226,16 +261,20 @@ const TEACHER_COLOR = {
   '柏 Bo':'#5C6B7A','獺 Ta':'#7A5C6B',
 };
 
+const TRAINEE_NAMES = new Set(['椰 Ye','寧 Ning','沐 Mu']);
+
 const DUR_CONFIG = {
   120:{ cls:'d120', short:'120min', full:'120min 泰空經典' },
   90: { cls:'d90',  short:'90min',  full:'90min 泰空調和'  },
   60: { cls:'d60',  short:'60min',  full:'60min 泰空輕行'  },
 };
 
-const STAFF_LIST = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Shu','柏 Bo','獺 Ta'];
+// 培訓新師群組在前，正規師在後
+const STAFF_TRAINEE  = ['椰 Ye','寧 Ning','沐 Mu'];
+const STAFF_REGULAR  = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Shu','柏 Bo','獺 Ta'];
 
 let selectedDurs = [60, 90, 120];
-let activeStaff  = '令 Ling';
+let activeStaff  = STAFF_TRAINEE[0];
 let currentTab   = 'today';
 const tabSlots   = { today: [], staff: [] };
 const cache      = { today: null, staff: {} };
@@ -264,12 +303,11 @@ function callGAS(params) {
   return fetch(GAS_URL + '?' + qs).then(r => r.json());
 }
 
-// ── 預熱 GAS（頁面載入立刻 ping，讓 GAS container 提前暖好）──
 function warmupGAS() {
   fetch(GAS_URL + '?action=ping').catch(() => {});
 }
 
-// ── Skeleton 佔位卡片 ─────────────────────────────────────────
+// ── Skeleton ──────────────────────────────────────────────────
 function skeletonCardHTML() {
   return `
   <div class="card card-skeleton">
@@ -292,7 +330,6 @@ function skeletonCardHTML() {
   </div>`;
 }
 
-// ── 載入動畫：掃描機器人 → 骨架卡片 ────────────────────────
 const SCAN_STEPS = [
   {av:'🤖', msg:'機器人出動中…',      sub:'SCANNING',   pct:10},
   {av:'📡', msg:'連線預約系統中…',     sub:'CONNECTING', pct:28},
@@ -302,26 +339,16 @@ const SCAN_STEPS = [
 ];
 let scanTimer = null;
 
-// containerId = card-row div
-// 策略：骨架卡片立刻顯示，掃描動畫以 position:absolute overlay 疊在 pane 上
-// 資料到 → overlay 淡出 → 直接 flip 真實卡片（不用等動畫跑完）
 function showScanning(containerId, statusId) {
   document.getElementById(statusId).innerHTML = '';
-
-  // 1. 骨架卡片立刻填入 card-row
   document.getElementById(containerId).innerHTML =
     `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
 
-  // 2. 掃描 overlay 包在 card-row 的同一個父層 wrapper 裡
-  //    用 relative wrapper 讓 overlay 只蓋住卡片區域，不影響 stab-wrap 等其他元素
   const cardRow = document.getElementById(containerId);
   const parent  = cardRow.parentNode;
-
-  // 移除舊的 wrapper/overlay（如果有）
   const oldWrapper = parent.querySelector('#scan-wrapper');
   if (oldWrapper) oldWrapper.replaceWith(cardRow);
 
-  // 建立 relative wrapper 包住 card-row
   const wrapper = document.createElement('div');
   wrapper.id = 'scan-wrapper';
   wrapper.style.cssText = 'position:relative';
@@ -343,7 +370,6 @@ function showScanning(containerId, statusId) {
   wrapper.appendChild(overlay);
   setTimeout(() => { const b=document.getElementById('sbar'); if(b) b.style.width='10%'; }, 80);
 
-  // 3. 輪播訊息
   let step = 0;
   if (scanTimer) clearInterval(scanTimer);
   scanTimer = setInterval(() => {
@@ -362,17 +388,8 @@ function showScanning(containerId, statusId) {
 
 function stopScanning() {
   if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
-  // overlay 淡出
   const overlay = document.getElementById('scan-overlay');
-  if (overlay) {
-    overlay.style.opacity = '0';
-    setTimeout(() => overlay.remove(), 380);
-  }
-}
-
-function showSkeletonThenRender(containerId, renderFn) {
-  // overlay 已移除，直接 render（骨架卡片已在，flipin 動畫會蓋掉它）
-  renderFn();
+  if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 380); }
 }
 
 // ── Filter ────────────────────────────────────────────────────
@@ -424,21 +441,28 @@ function computeStaffStatus(slots) {
   return { text:`${activeStaff} 今日有 ${todayOk.length} 個空位`, color:'var(--green)' };
 }
 
+// ── Banner 背景色 ─────────────────────────────────────────────
+function bannerBg(slot) {
+  return slot.isTrainee ? 'var(--tr-dark)' : (TEACHER_COLOR[slot.teacher] || '#666');
+}
+
 // ── Card HTML ─────────────────────────────────────────────────
 function cardHTML(slot, rank, flipCls, todayFull) {
   if (!slot) return `<div class="card-empty"><div class="card-empty-inner"><div class="card-empty-line"></div></div></div>`;
   const { mmdd, wd, nearLabel, diff } = dateMeta(slot.dateKey);
   const isToday = diff === 0;
-  const bannerColor = TEACHER_COLOR[slot.teacher] || '#666';
   const durPills = slot.durations.map(d =>
     `<span class="dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
   ).join('');
+  const badgeHTML = slot.isTrainee
+    ? `<span class="trainee-badge">培訓新師</span>`
+    : '';
   return `
   <div class="card">
     <div class="card-inner ${flipCls}" onclick="openSheet(${rank-1})">
-      <div class="card-teacher-banner" style="background:${bannerColor}">
+      <div class="card-teacher-banner" style="background:${bannerBg(slot)}">
         <span class="card-teacher-name">${slot.teacher}</span>
-        <span class="card-rank">#${rank}</span>
+        <div class="banner-right">${badgeHTML}<span class="card-rank">#${rank}</span></div>
       </div>
       <div class="card-body">
         <div class="card-near-row">
@@ -473,8 +497,7 @@ async function loadToday() {
     const data = await callGAS({ action:'today' });
     cache.today = data;
     stopScanning();
-    // 先切到骨架卡片，給使用者「快好了」的視覺回饋，再 flip 進真實卡片
-    showSkeletonThenRender('cards-today', () => renderTodayFromData(data));
+    renderTodayFromData(data);
   } catch(e) {
     stopScanning();
     renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
@@ -510,16 +533,13 @@ function renderTodayFromData(data) {
 // ── Staff ─────────────────────────────────────────────────────
 async function loadStaff(name) {
   activeStaff = name;
-  if (cache.staff[name]) {
-    renderStaffFromData(cache.staff[name]);
-    return;
-  }
+  if (cache.staff[name]) { renderStaffFromData(cache.staff[name]); return; }
   showScanning('cards-staff', 'status-staff');
   try {
     const data = await callGAS({ action:'staff', staff:name });
     cache.staff[name] = data;
     stopScanning();
-    showSkeletonThenRender('cards-staff', () => renderStaffFromData(data));
+    renderStaffFromData(data);
   } catch(e) {
     stopScanning();
     document.getElementById('cards-staff').innerHTML =
@@ -531,10 +551,8 @@ function renderStaffFromData(data) {
   const filtered = (data.slots || [])
     .filter(s => s.durations.some(d => selectedDurs.includes(d)))
     .slice(0, 3);
-
   const status = computeStaffStatus(filtered);
   renderStatus('status-staff', status.text, status.color);
-
   tabSlots.staff = filtered;
   paintCards('cards-staff', filtered);
 }
@@ -574,12 +592,46 @@ function goBooking() {
   else location.href = url;
 }
 
-// ── Staff tabs ────────────────────────────────────────────────
+// ── Staff tabs（培訓新師群組 + 分隔線 + 正規師）────────────────
 function buildStaffTabs() {
   const wrap = document.getElementById('staff-tabs');
-  STAFF_LIST.forEach((name, i) => {
+
+  // 培訓新師群組 label
+  const label = document.createElement('div');
+  label.className = 'stab-group-label';
+  label.textContent = '培訓新師';
+  wrap.appendChild(label);
+
+  const spacer = document.createElement('div');
+  spacer.style.cssText = 'width:6px;flex-shrink:0';
+  wrap.appendChild(spacer);
+
+  let firstBtn = null;
+
+  // 培訓新師 pills
+  STAFF_TRAINEE.forEach(name => {
     const btn = document.createElement('button');
-    btn.className = 'stab' + (i===0 ? ' active' : '');
+    btn.className = 'stab tr-pill';
+    btn.textContent = name;
+    btn.onclick = () => {
+      document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      btn.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+      loadStaff(name);
+    };
+    if (!firstBtn) firstBtn = btn;
+    wrap.appendChild(btn);
+  });
+
+  // 分隔線
+  const divider = document.createElement('div');
+  divider.className = 'stab-divider';
+  wrap.appendChild(divider);
+
+  // 正規師 pills
+  STAFF_REGULAR.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'stab';
     btn.textContent = name;
     btn.onclick = () => {
       document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
@@ -589,22 +641,20 @@ function buildStaffTabs() {
     };
     wrap.appendChild(btn);
   });
+
+  // 預設選中第一個培訓新師
+  if (firstBtn) firstBtn.classList.add('active');
 }
 
 // ── Init ──────────────────────────────────────────────────────
 function init() {
-  // 1. 預熱 GAS（立刻 ping，讓 GAS container 提前暖好）
   warmupGAS();
-
-  // 2. LIFF 初始化
   if (typeof liff !== 'undefined') {
     liff.init({ liffId: LIFF_ID }).catch(() => {});
   }
-
-  // 3. 建立 UI 並開始載入
   buildStaffTabs();
   loadToday();
-  loadStaff(STAFF_LIST[0]);
+  loadStaff(STAFF_TRAINEE[0]);
 }
 
 init();
