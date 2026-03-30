@@ -337,48 +337,57 @@ const SCAN_STEPS = [
   {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING', pct:75},
   {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING',    pct:92},
 ];
-let scanTimer = null;
+// per-container timers — 避免 today / staff 同時載入互搶同一個 timer / overlay
+const scanTimers = {};
 
 function showScanning(containerId, statusId) {
   document.getElementById(statusId).innerHTML = '';
   document.getElementById(containerId).innerHTML =
     `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
 
-  const cardRow = document.getElementById(containerId);
-  const parent  = cardRow.parentNode;
-  const oldWrapper = parent.querySelector('#scan-wrapper');
+  const cardRow   = document.getElementById(containerId);
+  const parent    = cardRow.parentNode;
+  const wrapperId = 'scan-wrapper-' + containerId;
+  const overlayId = 'scan-overlay-' + containerId;
+  const avId      = 'scan-av-'      + containerId;
+  const msgId     = 'scan-msg-'     + containerId;
+  const subId     = 'scan-sub-'     + containerId;
+  const barId     = 'sbar-'         + containerId;
+
+  // 移除舊 wrapper（若第二次呼叫同一 container）
+  const oldWrapper = parent.querySelector('#' + wrapperId);
   if (oldWrapper) oldWrapper.replaceWith(cardRow);
 
   const wrapper = document.createElement('div');
-  wrapper.id = 'scan-wrapper';
+  wrapper.id = wrapperId;
   wrapper.style.cssText = 'position:relative';
   cardRow.parentNode.insertBefore(wrapper, cardRow);
   wrapper.appendChild(cardRow);
 
   const overlay = document.createElement('div');
-  overlay.id = 'scan-overlay';
+  overlay.id = overlayId;
   overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;transition:opacity .35s ease;z-index:5;min-height:180px';
   overlay.innerHTML = `
-    <div id="scan-av" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
+    <div id="${avId}" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
     <div style="text-align:center">
-      <div id="scan-msg" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
-      <div id="scan-sub" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
+      <div id="${msgId}" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
+      <div id="${subId}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
     </div>
     <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-      <div id="sbar" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
+      <div id="${barId}" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
   wrapper.appendChild(overlay);
-  setTimeout(() => { const b=document.getElementById('sbar'); if(b) b.style.width='10%'; }, 80);
+  setTimeout(() => { const b=document.getElementById(barId); if(b) b.style.width='10%'; }, 80);
 
   let step = 0;
-  if (scanTimer) clearInterval(scanTimer);
-  scanTimer = setInterval(() => {
+  if (scanTimers[containerId]) clearInterval(scanTimers[containerId]);
+  scanTimers[containerId] = setInterval(() => {
     step = Math.min(step + 1, SCAN_STEPS.length - 1);
-    const s = SCAN_STEPS[step];
-    const msg = document.getElementById('scan-msg');
-    const av  = document.getElementById('scan-av');
-    const sub = document.getElementById('scan-sub');
-    const bar = document.getElementById('sbar');
+    const s   = SCAN_STEPS[step];
+    const msg = document.getElementById(msgId);
+    const av  = document.getElementById(avId);
+    const sub = document.getElementById(subId);
+    const bar = document.getElementById(barId);
     if (msg) { msg.style.opacity='0'; setTimeout(()=>{ msg.textContent=s.msg; msg.style.opacity='1'; },180); }
     if (av)  { av.style.transform='scale(.85)'; setTimeout(()=>{ av.textContent=s.av; av.style.transform='scale(1)'; av.style.transition='transform .2s'; },170); }
     if (sub) sub.textContent = s.sub;
@@ -386,9 +395,9 @@ function showScanning(containerId, statusId) {
   }, 2000);
 }
 
-function stopScanning() {
-  if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
-  const overlay = document.getElementById('scan-overlay');
+function stopScanning(containerId) {
+  if (scanTimers[containerId]) { clearInterval(scanTimers[containerId]); delete scanTimers[containerId]; }
+  const overlay = document.getElementById('scan-overlay-' + containerId);
   if (overlay) { overlay.style.opacity = '0'; setTimeout(() => overlay.remove(), 380); }
 }
 
@@ -496,10 +505,10 @@ async function loadToday() {
   try {
     const data = await callGAS({ action:'today' });
     cache.today = data;
-    stopScanning();
+    stopScanning('cards-today');
     renderTodayFromData(data);
   } catch(e) {
-    stopScanning();
+    stopScanning('cards-today');
     renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
     document.getElementById('cards-today').innerHTML =
       `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
@@ -538,10 +547,10 @@ async function loadStaff(name) {
   try {
     const data = await callGAS({ action:'staff', staff:name });
     cache.staff[name] = data;
-    stopScanning();
+    stopScanning('cards-staff');
     renderStaffFromData(data);
   } catch(e) {
-    stopScanning();
+    stopScanning('cards-staff');
     document.getElementById('cards-staff').innerHTML =
       `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料</div>`;
   }
