@@ -229,7 +229,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
   </div>
 
   <div class="footer">
-    <div class="ft-note">AI 即時抓取。本機器人與預約系統互相獨立，實際以預約系統為準。</div>
+    <div class="ft-note">AI 即時抓取。本機器人與預約系統互相獨立，實際以預約系統為準。<br><span id="ft-fetched" style="color:var(--gray3)"></span></div>
     <div class="ft-disc" onclick="openSheet(null)">注意事項</div>
   </div>
 </div>
@@ -505,6 +505,18 @@ function paintCards(containerId, slots) {
     padded.map((s,i) => cardHTML(s, i+1, classes[i], todayFull)).join('');
 }
 
+// ── 抓取時間顯示 ──────────────────────────────────────────────
+function setFetchedAt(isoString) {
+  const el = document.getElementById('ft-fetched');
+  if (!el || !isoString) return;
+  // 把 UTC ISO 轉成台灣時間 HH:MM 顯示
+  const d = new Date(isoString);
+  const hhmm = d.toLocaleTimeString('zh-TW', {
+    timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hour12: false
+  });
+  el.textContent = `資料時間 ${hhmm}`;
+}
+
 // ── Today ─────────────────────────────────────────────────────
 async function loadToday() {
   showScanning('cards-today', 'status-today');
@@ -543,6 +555,7 @@ function renderTodayFromData(data) {
   const top3 = earliestPerTeacher.slice(0, 3);
   tabSlots.today = top3;
   paintCards('cards-today', top3);
+  if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
 // ── Staff ─────────────────────────────────────────────────────
