@@ -600,7 +600,7 @@ function openSheet(slotIndex) {
       <div class="slot-summary">
         <span class="slot-time-big">${slot.time}</span>
         <div class="slot-meta">
-          <div class="slot-meta-name">${slot.teacher}</div>
+           <div class="slot-meta-name">${slot.teacher}${slot.isTrainee ? ' <span style="font-family:\'Noto Sans TC\',sans-serif;font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:var(--tr-bg);color:var(--tr-text);border:1px solid var(--tr-bdr);vertical-align:middle;white-space:nowrap">培訓新師</span>' : ''}</div>
           <div class="slot-meta-date">${nearLabel}　${mmdd}　${wd}</div>
         </div>
         <div class="slot-dur-pills">${pills}</div>
