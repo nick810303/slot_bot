@@ -330,34 +330,60 @@ function skeletonCardHTML() {
   </div>`;
 }
 
-// ── 掃描動畫：機器人訊息放在 status-bar，骨架卡片放在 card-row
-//    兩個區域完全獨立，不需要 overlay / wrapper DOM 操作 ──────────
 const SCAN_STEPS = [
-  {av:'🤖', msg:'機器人出動中…',      sub:'SCANNING'},
-  {av:'📡', msg:'連線預約系統中…',     sub:'CONNECTING'},
-  {av:'🔍', msg:'掃描所有老師時段…',   sub:'FETCHING'},
-  {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING'},
-  {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING'},
+  {av:'🤖', msg:'機器人出動中…',      sub:'SCANNING',   pct:10},
+  {av:'📡', msg:'連線預約系統中…',     sub:'CONNECTING', pct:28},
+  {av:'🔍', msg:'掃描所有老師時段…',   sub:'FETCHING',   pct:52},
+  {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING', pct:75},
+  {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING',    pct:92},
 ];
-const scanTimers = {}; // per-container，避免 today / staff 互搶
+// per-container，避免 today / staff 並行載入互搶同一 timer
+const scanTimers = {};
 
 function showScanning(containerId, statusId) {
-  // 1. 骨架卡片直接寫入 card-row，沒有任何東西蓋在上面
+  document.getElementById(statusId).innerHTML = '';
+
+  // 1. 骨架卡片放入 card-row
   document.getElementById(containerId).innerHTML =
-    `${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}`;
+    `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
 
-  // 2. 機器人動畫寫入 status-bar（和卡片區完全分離）
-  const avId  = 'scan-av-'  + containerId;
-  const msgId = 'scan-msg-' + containerId;
-  const subId = 'scan-sub-' + containerId;
-  document.getElementById(statusId).innerHTML = `
-    <div id="${avId}" style="width:22px;height:22px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:13px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
-    <div>
-      <div id="${msgId}" style="font-size:13px;font-weight:500;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
-      <div id="${subId}" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gray3);letter-spacing:.06em;margin-top:1px">${SCAN_STEPS[0].sub}</div>
+  // 2. wrapper 包住 card-row，讓 overlay 可以 position:absolute 蓋在上面
+  const cardRow   = document.getElementById(containerId);
+  const parent    = cardRow.parentNode;
+  const wrapperId = 'scan-wrapper-' + containerId;
+  const overlayId = 'scan-overlay-' + containerId;
+  const avId      = 'scan-av-'      + containerId;
+  const msgId     = 'scan-msg-'     + containerId;
+  const subId     = 'scan-sub-'     + containerId;
+  const barId     = 'sbar-'         + containerId;
+
+  // 若重複呼叫，先拆掉舊 wrapper
+  const oldWrapper = parent.querySelector('#' + wrapperId);
+  if (oldWrapper) oldWrapper.replaceWith(cardRow);
+
+  const wrapper = document.createElement('div');
+  wrapper.id = wrapperId;
+  wrapper.style.cssText = 'position:relative';
+  cardRow.parentNode.insertBefore(wrapper, cardRow);
+  wrapper.appendChild(cardRow);
+
+  // 3. overlay（機器人動畫）蓋在骨架卡片上——這是原版設計
+  const overlay = document.createElement('div');
+  overlay.id = overlayId;
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;z-index:5;min-height:180px;transition:opacity .35s ease';
+  overlay.innerHTML = `
+    <div id="${avId}" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
+    <div style="text-align:center">
+      <div id="${msgId}" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
+      <div id="${subId}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
+    </div>
+    <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
+      <div id="${barId}" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
+  wrapper.appendChild(overlay);
+  setTimeout(() => { const b=document.getElementById(barId); if(b) b.style.width='10%'; }, 80);
 
-  // 3. 輪播訊息
+  // 4. 訊息輪播（per-container timer）
   let step = 0;
   if (scanTimers[containerId]) clearInterval(scanTimers[containerId]);
   scanTimers[containerId] = setInterval(() => {
@@ -366,15 +392,19 @@ function showScanning(containerId, statusId) {
     const msg = document.getElementById(msgId);
     const av  = document.getElementById(avId);
     const sub = document.getElementById(subId);
+    const bar = document.getElementById(barId);
     if (msg) { msg.style.opacity='0'; setTimeout(()=>{ msg.textContent=s.msg; msg.style.opacity='1'; },180); }
-    if (av)  { av.style.transform='scale(.82)'; setTimeout(()=>{ av.textContent=s.av; av.style.transform='scale(1)'; av.style.transition='transform .18s'; },170); }
+    if (av)  { av.style.transform='scale(.85)'; setTimeout(()=>{ av.textContent=s.av; av.style.transform='scale(1)'; av.style.transition='transform .2s'; },170); }
     if (sub) sub.textContent = s.sub;
+    if (bar) bar.style.width = s.pct + '%';
   }, 2000);
 }
 
 function stopScanning(containerId) {
   if (scanTimers[containerId]) { clearInterval(scanTimers[containerId]); delete scanTimers[containerId]; }
-  // status-bar 會由 renderStatus() 覆寫，不需要額外清理
+  // overlay 淡出後移除，露出骨架卡片→緊接著 paintCards 換成真實卡片
+  const overlay = document.getElementById('scan-overlay-' + containerId);
+  if (overlay) { overlay.style.opacity='0'; setTimeout(()=>overlay.remove(), 380); }
 }
 
 // ── Filter ────────────────────────────────────────────────────
