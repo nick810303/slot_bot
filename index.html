@@ -583,6 +583,7 @@ function renderStaffFromData(data) {
   renderStatus('status-staff', status.text, status.color);
   tabSlots.staff = filtered;
   paintCards('cards-staff', filtered);
+  if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
 // ── Bottom sheet ──────────────────────────────────────────────
