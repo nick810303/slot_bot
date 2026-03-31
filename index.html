@@ -16,33 +16,23 @@
   --d120:#C4857A;--d120-bg:rgba(196,133,122,.10);--d120-bdr:rgba(196,133,122,.28);
   --d90:#A8906E; --d90-bg:rgba(168,144,110,.10); --d90-bdr:rgba(168,144,110,.28);
   --d60:#D4A882; --d60-bg:rgba(212,168,130,.10); --d60-bdr:rgba(212,168,130,.28);
-  /* ── 培訓新師代表色 #ADC99A ── */
-  --tr:      #ADC99A;
-  --tr-dark: #7A9B6A;
-  --tr-bg:   rgba(173,201,154,.10);
-  --tr-bdr:  rgba(173,201,154,.35);
-  --tr-text: #5C7A50;
+  --tr:#ADC99A;--tr-dark:#7A9B6A;--tr-bg:rgba(173,201,154,.10);--tr-bdr:rgba(173,201,154,.35);--tr-text:#5C7A50;
 }
 html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC',sans-serif;color:var(--black)}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
-
 .handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
-
 .hd{flex-shrink:0;padding:5px 14px 0}
 .hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .hd-name{font-size:11px;color:var(--gray)}
 .hd-live{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
-
 .tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px}
 .tab{flex:1;padding:5px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
 .tab.active{background:#fff;color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
-
 .filters{flex-shrink:0;border-bottom:1px solid #ebebeb;background:var(--bg3)}
 .filter-bar{display:flex;gap:5px;padding:5px 14px 5px}
-
 .filter-pill{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;cursor:pointer;transition:all .15s}
 .filter-pill.on-120{border-color:var(--d120);background:var(--d120-bg)}
 .filter-pill.on-90 {border-color:var(--d90); background:var(--d90-bg)}
@@ -57,52 +47,29 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .filter-pill.on-120 .pill-text{color:var(--d120);font-weight:500}
 .filter-pill.on-90  .pill-text{color:var(--d90); font-weight:500}
 .filter-pill.on-60  .pill-text{color:var(--d60); font-weight:500}
-
 .body{flex:1;overflow:hidden;position:relative}
 .pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:6px}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{display:none}
-
 .status-bar{display:flex;align-items:center;gap:6px;padding:6px 14px 4px}
 .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .status-text{font-size:13px;font-weight:500;line-height:1.3}
-
 .sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
-
 .card-row{display:flex;gap:6px;padding:0 12px}
-
 .card{flex:1 1 0;min-width:0;cursor:pointer}
-.card-inner{
-  height:148px;background:#f5f5f5;border:1px solid #e2e2e2;border-radius:8px;
-  overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;
-}
+.card-inner{height:148px;background:#f5f5f5;border:1px solid #e2e2e2;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;}
 .card-inner:active{background:#ececec}
-
-/* ── banner ── */
 .card-teacher-banner{flex-shrink:0;padding:4px 7px;display:flex;align-items:center;justify-content:space-between}
 .card-teacher-name{font-size:11px;font-weight:500;color:#fff;letter-spacing:.02em;line-height:1}
 .banner-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
-
-/* 培訓新師 badge（放在 rank 左側）*/
-.trainee-badge{
-  font-family:'Noto Sans TC',sans-serif;
-  font-size:7.5px;font-weight:500;
-  padding:1px 4px;border-radius:2px;
-  background:rgba(255,255,255,.20);
-  color:rgba(255,255,255,.92);
-  border:1px solid rgba(255,255,255,.28);
-  line-height:1.5;white-space:nowrap;flex-shrink:0;
-}
-
+.trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:7.5px;font-weight:500;padding:1px 4px;border-radius:2px;background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);line-height:1.5;white-space:nowrap;flex-shrink:0;}
 .card-body{flex:1;padding:5px 7px 5px;display:flex;flex-direction:column;background:#f5f5f5}
-
 .card-near-row{display:flex;align-items:center;gap:3px;margin-bottom:1px;flex-shrink:0}
 .near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;line-height:1.5}
 .near-badge.today{background:var(--black);color:#fff}
 .near-badge.other{background:#e0e0e0;color:#444}
 .full-badge{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
-
 .card-date-row{display:flex;align-items:baseline;gap:3px;margin-bottom:3px;flex-shrink:0}
 .card-mmdd{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#333}
 .card-wd{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray)}
@@ -113,52 +80,30 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .dur-pill.d120{color:var(--d120);background:rgba(196,133,122,.13);border:1px solid var(--d120-bdr)}
 .dur-pill.d90 {color:var(--d90); background:rgba(168,144,110,.13);border:1px solid var(--d90-bdr)}
 .dur-pill.d60 {color:var(--d60); background:rgba(212,168,130,.13);border:1px solid var(--d60-bdr)}
-
 .card-empty{flex:1 1 0;min-width:0}
 .card-empty-inner{height:148px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .card-empty-line{width:14px;height:1px;background:#e8e8e8}
-
-/* ── skeleton ── */
 .card-skeleton .card-inner{cursor:default}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .skel-banner{height:26px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0}
 .skel-line{border-radius:3px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite}
-
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes flipin{from{opacity:0;transform:perspective(500px) rotateY(-70deg)}to{opacity:1;transform:perspective(500px) rotateY(0deg)}}
 .flip-1{animation:flipin .4s cubic-bezier(.4,0,.2,1) both}
 .flip-2{animation:flipin .4s cubic-bezier(.4,0,.2,1) .11s both}
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
-
-/* ── staff tabs ── */
 .stab-group-wrap{display:flex;align-items:center;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
 .stab-group-wrap::-webkit-scrollbar{display:none}
-.stab-group-label{
-  flex-shrink:0;
-  font-family:'DM Mono',monospace;font-size:8.5px;
-  color:var(--tr-text);letter-spacing:.04em;
-  background:var(--tr-bg);border:1px solid var(--tr-bdr);
-  padding:3px 7px;border-radius:4px;
-  white-space:nowrap;align-self:center;line-height:1.4;
-}
+.stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--tr-text);letter-spacing:.04em;background:var(--tr-bg);border:1px solid var(--tr-bdr);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;}
 .stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
-.stab{
-  flex-shrink:0;padding:3px 10px;border-radius:20px;
-  border:1px solid var(--line);background:transparent;
-  font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);
-  cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;
-}
+.stab{flex-shrink:0;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;}
 .stab:last-child{margin-right:0}
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
 .stab.tr-pill{border-color:var(--tr-bdr);color:var(--tr-text)}
 .stab.tr-pill.active{background:var(--tr-dark);border-color:var(--tr-dark);color:#fff}
-
-/* ── footer ── */
 .footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff}
 .ft-note{font-size:9.5px;color:var(--gray2);line-height:1.5;flex:1}
 .ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
-
-/* ── bottom sheet ── */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
 .mask.show{opacity:1;pointer-events:all}
 .sheet{width:100%;max-width:480px;background:#fff;border-radius:14px 14px 0 0;padding:24px 24px max(22px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;border-top:3px solid var(--red)}
@@ -168,8 +113,9 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .slot-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:7px;background:var(--bg2);border:1px solid var(--line2);margin:8px 0 12px}
 .slot-time-big{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--black);letter-spacing:-.5px}
 .slot-meta{flex:1}
-.slot-meta-name{font-size:12px;color:var(--black);font-weight:500}
+.slot-meta-name{font-size:12px;color:var(--black);font-weight:500;display:flex;align-items:center;gap:5px}
 .slot-meta-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray)}
+.slot-trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:var(--tr-bg);color:var(--tr-text);border:1px solid var(--tr-bdr);white-space:nowrap;line-height:1.5;flex-shrink:0}
 .slot-dur-pills{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
 .slot-dur-pill{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;white-space:nowrap}
 .slot-dur-pill.d120{color:var(--d120);background:var(--d120-bg);border:1px solid var(--d120-bdr)}
@@ -185,7 +131,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 <body>
 <div class="app">
   <div class="handle"><div class="handle-bar"></div></div>
-
   <div class="hd">
     <div class="hd-top">
       <div class="hd-name">小泰空位查詢機器人</div>
@@ -196,7 +141,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
       <button class="tab" onclick="switchTab('staff',this)">指定老師</button>
     </div>
   </div>
-
   <div class="filters">
     <div class="filter-bar">
       <button class="filter-pill on-120" id="pill-120" onclick="toggleDur(120)">
@@ -213,7 +157,6 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
       </button>
     </div>
   </div>
-
   <div class="body">
     <div class="pane active" id="pane-today">
       <div class="status-bar" id="status-today"></div>
@@ -227,14 +170,12 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
       <div class="card-row" id="cards-staff"></div>
     </div>
   </div>
-
   <div class="footer">
     <div class="ft-note">AI 即時抓取。本機器人可能有誤差，實際以預約系統為準。</div>
     <span id="ft-fetched" style="font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray3);flex-shrink:0;white-space:nowrap"></span>
     <div class="ft-disc" onclick="openSheet(null)">注意事項</div>
   </div>
 </div>
-
 <div class="mask" id="mask" onclick="handleMaskClick(event)">
   <div class="sheet">
     <div class="sheet-tag">NOTICE</div>
@@ -247,39 +188,29 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     <span class="sheet-close" onclick="closeSheet()">關閉</span>
   </div>
 </div>
-
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
 const GAS_URL = 'https://green-art-030a.nick810303.workers.dev';
 const LIFF_ID = '2009610906-9zraEtAy';
-
 const WD = ['日','一','二','三','四','五','六'];
-
 const TEACHER_COLOR = {
   '令 Ling':'#6B7A8D','曜 Yao':'#7A6B6B','澈 Che':'#5C7A6E',
   '源 Yuan':'#7A6B52','鍛 Duan':'#6B5C7A','書 Shu':'#7A6B5C',
   '柏 Bo':'#5C6B7A','獺 Ta':'#7A5C6B',
 };
-
-const TRAINEE_NAMES = new Set(['椰 Ye','寧 Ning','沐 Mu']);
-
 const DUR_CONFIG = {
   120:{ cls:'d120', short:'120min', full:'120min 泰空經典' },
   90: { cls:'d90',  short:'90min',  full:'90min 泰空調和'  },
   60: { cls:'d60',  short:'60min',  full:'60min 泰空輕行'  },
 };
-
-// 培訓新師群組在前，正規師在後
-const STAFF_TRAINEE  = ['椰 Ye','寧 Ning','沐 Mu'];
-const STAFF_REGULAR  = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Shu','柏 Bo','獺 Ta'];
-
+const STAFF_TRAINEE = ['椰 Ye','寧 Ning','沐 Mu'];
+const STAFF_REGULAR = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Shu','柏 Bo','獺 Ta'];
 let selectedDurs = [60, 90, 120];
 let activeStaff  = STAFF_TRAINEE[0];
 let currentTab   = 'today';
 const tabSlots   = { today: [], staff: [] };
 const cache      = { today: null, staff: {} };
 
-// ── 日期工具 ──────────────────────────────────────────────────
 function dateMeta(dateKey) {
   const [y,m,d] = dateKey.split('-').map(Number);
   const date = new Date(y, m-1, d);
@@ -291,23 +222,16 @@ function dateMeta(dateKey) {
   const nearLabel = diff===0?'今日':diff===1?'明天':diff===2?'後天':`${diff}天後`;
   return { mmdd, wd, nearLabel, diff };
 }
-
 function todayKey() {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
-
-// ── API ───────────────────────────────────────────────────────
 function callGAS(params) {
   const qs = Object.keys(params).map(k => k+'='+encodeURIComponent(params[k])).join('&');
   return fetch(GAS_URL + '?' + qs).then(r => r.json());
 }
+function warmupGAS() { fetch(GAS_URL + '?action=ping').catch(() => {}); }
 
-function warmupGAS() {
-  fetch(GAS_URL + '?action=ping').catch(() => {});
-}
-
-// ── Skeleton ──────────────────────────────────────────────────
 function skeletonCardHTML() {
   return `
   <div class="card card-skeleton">
@@ -337,17 +261,12 @@ const SCAN_STEPS = [
   {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING', pct:75},
   {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING',    pct:92},
 ];
-// per-container，避免 today / staff 並行載入互搶同一 timer
 const scanTimers = {};
 
 function showScanning(containerId, statusId) {
   document.getElementById(statusId).innerHTML = '';
-
-  // 1. 骨架卡片放入 card-row
   document.getElementById(containerId).innerHTML =
     `<div style="width:100%;display:flex;gap:6px">${skeletonCardHTML()}${skeletonCardHTML()}${skeletonCardHTML()}</div>`;
-
-  // 2. wrapper 包住 card-row，讓 overlay 可以 position:absolute 蓋在上面
   const cardRow   = document.getElementById(containerId);
   const parent    = cardRow.parentNode;
   const wrapperId = 'scan-wrapper-' + containerId;
@@ -356,18 +275,13 @@ function showScanning(containerId, statusId) {
   const msgId     = 'scan-msg-'     + containerId;
   const subId     = 'scan-sub-'     + containerId;
   const barId     = 'sbar-'         + containerId;
-
-  // 若重複呼叫，先拆掉舊 wrapper
   const oldWrapper = parent.querySelector('#' + wrapperId);
   if (oldWrapper) oldWrapper.replaceWith(cardRow);
-
   const wrapper = document.createElement('div');
   wrapper.id = wrapperId;
   wrapper.style.cssText = 'position:relative';
   cardRow.parentNode.insertBefore(wrapper, cardRow);
   wrapper.appendChild(cardRow);
-
-  // 3. overlay（機器人動畫）蓋在骨架卡片上——這是原版設計
   const overlay = document.createElement('div');
   overlay.id = overlayId;
   overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;z-index:5;min-height:180px;transition:opacity .35s ease';
@@ -382,8 +296,6 @@ function showScanning(containerId, statusId) {
     </div>`;
   wrapper.appendChild(overlay);
   setTimeout(() => { const b=document.getElementById(barId); if(b) b.style.width='10%'; }, 80);
-
-  // 4. 訊息輪播（per-container timer）
   let step = 0;
   if (scanTimers[containerId]) clearInterval(scanTimers[containerId]);
   scanTimers[containerId] = setInterval(() => {
@@ -399,15 +311,12 @@ function showScanning(containerId, statusId) {
     if (bar) bar.style.width = s.pct + '%';
   }, 2000);
 }
-
 function stopScanning(containerId) {
   if (scanTimers[containerId]) { clearInterval(scanTimers[containerId]); delete scanTimers[containerId]; }
-  // overlay 淡出後移除，露出骨架卡片→緊接著 paintCards 換成真實卡片
   const overlay = document.getElementById('scan-overlay-' + containerId);
   if (overlay) { overlay.style.opacity='0'; setTimeout(()=>overlay.remove(), 380); }
 }
 
-// ── Filter ────────────────────────────────────────────────────
 function toggleDur(d) {
   if(selectedDurs.includes(d) && selectedDurs.length===1) return;
   selectedDurs = selectedDurs.includes(d) ? selectedDurs.filter(x=>x!==d) : [...selectedDurs,d];
@@ -417,8 +326,6 @@ function toggleDur(d) {
   if(cache.today) renderTodayFromData(cache.today);
   if(cache.staff[activeStaff]) renderStaffFromData(cache.staff[activeStaff]);
 }
-
-// ── Tab ───────────────────────────────────────────────────────
 function switchTab(id, btn) {
   currentTab = id;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -426,13 +333,10 @@ function switchTab(id, btn) {
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+id).classList.add('active');
 }
-
-// ── Status bar ────────────────────────────────────────────────
 function renderStatus(elId, text, color) {
   document.getElementById(elId).innerHTML =
     `<div class="status-dot" style="background:${color}"></div><span class="status-text" style="color:${color}">${text}</span>`;
 }
-
 function computeTodayStatus(slots) {
   const tk = todayKey();
   const todaySlots = slots.filter(s => s.dateKey === tk);
@@ -444,7 +348,6 @@ function computeTodayStatus(slots) {
   if (todaySlots.length <= 3) return { text:`今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
   return { text:'今日有多個時段可預約', color:'var(--green)' };
 }
-
 function computeStaffStatus(slots) {
   const tk = todayKey();
   const todayOk = slots.filter(s => s.dateKey === tk);
@@ -455,13 +358,9 @@ function computeStaffStatus(slots) {
   }
   return { text:`${activeStaff} 今日有 ${todayOk.length} 個空位`, color:'var(--green)' };
 }
-
-// ── Banner 背景色 ─────────────────────────────────────────────
 function bannerBg(slot) {
   return slot.isTrainee ? 'var(--tr-dark)' : (TEACHER_COLOR[slot.teacher] || '#666');
 }
-
-// ── Card HTML ─────────────────────────────────────────────────
 function cardHTML(slot, rank, flipCls, todayFull) {
   if (!slot) return `<div class="card-empty"><div class="card-empty-inner"><div class="card-empty-line"></div></div></div>`;
   const { mmdd, wd, nearLabel, diff } = dateMeta(slot.dateKey);
@@ -469,9 +368,7 @@ function cardHTML(slot, rank, flipCls, todayFull) {
   const durPills = slot.durations.map(d =>
     `<span class="dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
   ).join('');
-  const badgeHTML = slot.isTrainee
-    ? `<span class="trainee-badge">培訓新師</span>`
-    : '';
+  const badgeHTML = slot.isTrainee ? `<span class="trainee-badge">培訓新師</span>` : '';
   return `
   <div class="card">
     <div class="card-inner ${flipCls}" onclick="openSheet(${rank-1})">
@@ -495,7 +392,6 @@ function cardHTML(slot, rank, flipCls, todayFull) {
     </div>
   </div>`;
 }
-
 function paintCards(containerId, slots) {
   const tk = todayKey();
   const todayFull = !slots.some(s => s.dateKey === tk);
@@ -504,12 +400,9 @@ function paintCards(containerId, slots) {
   document.getElementById(containerId).innerHTML =
     padded.map((s,i) => cardHTML(s, i+1, classes[i], todayFull)).join('');
 }
-
-// ── 抓取時間顯示 ──────────────────────────────────────────────
 function setFetchedAt(isoString) {
   const el = document.getElementById('ft-fetched');
   if (!el || !isoString) return;
-  // 把 UTC ISO 轉成台灣時間 HH:MM 顯示
   const d = new Date(isoString);
   const hhmm = d.toLocaleTimeString('zh-TW', {
     timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hour12: false
@@ -517,7 +410,6 @@ function setFetchedAt(isoString) {
   el.textContent = `資料時間 ${hhmm}`;
 }
 
-// ── Today ─────────────────────────────────────────────────────
 async function loadToday() {
   showScanning('cards-today', 'status-today');
   try {
@@ -532,33 +424,26 @@ async function loadToday() {
       `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
   }
 }
-
 function renderTodayFromData(data) {
-  const allSlots = (data.slots || [])
-    .filter(s => s.durations.some(d => selectedDurs.includes(d)));
-
+  const allSlots = (data.slots || []).filter(s => s.durations.some(d => selectedDurs.includes(d)));
   const seenTeachers = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
     if (seenTeachers.has(s.teacher)) return false;
     seenTeachers.add(s.teacher);
     return true;
   });
-
   earliestPerTeacher.sort((a, b) => {
     if (a.dateKey !== b.dateKey) return a.dateKey < b.dateKey ? -1 : 1;
     return a.time < b.time ? -1 : 1;
   });
-
   const status = computeTodayStatus(earliestPerTeacher);
   renderStatus('status-today', status.text, status.color);
-
   const top3 = earliestPerTeacher.slice(0, 3);
   tabSlots.today = top3;
   paintCards('cards-today', top3);
   if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
-// ── Staff ─────────────────────────────────────────────────────
 async function loadStaff(name) {
   activeStaff = name;
   if (cache.staff[name]) { renderStaffFromData(cache.staff[name]); return; }
@@ -574,11 +459,8 @@ async function loadStaff(name) {
       `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料</div>`;
   }
 }
-
 function renderStaffFromData(data) {
-  const filtered = (data.slots || [])
-    .filter(s => s.durations.some(d => selectedDurs.includes(d)))
-    .slice(0, 3);
+  const filtered = (data.slots || []).filter(s => s.durations.some(d => selectedDurs.includes(d))).slice(0, 3);
   const status = computeStaffStatus(filtered);
   renderStatus('status-staff', status.text, status.color);
   tabSlots.staff = filtered;
@@ -586,7 +468,6 @@ function renderStaffFromData(data) {
   if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
-// ── Bottom sheet ──────────────────────────────────────────────
 function openSheet(slotIndex) {
   const wrap = document.getElementById('slot-summary-wrap');
   const slots = tabSlots[currentTab] || [];
@@ -596,11 +477,13 @@ function openSheet(slotIndex) {
     const pills = slot.durations.map(d =>
       `<span class="slot-dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
     ).join('');
+    const traineeBadge = slot.isTrainee
+      ? `<span class="slot-trainee-badge">培訓新師</span>` : '';
     wrap.innerHTML = `
       <div class="slot-summary">
         <span class="slot-time-big">${slot.time}</span>
         <div class="slot-meta">
-           <div class="slot-meta-name">${slot.teacher}${slot.isTrainee ? ' <span style="font-family:\'Noto Sans TC\',sans-serif;font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:var(--tr-bg);color:var(--tr-text);border:1px solid var(--tr-bdr);vertical-align:middle;white-space:nowrap">培訓新師</span>' : ''}</div>
+          <div class="slot-meta-name">${slot.teacher}${traineeBadge}</div>
           <div class="slot-meta-date">${nearLabel}　${mmdd}　${wd}</div>
         </div>
         <div class="slot-dur-pills">${pills}</div>
@@ -610,10 +493,8 @@ function openSheet(slotIndex) {
   }
   document.getElementById('mask').classList.add('show');
 }
-
 function closeSheet() { document.getElementById('mask').classList.remove('show'); }
 function handleMaskClick(e) { if(e.target.id==='mask') closeSheet(); }
-
 function goBooking() {
   closeSheet();
   const url = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu';
@@ -621,23 +502,16 @@ function goBooking() {
   else location.href = url;
 }
 
-// ── Staff tabs（培訓新師群組 + 分隔線 + 正規師）────────────────
 function buildStaffTabs() {
   const wrap = document.getElementById('staff-tabs');
-
-  // 培訓新師群組 label
   const label = document.createElement('div');
   label.className = 'stab-group-label';
   label.textContent = '培訓新師';
   wrap.appendChild(label);
-
   const spacer = document.createElement('div');
   spacer.style.cssText = 'width:6px;flex-shrink:0';
   wrap.appendChild(spacer);
-
   let firstBtn = null;
-
-  // 培訓新師 pills
   STAFF_TRAINEE.forEach(name => {
     const btn = document.createElement('button');
     btn.className = 'stab tr-pill';
@@ -651,13 +525,9 @@ function buildStaffTabs() {
     if (!firstBtn) firstBtn = btn;
     wrap.appendChild(btn);
   });
-
-  // 分隔線
   const divider = document.createElement('div');
   divider.className = 'stab-divider';
   wrap.appendChild(divider);
-
-  // 正規師 pills
   STAFF_REGULAR.forEach(name => {
     const btn = document.createElement('button');
     btn.className = 'stab';
@@ -670,22 +540,16 @@ function buildStaffTabs() {
     };
     wrap.appendChild(btn);
   });
-
-  // 預設選中第一個培訓新師
   if (firstBtn) firstBtn.classList.add('active');
 }
 
-// ── Init ──────────────────────────────────────────────────────
 function init() {
   warmupGAS();
-  if (typeof liff !== 'undefined') {
-    liff.init({ liffId: LIFF_ID }).catch(() => {});
-  }
+  if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
   buildStaffTabs();
   loadToday();
   loadStaff(STAFF_TRAINEE[0]);
 }
-
 init();
 </script>
 </body>
