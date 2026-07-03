@@ -9,84 +9,115 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#fff;--bg2:#f7f7f7;--bg3:#fafafa;--line:#e8e8e8;--line2:#ebebeb;
-  --black:#111;--gray:#999;--gray2:#bbb;--gray3:#ccc;
-  --red:#D94F4F;--red-bg:rgba(217,79,79,.07);--red-bdr:rgba(217,79,79,.2);
-  --green:#2a9d5c;
+  /* 溫潤陶土・小泰空品牌暖棕調（白天明亮，但整體更棕更暖）*/
+  --cream:#F8F2EE;--clay:#AE6C56;--cocoa:#91563E;--gold:#C9963C;--sand:#D1CBBF;
+  --bg:#F4ECE3;--bg2:#EADFD1;--bg3:#F0E7DC;--line:#E0D4C4;--line2:#E7DDCE;
+  --black:#3E2A21;--gray:#8b7d6b;--gray2:#b3a58f;--gray3:#cbbca6;
+  /* 卡片頭統一色（深可可）＋卡片亮面 */
+  --header:#91563E;--card:#FCF8F3;--card-bdr:#E4D8C7;
+  /* 通知/提醒紅：品牌莓陶紅 */
+  --red:#C24D3F;--red-bg:rgba(194,77,63,.07);--red-bdr:rgba(194,77,63,.2);
+  /* 狀態綠：品牌暖綠 */
+  --green:#5C7A50;
+  /* 分店識別色（南京三民＝深松綠；中山＝棗磚紅）*/
+  --nj:#4E5D3E;--nj-bg:rgba(78,93,62,.10);--nj-bdr:rgba(78,93,62,.30);
+  --zs:#96382E;--zs-bg:rgba(150,56,46,.10);--zs-bdr:rgba(150,56,46,.30);
+  /* 老師膠囊：正規＝陶土棕、培訓＝橄欖綠（同大地色系、和諧可辨）*/
+  --pill-reg:#AE6C56;--pill-reg-bg:rgba(174,108,86,.10);--pill-reg-bdr:rgba(174,108,86,.42);
+  --pill-tr:#6E7B4E;--pill-tr-bg:rgba(110,123,78,.12);--pill-tr-bdr:rgba(110,123,78,.46);
   --d120:#C4857A;--d120-bg:rgba(196,133,122,.10);--d120-bdr:rgba(196,133,122,.28);
   --d90:#A8906E; --d90-bg:rgba(168,144,110,.10); --d90-bdr:rgba(168,144,110,.28);
   --d60:#D4A882; --d60-bg:rgba(212,168,130,.10); --d60-bdr:rgba(212,168,130,.28);
-  --tr:#ADC99A;--tr-dark:#7A9B6A;--tr-bg:rgba(173,201,154,.10);--tr-bdr:rgba(173,201,154,.35);--tr-text:#5C7A50;
+  --tr:#ADC99A;--tr-dark:#6E7B4E;--tr-bg:rgba(110,123,78,.12);--tr-bdr:rgba(110,123,78,.42);--tr-text:#5A6640;
 }
-html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC',sans-serif;color:var(--black)}
-.app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:#fff}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--black)}
+.app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg)}
 .handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
-.hd{flex-shrink:0;padding:5px 14px 0}
+.hd{flex-shrink:0;padding:5px 14px 8px}
 .hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
 .hd-name{font-size:11px;color:var(--gray)}
 .hd-live{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
-.tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px}
+.tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(62,42,33,.13)}
 .tab{flex:1;padding:5px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
-.tab.active{background:#fff;color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
-.filters{flex-shrink:0;border-bottom:1px solid #ebebeb;background:var(--bg3)}
-.branch-bar{display:flex;gap:5px;padding:5px 14px 0}
-.bpill{flex:1;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:#aaa;cursor:pointer;transition:all .15s;text-align:center}
-.bpill.on{border-color:var(--black);background:var(--black);color:#fff;font-weight:500}
-.filter-bar{display:flex;gap:5px;padding:5px 14px 5px}
-.filter-pill{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;cursor:pointer;transition:all .15s}
-.filter-pill.on-120{border-color:var(--d120);background:var(--d120-bg)}
-.filter-pill.on-90 {border-color:var(--d90); background:var(--d90-bg)}
-.filter-pill.on-60 {border-color:var(--d60); background:var(--d60-bg)}
-.pill-box{width:11px;height:11px;border-radius:2px;border:1.5px solid #ccc;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.filter-pill.on-120 .pill-box{border-color:var(--d120);background:var(--d120)}
-.filter-pill.on-90  .pill-box{border-color:var(--d90); background:var(--d90)}
-.filter-pill.on-60  .pill-box{border-color:var(--d60); background:var(--d60)}
-.pill-check{display:none}
-.filter-pill.on-120 .pill-check,.filter-pill.on-90 .pill-check,.filter-pill.on-60 .pill-check{display:block}
-.pill-text{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;line-height:1;white-space:nowrap;transition:color .15s}
-.filter-pill.on-120 .pill-text{color:var(--d120);font-weight:500}
-.filter-pill.on-90  .pill-text{color:var(--d90); font-weight:500}
-.filter-pill.on-60  .pill-text{color:var(--d60); font-weight:500}
+.tab.active{background:var(--card);color:var(--black);font-weight:500;box-shadow:0 1px 2px rgba(62,42,33,.18),inset 0 1px 0 rgba(255,255,255,.75)}
+.filters{flex-shrink:0;border-bottom:1px solid var(--line2);background:var(--bg3);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+/* 分店＋時長：一列五個勾選框（左分店、右時長，中間分隔）*/
+.filter-row{display:flex;align-items:stretch;gap:5px;padding:5px 12px 6px}
+.cbx{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 3px;border-radius:6px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;transition:all .15s;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 1px rgba(62,42,33,.07)}
+.cbx.on{box-shadow:inset 0 1px 2px rgba(62,42,33,.17)}
+.cbx:active{transform:scale(.97)}
+.cbx-box{width:12px;height:12px;border-radius:3px;border:1.5px solid #cdc4b8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.cbx-check{display:none}
+.cbx.on .cbx-check{display:block}
+.cbx-label{font-size:11px;color:#a79d8f;line-height:1;white-space:nowrap;transition:color .15s}
+.cbx-dur .cbx-label{font-family:'DM Mono',monospace;font-size:10px}
+.cbx-branch{flex:1.2 1 0}
+.cbx-sep{width:1px;background:var(--line);flex-shrink:0;margin:3px 3px;align-self:stretch}
+/* 分店 on 狀態（品牌分店色）*/
+.cbx-branch[data-branch="南京三民"].on{border-color:var(--nj);background:var(--nj-bg)}
+.cbx-branch[data-branch="南京三民"].on .cbx-box{border-color:var(--nj);background:var(--nj)}
+.cbx-branch[data-branch="南京三民"].on .cbx-label{color:var(--nj);font-weight:500}
+.cbx-branch[data-branch="中山"].on{border-color:var(--zs);background:var(--zs-bg)}
+.cbx-branch[data-branch="中山"].on .cbx-box{border-color:var(--zs);background:var(--zs)}
+.cbx-branch[data-branch="中山"].on .cbx-label{color:var(--zs);font-weight:500}
+/* 時長 on 狀態 */
+.cbx-dur.d120.on{border-color:var(--d120);background:var(--d120-bg)}
+.cbx-dur.d120.on .cbx-box{border-color:var(--d120);background:var(--d120)}
+.cbx-dur.d120.on .cbx-label{color:var(--d120);font-weight:500}
+.cbx-dur.d90.on{border-color:var(--d90);background:var(--d90-bg)}
+.cbx-dur.d90.on .cbx-box{border-color:var(--d90);background:var(--d90)}
+.cbx-dur.d90.on .cbx-label{color:var(--d90);font-weight:500}
+.cbx-dur.d60.on{border-color:var(--d60);background:var(--d60-bg)}
+.cbx-dur.d60.on .cbx-box{border-color:var(--d60);background:var(--d60)}
+.cbx-dur.d60.on .cbx-label{color:var(--d60);font-weight:500}
 .body{flex:1;overflow:hidden;position:relative}
 .pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:6px}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{display:none}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 14px 6px}
 .status-bar{display:flex;align-items:center;gap:6px;padding:6px 14px 4px}
+.status-row .status-bar{padding:0;flex:1;min-width:0}
+.status-row .sec-label{padding:0;flex-shrink:0;text-align:right;white-space:nowrap}
 .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .status-text{font-size:13px;font-weight:500;line-height:1.3}
 .sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
 .card-row{display:flex;gap:6px;padding:0 12px}
 .card{flex:1 1 0;min-width:0;cursor:pointer}
-.card-inner{height:148px;background:#f5f5f5;border:1px solid #e2e2e2;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;}
-.card-inner:active{background:#ececec}
-.card-teacher-banner{flex-shrink:0;padding:4px 7px;display:flex;align-items:center;justify-content:space-between}
-.card-teacher-name{font-size:11px;font-weight:500;color:#fff;letter-spacing:.02em;line-height:1}
+.card-inner{height:148px;background:var(--card);border:1px solid var(--card-bdr);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;box-shadow:0 1px 2px rgba(62,42,33,.14),inset 0 1px 0 rgba(255,255,255,.5)}
+.card-inner:active{background:#f3ebe0}
+.card-teacher-banner{flex-shrink:0;padding:4px 7px;display:flex;align-items:center;justify-content:space-between;gap:5px;background:var(--header)}
+.banner-left{display:flex;align-items:center;gap:5px;min-width:0}
+.card-hd-av{width:17px;height:17px;border-radius:50%;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4)}
+.card-teacher-name{font-size:11px;font-weight:500;color:var(--cream);letter-spacing:.02em;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .banner-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
 .trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:7.5px;font-weight:500;padding:1px 4px;border-radius:2px;background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);line-height:1.5;white-space:nowrap;flex-shrink:0;}
-.card-body{flex:1;padding:5px 7px 5px;display:flex;flex-direction:column;background:#f5f5f5}
-.card-near-row{display:flex;align-items:center;gap:3px;margin-bottom:1px;flex-shrink:0}
-.near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;line-height:1.5}
+.card-body{flex:1;padding:5px 7px 5px;display:flex;flex-direction:column;background:var(--card)}
+.card-near-row{display:flex;align-items:center;gap:4px;margin-bottom:6px;flex-shrink:0}
+.near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;line-height:1.6}
 .near-badge.today{background:var(--black);color:#fff}
-.near-badge.other{background:#e0e0e0;color:#444}
+.near-badge.other{background:#e7ddce;color:#6b5d4d}
 .branch-chip{font-family:'Noto Sans TC',sans-serif;font-size:8px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:#fff;border:1px solid #ddd;color:#888;white-space:nowrap}
+.branch-chip.bc-nj{color:var(--nj);border-color:var(--nj-bdr);background:var(--nj-bg)}
+.branch-chip.bc-zs{color:var(--zs);border-color:var(--zs-bdr);background:var(--zs-bg)}
 .full-badge{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
-.card-date-row{display:flex;align-items:baseline;gap:3px;margin-bottom:3px;flex-shrink:0}
-.card-mmdd{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#333}
-.card-wd{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray)}
-.card-time{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:1;margin-bottom:4px;flex-shrink:0}
-.card-div{height:1px;background:#e0e0e0;flex-shrink:0;margin-bottom:4px}
-.card-durs{display:flex;flex-wrap:wrap;gap:3px;flex:1;align-content:flex-start;overflow:hidden}
-.dur-pill{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;white-space:nowrap;display:inline-block}
+.card-when{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-shrink:0}
+.card-date{display:flex;flex-direction:column;line-height:1.12}
+.card-mmdd{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#6b5240}
+.card-wd{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray)}
+.card-time{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:.95}
+.card-div{height:1px;background:var(--line);flex-shrink:0;margin-bottom:5px}
+.card-durs{display:flex;flex-wrap:wrap;gap:4px;flex:1;align-content:flex-start;overflow:hidden}
+.dur-pill{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;line-height:1.6;white-space:nowrap;display:inline-block}
 .dur-pill.d120{color:var(--d120);background:rgba(196,133,122,.13);border:1px solid var(--d120-bdr)}
 .dur-pill.d90 {color:var(--d90); background:rgba(168,144,110,.13);border:1px solid var(--d90-bdr)}
 .dur-pill.d60 {color:var(--d60); background:rgba(212,168,130,.13);border:1px solid var(--d60-bdr)}
 .card-empty{flex:1 1 0;min-width:0}
-.card-empty-inner{height:148px;border:1px dashed #efefef;border-radius:8px;display:flex;align-items:center;justify-content:center}
-.card-empty-line{width:14px;height:1px;background:#e8e8e8}
+.card-empty-inner{height:148px;border:1px dashed var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.card-empty-line{width:14px;height:1px;background:var(--line)}
 .card-skeleton .card-inner{cursor:default}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .skel-banner{height:26px;background:linear-gradient(90deg,#e8e8e8 25%,#f0f0f0 50%,#e8e8e8 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;flex-shrink:0}
@@ -96,31 +127,42 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .flip-1{animation:flipin .4s cubic-bezier(.4,0,.2,1) both}
 .flip-2{animation:flipin .4s cubic-bezier(.4,0,.2,1) .11s both}
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
-.stab-group-wrap{display:flex;align-items:center;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan-spin{width:34px;height:34px;border-radius:50%;border:2.5px solid rgba(174,108,86,.16);border-top-color:var(--clay);animation:spin .85s linear infinite;flex-shrink:0}
+.stab-group-wrap{flex-shrink:0;display:flex;align-items:center;padding:7px 14px;overflow-x:auto;scrollbar-width:none;background:var(--bg3);border-bottom:1px solid var(--line2);box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
 .stab-group-wrap::-webkit-scrollbar{display:none}
-.stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:#8a8a8a;letter-spacing:.04em;background:#f2f2f2;border:1px solid #e4e4e4;padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px}
+.stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--gray);letter-spacing:.04em;background:var(--bg2);border:1px solid var(--line);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px}
 .stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
-.stab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;}
+.stab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:20px;border:1px solid var(--pill-reg-bdr);background:var(--card);font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--pill-reg);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 1.5px rgba(62,42,33,.08)}
 .stab:last-child{margin-right:0}
 .stab-av{width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#e8e8e8}
-.stab.active{background:var(--black);border-color:var(--black);color:#fff}
-.stab.tr-pill{border-color:var(--tr-bdr);color:var(--tr-text)}
-.stab.tr-pill.active{background:var(--tr-dark);border-color:var(--tr-dark);color:#fff}
-.footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff}
+.stab.active{background:var(--pill-reg);border-color:var(--pill-reg);color:var(--cream);box-shadow:inset 0 1px 2px rgba(0,0,0,.2),0 1px 1px rgba(62,42,33,.1)}
+.stab-tr-tag{font-family:'Noto Sans TC',sans-serif;font-size:7.5px;font-weight:500;line-height:1.6;padding:1px 4px;border-radius:2px;margin-left:3px;flex-shrink:0;white-space:nowrap;background:rgba(174,108,86,.13);color:var(--clay);border:1px solid rgba(174,108,86,.30)}
+.stab.active .stab-tr-tag{background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border-color:rgba(255,255,255,.28)}
+.footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg)}
 .ft-note{font-size:9.5px;color:var(--gray2);line-height:1.5;flex:1}
 .ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
-.mask{position:fixed;inset:0;background:rgba(0,0,0,.22);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
+.mask{position:fixed;inset:0;background:rgba(62,42,33,.30);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
 .mask.show{opacity:1;pointer-events:all}
-.sheet{width:100%;max-width:480px;background:#fff;border-radius:14px 14px 0 0;padding:24px 24px max(22px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;border-top:3px solid var(--red)}
+.sheet{position:relative;width:100%;max-width:480px;background:var(--card);border:1px solid #d3c3ac;border-bottom:none;border-radius:12px 12px 0 0;padding:22px 22px max(20px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;box-shadow:0 -3px 18px rgba(62,42,33,.22),inset 0 1px 0 rgba(255,255,255,.7)}
+.sheet::before{content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);width:34px;height:4px;border-radius:2px;background:var(--sand);box-shadow:inset 0 1px 1px rgba(62,42,33,.2)}
 .mask.show .sheet{transform:translateY(0)}
-.sheet-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:.09em;margin-bottom:12px}
+.sheet-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;color:var(--cream);letter-spacing:.09em;background:var(--cocoa);padding:2px 7px;border-radius:4px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 1px rgba(62,42,33,.16)}
 .sheet-title{font-size:16px;font-weight:500;line-height:1.4;margin-bottom:4px}
-.slot-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:7px;background:var(--bg2);border:1px solid var(--line2);margin:8px 0 12px}
+.slot-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px;border-radius:7px;background:var(--bg2);border:1px solid var(--line2);margin:8px 0 12px}
 .slot-time-big{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--black);letter-spacing:-.5px}
 .slot-meta{flex:1}
 .slot-meta-name{font-size:12px;color:var(--black);font-weight:500;display:flex;align-items:center;gap:5px}
-.slot-meta-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray)}
-.slot-trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:var(--tr-bg);color:var(--tr-text);border:1px solid var(--tr-bdr);white-space:nowrap;line-height:1.5;flex-shrink:0}
+.slot-meta-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);margin-top:4px}
+.slot-timecol{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0}
+.slot-div{width:1px;align-self:stretch;background:var(--sand);flex-shrink:0;margin:2px 4px}
+.slot-av{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3);border:1px solid var(--line2)}
+.slot-branch-link{display:inline-flex;align-items:center;gap:3px;font-family:'Noto Sans TC',sans-serif;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;text-decoration:none;color:var(--cream)}
+.slot-branch-link.bc-nj{background:var(--nj)}
+.slot-branch-link.bc-zs{background:var(--zs)}
+.slot-branch-link .ext{opacity:.85}
+.slot-branch-plain{font-family:'Noto Sans TC',sans-serif;font-size:10.5px;color:var(--gray)}
+.slot-trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:rgba(201,150,60,.15);color:#6b4f0e;border:1px solid rgba(201,150,60,.4);white-space:nowrap;line-height:1.5;flex-shrink:0}
 .slot-dur-pills{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
 .slot-dur-pill{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;white-space:nowrap}
 .slot-dur-pill.d120{color:var(--d120);background:var(--d120-bg);border:1px solid var(--d120-bdr)}
@@ -128,8 +170,8 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .slot-dur-pill.d60 {color:var(--d60); background:var(--d60-bg); border:1px solid var(--d60-bdr)}
 .sheet-body{font-size:13px;color:var(--gray);line-height:1.85;margin-bottom:16px}
 .sheet-body b{color:var(--black);font-weight:500}
-.sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--black);color:#fff;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer}
-.sheet-btn:active{opacity:.8}
+.sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;border:1px solid #7d4a37;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
+.sheet-btn:active{box-shadow:inset 0 1px 3px rgba(0,0,0,.28);opacity:.96}
 .sheet-close{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--gray2);cursor:pointer;padding:4px}
 </style>
 </head>
@@ -147,41 +189,49 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     </div>
   </div>
   <div class="filters">
-    <div class="branch-bar">
-      <button class="bpill on" id="bpill-all" onclick="setBranch('all')">全部分店</button>
-      <button class="bpill" id="bpill-南京三民" onclick="setBranch('南京三民')">南京三民 G18</button>
-      <button class="bpill" id="bpill-中山" onclick="setBranch('中山')">中山 R11/G14</button>
-    </div>
-    <div class="filter-bar">
-      <button class="filter-pill on-120" id="pill-120" onclick="toggleDur(120)">
-        <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <span class="pill-text">120min 泰空經典</span>
+    <div class="filter-row">
+      <button class="cbx cbx-branch on" data-branch="南京三民" onclick="toggleBranch('南京三民')">
+        <span class="cbx-box"><svg class="cbx-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cbx-label">南京三民</span>
       </button>
-      <button class="filter-pill on-90" id="pill-90" onclick="toggleDur(90)">
-        <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <span class="pill-text">90min 泰空調和</span>
+      <button class="cbx cbx-branch on" data-branch="中山" onclick="toggleBranch('中山')">
+        <span class="cbx-box"><svg class="cbx-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cbx-label">中山</span>
       </button>
-      <button class="filter-pill on-60" id="pill-60" onclick="toggleDur(60)">
-        <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <span class="pill-text">60min 泰空輕行</span>
+      <span class="cbx-sep"></span>
+      <button class="cbx cbx-dur d120 on" id="pill-120" onclick="toggleDur(120)">
+        <span class="cbx-box"><svg class="cbx-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cbx-label">120min</span>
+      </button>
+      <button class="cbx cbx-dur d90 on" id="pill-90" onclick="toggleDur(90)">
+        <span class="cbx-box"><svg class="cbx-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cbx-label">90min</span>
+      </button>
+      <button class="cbx cbx-dur d60 on" id="pill-60" onclick="toggleDur(60)">
+        <span class="cbx-box"><svg class="cbx-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="cbx-label">60min</span>
       </button>
     </div>
   </div>
+  <div class="stab-group-wrap" id="staff-tabs"></div>
   <div class="body">
     <div class="pane active" id="pane-today">
-      <div class="status-bar" id="status-today"></div>
-      <div class="sec-label" id="label-today">最早可約 · 3 位不同老師</div>
+      <div class="status-row">
+        <div class="status-bar" id="status-today"></div>
+        <div class="sec-label" id="label-today">最早可約 · 3 位老師</div>
+      </div>
       <div class="card-row" id="cards-today"></div>
     </div>
     <div class="pane" id="pane-staff">
-      <div class="stab-group-wrap" id="staff-tabs"></div>
-      <div class="status-bar" id="status-staff"></div>
-      <div class="sec-label">最早可約 3 筆</div>
+      <div class="status-row">
+        <div class="status-bar" id="status-staff"></div>
+        <div class="sec-label" id="label-staff">最早可約 3 筆</div>
+      </div>
       <div class="card-row" id="cards-staff"></div>
     </div>
   </div>
   <div class="footer">
-    <div class="ft-note">AI 即時抓取。本儀表板可能有誤差，實際以預約系統為準。</div>
+    <div class="ft-note">本儀表板可能有誤差，實際以預約系統為準。</div>
     <span id="ft-fetched" style="font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray3);flex-shrink:0;white-space:nowrap"></span>
     <div class="ft-disc" onclick="openSheet(null)">注意事項</div>
   </div>
@@ -209,7 +259,11 @@ const LIFF_BOOKING = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2j
 const BRANCHES     = ['南京三民', '中山'];
 const CACHE_TTL_MS = 3 * 60 * 1000; // 3 分鐘
 const WD = ['日','一','二','三','四','五','六'];
-const BRANCH_SHORT = { '南京三民':'南京', '中山':'中山' };
+const BRANCH_SHORT = { '南京三民':'南京三民', '中山':'中山' }; // 南京三民為整體，不簡稱
+const BRANCH_MAP = {
+  '南京三民':'https://maps.app.goo.gl/i3ZkLhMTygNhrhEs7',
+  '中山':'https://maps.app.goo.gl/KhFGBErcJSEoDF3f7',
+};
 const TEACHER_COLOR = {
   '令 Ling':'#6B7A8D','曜 Yao':'#7A6B6B','澈 Che':'#5C7A6E',
   '源 Yuan':'#7A6B52','鍛 Duan':'#6B5C7A','書 Shu':'#7A6B5C',
@@ -221,14 +275,15 @@ const DUR_CONFIG = {
   90: { cls:'d90',  short:'90min',  full:'90min 泰空調和'  },
   60: { cls:'d60',  short:'60min',  full:'60min 泰空輕行'  },
 };
-let selectedDurs   = [60, 90, 120];
-let selectedBranch = 'all';
-let roster         = [];   // 從客立樂選單動態解析
-let allData        = null; // { slots, roster, fetchedAt }
-let activeStaffId  = null;
-let currentTab     = 'today';
-let sheetSlot      = null;
-const tabSlots     = { today: [], staff: [] };
+let selectedDurs     = [120, 90, 60];
+let selectedBranches = ['南京三民', '中山'];   // 兩間都選＝全部
+let roster           = [];   // 從客立樂選單動態解析
+let allData          = null; // { slots, roster, fetchedAt }
+let activeStaffId    = null; // 指定老師模式：單選
+let todayStaff       = new Set(); // 今日模式：老師多選（預設全選）
+let currentTab       = 'today';
+let sheetSlot        = null;
+const tabSlots       = { today: [], staff: [] };
 
 function dateMeta(dateKey) {
   const [y,m,d] = dateKey.split('-').map(Number);
@@ -333,7 +388,7 @@ async function loadAll() {
   rlist.sort((a,b) => {
     const bi = BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch);
     if (bi) return bi;
-    if (a.isTrainee !== b.isTrainee) return a.isTrainee ? 1 : -1;
+    if (a.isTrainee !== b.isTrainee) return a.isTrainee ? -1 : 1;
     return a.name < b.name ? -1 : 1;
   });
   return { slots, roster:rlist, fetchedAt:new Date().toISOString() };
@@ -381,11 +436,11 @@ function skeletonCardHTML() {
 }
 
 const SCAN_STEPS = [
-  {av:'🤖', msg:'機器人出動中…',      sub:'SCANNING',   pct:10},
-  {av:'📡', msg:'連線預約系統中…',     sub:'CONNECTING', pct:28},
-  {av:'🔍', msg:'掃描兩分店老師時段…', sub:'FETCHING',   pct:52},
-  {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING', pct:75},
-  {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING',    pct:92},
+  {msg:'讀取空檔資料…',   sub:'LOADING',    pct:12},
+  {msg:'連線預約系統…',   sub:'CONNECTING', pct:30},
+  {msg:'查詢兩分店時段…', sub:'SCANNING',   pct:54},
+  {msg:'整理可預約時間…', sub:'ARRANGING',  pct:78},
+  {msg:'即將完成…',       sub:'ALMOST',     pct:93},
 ];
 const scanTimers = {};
 
@@ -397,7 +452,6 @@ function showScanning(containerId, statusId) {
   const parent    = cardRow.parentNode;
   const wrapperId = 'scan-wrapper-' + containerId;
   const overlayId = 'scan-overlay-' + containerId;
-  const avId      = 'scan-av-'      + containerId;
   const msgId     = 'scan-msg-'     + containerId;
   const subId     = 'scan-sub-'     + containerId;
   const barId     = 'sbar-'         + containerId;
@@ -412,13 +466,13 @@ function showScanning(containerId, statusId) {
   overlay.id = overlayId;
   overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;z-index:5;min-height:180px;transition:opacity .35s ease';
   overlay.innerHTML = `
-    <div id="${avId}" style="width:50px;height:50px;border-radius:50%;background:#f2f2f2;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:center;font-size:22px;animation:bob 1.8s ease-in-out infinite;flex-shrink:0">🤖</div>
+    <div class="scan-spin"></div>
     <div style="text-align:center">
       <div id="${msgId}" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
       <div id="${subId}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
     </div>
-    <div style="width:100px;height:2px;background:#f0f0f0;border-radius:2px;overflow:hidden">
-      <div id="${barId}" style="height:100%;width:5%;background:var(--black);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
+    <div style="width:100px;height:2px;background:var(--bg2);border-radius:2px;overflow:hidden">
+      <div id="${barId}" style="height:100%;width:5%;background:var(--clay);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
     </div>`;
   wrapper.appendChild(overlay);
   setTimeout(() => { const b=document.getElementById(barId); if(b) b.style.width='10%'; }, 80);
@@ -428,11 +482,9 @@ function showScanning(containerId, statusId) {
     step = Math.min(step + 1, SCAN_STEPS.length - 1);
     const s   = SCAN_STEPS[step];
     const msg = document.getElementById(msgId);
-    const av  = document.getElementById(avId);
     const sub = document.getElementById(subId);
     const bar = document.getElementById(barId);
     if (msg) { msg.style.opacity='0'; setTimeout(()=>{ msg.textContent=s.msg; msg.style.opacity='1'; },180); }
-    if (av)  { av.style.transform='scale(.85)'; setTimeout(()=>{ av.textContent=s.av; av.style.transform='scale(1)'; av.style.transition='transform .2s'; },170); }
     if (sub) sub.textContent = s.sub;
     if (bar) bar.style.width = s.pct + '%';
   }, 2000);
@@ -445,35 +497,41 @@ function stopScanning(containerId) {
 
 // ── 篩選 ─────────────────────────────────────────────────────
 function toggleDur(d) {
-  if(selectedDurs.includes(d) && selectedDurs.length===1) return;
+  if (selectedDurs.includes(d) && selectedDurs.length===1) return; // 至少保留一個時長
   selectedDurs = selectedDurs.includes(d) ? selectedDurs.filter(x=>x!==d) : [...selectedDurs,d];
-  [120,90,60].forEach(x => {
-    document.getElementById('pill-'+x).className = 'filter-pill'+(selectedDurs.includes(x)?' on-'+x:'');
-  });
-  rerenderAll();
+  [120,90,60].forEach(x =>
+    document.getElementById('pill-'+x).classList.toggle('on', selectedDurs.includes(x))
+  );
+  onFilterChange();
 }
-function setBranch(b) {
-  if (selectedBranch === b) return;
-  selectedBranch = b;
-  ['all','南京三民','中山'].forEach(x => {
-    document.getElementById('bpill-'+x).className = 'bpill'+(selectedBranch===x?' on':'');
-  });
-  buildStaffTabs();
-  rerenderAll();
+function toggleBranch(b) {
+  const has = selectedBranches.includes(b);
+  if (has && selectedBranches.length===1) return; // 至少保留一間分店
+  if (has) {
+    selectedBranches = selectedBranches.filter(x=>x!==b);
+  } else {
+    selectedBranches = [...selectedBranches, b];
+    roster.filter(s=>s.branch===b).forEach(s=>todayStaff.add(s.staffId)); // 新開分店的老師預設納入
+  }
+  // 移除被隱藏分店的老師（今日多選）
+  const vis = new Set(visibleRoster().map(s=>s.staffId));
+  [...todayStaff].forEach(id=>{ if(!vis.has(id)) todayStaff.delete(id); });
+  document.querySelectorAll('.cbx-branch').forEach(el =>
+    el.classList.toggle('on', selectedBranches.includes(el.dataset.branch))
+  );
+  onFilterChange();
 }
-function rerenderAll() {
+function onFilterChange() {
   if (!allData) return;
+  buildStaffTabs();
   renderToday();
-  // 指定老師分頁：若目前老師被分店篩掉，換成第一位可見老師
-  const visible = visibleRoster();
-  if (visible.length && !visible.some(s => s.staffId === activeStaffId)) {
-    selectStaff(visible[0].staffId);
-  } else if (activeStaffId) {
+  if (currentTab === 'staff') {
+    if (activeStaffId && !visibleRoster().some(s=>s.staffId===activeStaffId)) activeStaffId = null;
     renderStaff();
   }
 }
 function visibleRoster() {
-  return roster.filter(s => selectedBranch==='all' || s.branch===selectedBranch);
+  return roster.filter(s => selectedBranches.includes(s.branch));
 }
 
 function switchTab(id, btn) {
@@ -482,13 +540,25 @@ function switchTab(id, btn) {
   btn.classList.add('active');
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+id).classList.add('active');
+  if (!allData) return;
+  if (id === 'today') {
+    // 今日 / 最早：膠囊預設全選（多選過濾）
+    todayStaff = new Set(visibleRoster().map(s=>s.staffId));
+    syncCapsuleSelection();
+    renderToday();
+  } else {
+    // 指定老師：進入時全部取消選取，等使用者點一位
+    activeStaffId = null;
+    syncCapsuleSelection();
+    renderStaff();
+  }
 }
 function renderStatus(elId, text, color) {
   document.getElementById(elId).innerHTML =
     `<div class="status-dot" style="background:${color}"></div><span class="status-text" style="color:${color}">${text}</span>`;
 }
 function branchPrefix() {
-  return selectedBranch==='all' ? '' : `${selectedBranch}｜`;
+  return selectedBranches.length===1 ? `${selectedBranches[0]}｜` : '';
 }
 function computeTodayStatus(slots) {
   const tk = todayKey();
@@ -516,16 +586,20 @@ function cardHTML(slot, rank, flipCls, todayFull) {
   if (!slot) return `<div class="card-empty"><div class="card-empty-inner"><div class="card-empty-line"></div></div></div>`;
   const { mmdd, wd, nearLabel, diff } = dateMeta(slot.dateKey);
   const isToday = diff === 0;
+  const [,mNum,dNum] = slot.dateKey.split('-').map(Number);
+  const mShort = `${mNum}/${dNum}`;
+  const avHtml = slot.avatar ? `<img class="card-hd-av" src="${slot.avatar}" loading="lazy" onerror="this.remove()">` : '';
   const durPills = slot.durations.map(d =>
     `<span class="dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
   ).join('');
   const badgeHTML  = slot.isTrainee ? `<span class="trainee-badge">培訓新師</span>` : '';
-  const branchChip = `<span class="branch-chip">${BRANCH_SHORT[slot.branch]||slot.branch}</span>`;
+  const bcCls      = slot.branch==='南京三民' ? 'bc-nj' : 'bc-zs';
+  const branchChip = `<span class="branch-chip ${bcCls}">${BRANCH_SHORT[slot.branch]||slot.branch}</span>`;
   return `
   <div class="card">
     <div class="card-inner ${flipCls}" onclick="openSheet(${rank-1})">
-      <div class="card-teacher-banner" style="background:${bannerBg(slot)}">
-        <span class="card-teacher-name">${slot.teacher}</span>
+      <div class="card-teacher-banner">
+        <div class="banner-left">${avHtml}<span class="card-teacher-name">${slot.teacher}</span></div>
         <div class="banner-right">${badgeHTML}<span class="card-rank">#${rank}</span></div>
       </div>
       <div class="card-body">
@@ -534,11 +608,10 @@ function cardHTML(slot, rank, flipCls, todayFull) {
           ${branchChip}
           ${(!isToday&&todayFull)?'<span class="full-badge">今日已滿</span>':''}
         </div>
-        <div class="card-date-row">
-          <span class="card-mmdd">${mmdd}</span>
-          <span class="card-wd">${wd}</span>
+        <div class="card-when">
+          <span class="card-date"><span class="card-mmdd">${mShort}</span><span class="card-wd">${wd}</span></span>
+          <span class="card-time">${slot.time}</span>
         </div>
-        <div class="card-time">${slot.time}</div>
         <div class="card-div"></div>
         <div class="card-durs">${durPills}</div>
       </div>
@@ -565,12 +638,12 @@ function setFetchedAt(isoString) {
 function applyFilters(slots) {
   return (slots || [])
     .filter(s => s.durations.some(d => selectedDurs.includes(d)))
-    .filter(s => selectedBranch==='all' || s.branch===selectedBranch);
+    .filter(s => selectedBranches.includes(s.branch));
 }
 
 // ── 今日 / 最早時段 ──────────────────────────────────────────
 function renderToday() {
-  const allSlots = applyFilters(allData.slots);
+  const allSlots = applyFilters(allData.slots).filter(s => todayStaff.has(s.staffId));
   const seen = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
     const k = s.staffId || s.teacher;
@@ -584,21 +657,51 @@ function renderToday() {
   });
   const status = computeTodayStatus(earliestPerTeacher);
   renderStatus('status-today', status.text, status.color);
+  const label = document.getElementById('label-today');
+  if (label) label.textContent = `最早可約 · ${Math.min(earliestPerTeacher.length,3)} 位老師`;
   const top3 = earliestPerTeacher.slice(0, 3);
   tabSlots.today = top3;
   paintCards('cards-today', top3);
 }
 
-// ── 指定老師（資料已全部在手，切換零延遲）─────────────────────
-function selectStaff(staffId) {
-  activeStaffId = staffId;
-  document.querySelectorAll('.stab').forEach(b => {
-    b.classList.toggle('active', b.dataset.sid === staffId);
-    if (b.dataset.sid === staffId) b.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+// ── 老師膠囊：兩模式共用同一列 ────────────────────────────────
+function onStaffCapsule(staffId) {
+  if (currentTab === 'today') {
+    // 今日 / 最早：多選過濾（至少保留一位）
+    if (todayStaff.has(staffId)) {
+      if (todayStaff.size > 1) todayStaff.delete(staffId);
+    } else {
+      todayStaff.add(staffId);
+    }
+    syncCapsuleSelection();
+    renderToday();
+  } else {
+    // 指定老師：單選
+    activeStaffId = staffId;
+    syncCapsuleSelection();
+    const el = document.querySelector(`#staff-tabs .stab[data-sid="${staffId}"]`);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+    renderStaff();
+  }
+}
+function syncCapsuleSelection() {
+  document.querySelectorAll('#staff-tabs .stab').forEach(b => {
+    const sid = b.dataset.sid;
+    const on = currentTab==='today' ? todayStaff.has(sid) : (sid===activeStaffId);
+    b.classList.toggle('active', on);
   });
-  renderStaff();
 }
 function renderStaff() {
+  const label = document.getElementById('label-staff');
+  if (!activeStaffId) {
+    renderStatus('status-staff', '請點選上方老師，查看其最早可約時段', 'var(--gray)');
+    if (label) label.textContent = '';
+    tabSlots.staff = [];
+    document.getElementById('cards-staff').innerHTML =
+      `<div style="width:100%;padding:24px 14px;text-align:center;font-size:12px;color:var(--gray2)">請點選上方任一位老師</div>`;
+    return;
+  }
+  if (label) label.textContent = '最早可約 3 筆';
   const s = staffById(activeStaffId);
   const name = s ? s.name : '';
   const filtered = allData.slots
@@ -614,7 +717,7 @@ function renderStaff() {
 function buildStaffTabs() {
   const wrap = document.getElementById('staff-tabs');
   wrap.innerHTML = '';
-  const branches = ['南京三民','中山'].filter(b => selectedBranch==='all' || selectedBranch===b);
+  const branches = ['南京三民','中山'].filter(b => selectedBranches.includes(b));
   let addedAny = false;
   branches.forEach(b => {
     const members = roster.filter(s => s.branch === b);
@@ -638,13 +741,14 @@ function buildStaffTabs() {
       av.loading = 'lazy';
       av.onerror = function(){ this.remove(); };
       btn.appendChild(av);
-      btn.appendChild(document.createTextNode(s.name + (s.isTrainee ? '・培訓' : '')));
-      btn.onclick = () => selectStaff(s.staffId);
-      if (s.staffId === activeStaffId) btn.classList.add('active');
+      btn.appendChild(document.createTextNode(s.name));
+      if (s.isTrainee) { const tg = document.createElement('span'); tg.className = 'stab-tr-tag'; tg.textContent = '培訓新師'; btn.appendChild(tg); }
+      btn.onclick = () => onStaffCapsule(s.staffId);
       wrap.appendChild(btn);
     });
     addedAny = true;
   });
+  syncCapsuleSelection();
 }
 
 // ── 免責 / 前往預約 ──────────────────────────────────────────
@@ -663,12 +767,25 @@ function openSheet(slotIndex) {
     ).join('');
     const traineeBadge = slot.isTrainee
       ? `<span class="slot-trainee-badge">培訓新師</span>` : '';
+    const bcCls  = slot.branch === '南京三民' ? 'bc-nj' : 'bc-zs';
+    const mapUrl = BRANCH_MAP[slot.branch] || '';
+    const [,mN,dN] = slot.dateKey.split('-').map(Number);
+    const dShort = `${mN}/${dN}`;
+    const avImg = slot.avatar ? `<img class="slot-av" src="${slot.avatar}" onerror="this.remove()">` : '';
+    const extSvg = `<svg class="ext" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2.6 1H7v4.4M7 1 1 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const branchLink = mapUrl
+      ? `<a class="slot-branch-link ${bcCls}" href="${mapUrl}" onclick="return openMap('${mapUrl}')">${slot.branch}${extSvg}</a>`
+      : `<span class="slot-branch-plain">${slot.branch}</span>`;
     wrap.innerHTML = `
       <div class="slot-summary">
-        <span class="slot-time-big">${slot.time}</span>
+        <div class="slot-timecol">
+          <span class="slot-time-big">${slot.time}</span>
+          ${branchLink}
+        </div>
+        <div class="slot-div"></div>
         <div class="slot-meta">
-          <div class="slot-meta-name">${slot.teacher}${traineeBadge}</div>
-          <div class="slot-meta-date">${nearLabel}　${mmdd}　${wd}　${slot.branch}</div>
+          <div class="slot-meta-name">${avImg}${slot.teacher}${traineeBadge}</div>
+          <div class="slot-meta-date">${nearLabel}　${dShort}　${wd}</div>
         </div>
         <div class="slot-dur-pills">${pills}</div>
       </div>`;
@@ -683,6 +800,14 @@ function openSheet(slotIndex) {
     btn.textContent = '前往預約系統';
   }
   document.getElementById('mask').classList.add('show');
+}
+function openMap(url) {
+  // 一律用外部瀏覽器開啟（LINE 內用 liff 外開，否則開新分頁）
+  try {
+    if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) liff.openWindow({ url, external:true });
+    else window.open(url, '_blank', 'noopener');
+  } catch(e) { window.open(url, '_blank', 'noopener'); }
+  return false;
 }
 function closeSheet() { document.getElementById('mask').classList.remove('show'); }
 function handleMaskClick(e) { if(e.target.id==='mask') closeSheet(); }
@@ -704,12 +829,12 @@ async function init() {
     if (!data) { data = await loadAll(); writeCache(data); }
     allData = data;
     roster  = data.roster;
+    todayStaff = new Set(visibleRoster().map(s=>s.staffId)); // 今日模式預設全選
     stopScanning('cards-today');
     stopScanning('cards-staff');
     buildStaffTabs();
     renderToday();
-    const first = visibleRoster()[0];
-    if (first) selectStaff(first.staffId);
+    renderStaff(); // 指定老師模式：預設未選，顯示提示
     setFetchedAt(data.fetchedAt);
   } catch(e) {
     stopScanning('cards-today');
