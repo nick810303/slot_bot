@@ -55,6 +55,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .cbx-label{font-size:11px;color:#a79d8f;line-height:1;white-space:nowrap;transition:color .15s}
 .cbx-dur .cbx-label{font-family:'DM Mono',monospace;font-size:10px}
 .cbx-branch{flex:1.2 1 0}
+.cbx-locked{opacity:.38;pointer-events:none}
 .cbx-sep{width:1px;background:var(--line);flex-shrink:0;margin:3px 3px;align-self:stretch}
 /* 分店 on 狀態（品牌分店色）*/
 .cbx-branch[data-branch="南京三民"].on{border-color:var(--nj);background:var(--nj-bg)}
@@ -77,7 +78,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:6px}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{display:none}
-.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 14px 6px}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:7px 12px;padding:8px 11px;background:var(--bg2);border:1px solid var(--line2);border-radius:7px}
 .status-bar{display:flex;align-items:center;gap:6px;padding:6px 14px 4px}
 .status-row .status-bar{padding:0;flex:1;min-width:0}
 .status-row .sec-label{padding:0;flex-shrink:0;text-align:right;white-space:nowrap}
@@ -257,7 +258,11 @@ const API_BASE     = 'https://booking-api.qlieer.app';
 const LIFF_ID = '2009610906-9zraEtAy';
 const LIFF_BOOKING = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N';
 const BRANCHES     = ['南京三民', '中山'];
-const CACHE_TTL_MS = 3 * 60 * 1000; // 3 分鐘
+const CACHE_TTL_MS = 4 * 60 * 1000; // 4 分鐘（localStorage 快取）
+const WINDOW_DAYS_1 = 7;   // 開場先問最近 7 天
+const WINDOW_DAYS_2 = 14;  // 7 天內沒空位的老師，再延長問到 14 天
+const FETCH_CONCURRENCY = 6;      // 同時最多 6 支請求
+const FETCH_JITTER = [60, 120];   // 每支之間間隔 60–120ms（含隨機抖動）
 const WD = ['日','一','二','三','四','五','六'];
 const BRANCH_SHORT = { '南京三民':'南京三民', '中山':'中山' }; // 南京三民為整體，不簡稱
 const BRANCH_MAP = {
@@ -279,11 +284,18 @@ let selectedDurs     = [120, 90, 60];
 let selectedBranches = ['南京三民', '中山'];   // 兩間都選＝全部
 let roster           = [];   // 從客立樂選單動態解析
 let allData          = null; // { slots, roster, fetchedAt }
-let activeStaffId    = null; // 指定老師模式：單選
+let staffPicked      = []; // 指定老師模式：多選（最多 3 位，FIFO）
 let todayStaff       = new Set(); // 今日模式：老師多選（預設全選）
 let currentTab       = 'today';
 let sheetSlot        = null;
 const tabSlots       = { today: [], staff: [] };
+// ── Step 2 分段抓取用 ──
+let CATALOG      = [];  // 老師清單（含 jobs）
+let GROUPED      = {};  // key staffId__branch__dateKey__time -> slot（含 durations[]）
+let FETCHED      = {};  // key `${staffId}:${dur}` -> 已抓到的天數(7/14)
+let teacherDays  = {};  // staffId -> 該老師資料所在的視窗天數(7/14)
+let refreshSeq   = 0;   // 防止非同步補資料時的過時渲染
+let userDurs     = [120, 90, 60]; // 使用者自己勾的時長（培訓鎖定時另算 effective=selectedDurs）
 
 function dateMeta(dateKey) {
   const [y,m,d] = dateKey.split('-').map(Number);
@@ -355,20 +367,25 @@ async function fetchSlotCells(productId, userId, startTime, endTime) {
   if (!r.ok) return {};
   return (await r.json()).result || {};
 }
-async function loadAll() {
-  const menu    = await getMenu();
-  const catalog = buildCatalog(menu);
-  const st = dayStartEpoch(), et = dayEndEpoch(14);
-  const tasks = [], meta = [];
-  for (const s of Object.values(catalog)) {
-    for (const job of s.jobs) {
-      tasks.push(fetchSlotCells(job.productId, s.staffId, st, et).catch(() => ({})));
-      meta.push({ s, job });
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// 併發上限 + 批間微抖動：把一次爆量攤平成一小段平滑流量（降低被判為爬蟲的機會）
+async function runPooled(taskFns, limit, jitter) {
+  const results = new Array(taskFns.length);
+  let idx = 0;
+  async function worker() {
+    while (true) {
+      const my = idx++;
+      if (my >= taskFns.length) break;
+      try { results[my] = await taskFns[my](); } catch(e) { results[my] = null; }
+      if (jitter) await sleep(jitter[0] + Math.random() * (jitter[1] - jitter[0]));
     }
   }
-  const results = await Promise.all(tasks);
-  const grouped = {};
+  await Promise.all(Array.from({ length: Math.min(limit, taskFns.length) }, worker));
+  return results;
+}
+function groupSlots(results, meta, grouped) {
   results.forEach((data, i) => {
+    if (!data) return;
     const { s, job } = meta[i];
     for (const k of Object.keys(data)) {
       const info = data[k];
@@ -381,27 +398,82 @@ async function loadAll() {
       }
     }
   });
-  const slots = Object.values(grouped);
-  slots.forEach(x => x.durations.sort((a,b) => b-a));
-  slots.sort((a,b) => a.dateKey !== b.dateKey ? (a.dateKey < b.dateKey ? -1 : 1) : (a.time < b.time ? -1 : 1));
-  const rlist = Object.values(catalog).map(s => ({ staffId:s.staffId, name:s.name, avatar:s.avatar, branch:s.branch, isTrainee:s.isTrainee }));
-  rlist.sort((a,b) => {
-    const bi = BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch);
+}
+// ── Step 2：分段抓取 helpers ─────────────────────────────────
+function offeredDurs(s) { return [...new Set(s.jobs.map(j=>j.dur))].sort((a,b)=>a-b); } // 升冪
+function jobFor(s, dur) { return s.jobs.find(j=>j.dur===dur); }
+// 該老師「最小的、被選取的、他有做的」時長（用來排序＝找最早）；null=目前時長篩選下他無方案
+function rankingDur(s) {
+  const sel = offeredDurs(s).filter(d=>selectedDurs.includes(d));
+  return sel.length ? sel[0] : null;
+}
+async function fetchJobWindow(s, job, days) {
+  const st = dayStartEpoch(), et = dayEndEpoch(days);
+  const data = await fetchSlotCells(job.productId, s.staffId, st, et);
+  groupSlots([data], [{ s, job }], GROUPED);
+  FETCHED[`${s.staffId}:${job.dur}`] = days;
+}
+function rebuildSlots() {
+  const slots = Object.values(GROUPED);
+  slots.forEach(x => x.durations.sort((a,b)=>b-a));
+  slots.sort((a,b)=> a.dateKey!==b.dateKey ? (a.dateKey<b.dateKey?-1:1) : (a.time<b.time?-1:1));
+  allData.slots = slots;
+}
+function buildRoster(teachers) {
+  const rlist = teachers.map(s => ({ staffId:s.staffId, name:s.name, avatar:s.avatar, branch:s.branch, isTrainee:s.isTrainee }));
+  rlist.sort((a,b)=>{
+    const bi = BRANCHES.indexOf(a.branch)-BRANCHES.indexOf(b.branch);
     if (bi) return bi;
-    if (a.isTrainee !== b.isTrainee) return a.isTrainee ? -1 : 1;
-    return a.name < b.name ? -1 : 1;
+    if (a.isTrainee!==b.isTrainee) return a.isTrainee?-1:1;
+    return a.name<b.name?-1:1;
   });
-  return { slots, roster:rlist, fetchedAt:new Date().toISOString() };
+  return rlist;
+}
+// 只問「排序用時長」（每位老師最短的被選時長），指定天數、指定老師群
+function ensureRanking(days, list) {
+  const targets = [];
+  for (const s of (list || CATALOG)) {
+    const dur = rankingDur(s); if (dur==null) continue;
+    if ((FETCHED[`${s.staffId}:${dur}`]||0) >= days) continue;
+    targets.push(() => fetchJobWindow(s, jobFor(s,dur), days));
+  }
+  return targets.length ? runPooled(targets, FETCH_CONCURRENCY, FETCH_JITTER) : Promise.resolve();
+}
+// 先 7 天，仍完全無空位的老師再延長 14 天；並記錄每位老師資料所在視窗
+async function ensureRankingProgressive() {
+  await ensureRanking(WINDOW_DAYS_1);
+  const has = new Set(Object.values(GROUPED).map(x=>x.staffId));
+  const empties = CATALOG.filter(s => rankingDur(s)!=null && !has.has(s.staffId));
+  if (empties.length) await ensureRanking(WINDOW_DAYS_2, empties);
+  for (const s of CATALOG) {
+    const dur = rankingDur(s); if (dur==null) continue;
+    teacherDays[s.staffId] = FETCHED[`${s.staffId}:${dur}`] || WINDOW_DAYS_1;
+  }
+}
+// 補齊指定老師們「所有被選時長」的資料（讓卡片時長標籤完整）
+function ensurePills(staffIds) {
+  const targets = [];
+  for (const id of staffIds) {
+    const s = CATALOG.find(x=>x.staffId===id); if (!s) continue;
+    const days = teacherDays[id] || WINDOW_DAYS_1;
+    for (const dur of offeredDurs(s)) {
+      if (!selectedDurs.includes(dur)) continue;
+      if ((FETCHED[`${id}:${dur}`]||0) >= days) continue;
+      targets.push(() => fetchJobWindow(s, jobFor(s,dur), days));
+    }
+  }
+  return targets.length ? runPooled(targets, FETCH_CONCURRENCY, FETCH_JITTER) : Promise.resolve();
 }
 function readCache() {
   try {
-    const c = JSON.parse(sessionStorage.getItem('slotdash_v3') || 'null');
+    // 改用 localStorage：同一人幾分鐘內重開／重整都能吃快取、不重抓
+    const c = JSON.parse(localStorage.getItem('slotdash_v4') || 'null');
     if (c && Date.now() - c.t < CACHE_TTL_MS) return c.d;
   } catch(e) {}
   return null;
 }
 function writeCache(d) {
-  try { sessionStorage.setItem('slotdash_v3', JSON.stringify({ t:Date.now(), d })); } catch(e) {}
+  try { localStorage.setItem('slotdash_v4', JSON.stringify({ t:Date.now(), d })); } catch(e) {}
 }
 function hashColor(name) {
   let h = 0;
@@ -464,7 +536,7 @@ function showScanning(containerId, statusId) {
   wrapper.appendChild(cardRow);
   const overlay = document.createElement('div');
   overlay.id = overlayId;
-  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#fff;z-index:5;min-height:180px;transition:opacity .35s ease';
+  overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);z-index:5;min-height:180px;transition:opacity .35s ease';
   overlay.innerHTML = `
     <div class="scan-spin"></div>
     <div style="text-align:center">
@@ -497,11 +569,14 @@ function stopScanning(containerId) {
 
 // ── 篩選 ─────────────────────────────────────────────────────
 function toggleDur(d) {
-  if (selectedDurs.includes(d) && selectedDurs.length===1) return; // 至少保留一個時長
-  selectedDurs = selectedDurs.includes(d) ? selectedDurs.filter(x=>x!==d) : [...selectedDurs,d];
-  [120,90,60].forEach(x =>
-    document.getElementById('pill-'+x).classList.toggle('on', selectedDurs.includes(x))
-  );
+  const picks = (currentTab==='staff') ? staffPicked : [];
+  const allTrainee = picks.length>0 && picks.every(isTraineeId);
+  const hasTrainee = picks.some(isTraineeId);
+  if (allTrainee && d !== 120) return; // 純選培訓師：60/90 凍結
+  if (hasTrainee && d === 120) return; // 有選到培訓師：120 不可取消（避免培訓師被藏）
+  if (userDurs.includes(d) && userDurs.length===1) return; // 至少保留一個時長
+  userDurs = userDurs.includes(d) ? userDurs.filter(x=>x!==d) : [...userDurs, d];
+  recomputeDurs();
   onFilterChange();
 }
 function toggleBranch(b) {
@@ -521,14 +596,22 @@ function toggleBranch(b) {
   );
   onFilterChange();
 }
-function onFilterChange() {
+async function onFilterChange() {
   if (!allData) return;
+  const my = ++refreshSeq;
   buildStaffTabs();
-  renderToday();
-  if (currentTab === 'staff') {
-    if (activeStaffId && !visibleRoster().some(s=>s.staffId===activeStaffId)) activeStaffId = null;
-    renderStaff();
-  }
+  if (currentTab === 'staff') staffPicked = staffPicked.filter(id => visibleRoster().some(s=>s.staffId===id));
+  // 先用現有資料立即畫（時長標籤可能暫時不完整）
+  rebuildSlots(); renderToday(); if (currentTab==='staff') renderStaff();
+  // 改了時長篩選可能需要新的「排序時長」資料 → 補抓
+  await ensureRankingProgressive();
+  if (my !== refreshSeq) return;
+  rebuildSlots(); renderToday(); if (currentTab==='staff') renderStaff();
+  // 補齊目前顯示中（今日 3 位＋指定老師所選）的時長標籤
+  const ids = [...new Set([...tabSlots.today.map(s=>s.staffId), ...staffPicked])];
+  await ensurePills(ids);
+  if (my !== refreshSeq) return;
+  rebuildSlots(); renderToday(); if (currentTab==='staff') renderStaff();
 }
 function visibleRoster() {
   return roster.filter(s => selectedBranches.includes(s.branch));
@@ -544,11 +627,13 @@ function switchTab(id, btn) {
   if (id === 'today') {
     // 今日 / 最早：膠囊預設全選（多選過濾）
     todayStaff = new Set(visibleRoster().map(s=>s.staffId));
+    recomputeDurs(); // 離開指定老師→回到使用者原本的時長
     syncCapsuleSelection();
     renderToday();
   } else {
-    // 指定老師：進入時全部取消選取，等使用者點一位
-    activeStaffId = null;
+    // 指定老師：進入時清空選取，等使用者點（可多選最多 3 位）
+    staffPicked = [];
+    recomputeDurs(); // 清空選取→確保解鎖
     syncCapsuleSelection();
     renderStaff();
   }
@@ -565,7 +650,7 @@ function computeTodayStatus(slots) {
   const todaySlots = slots.filter(s => s.dateKey === tk);
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
-    if (!fut) return { text:branchPrefix()+'近期暫無可預約時段', color:'var(--red)' };
+    if (!fut) return { text:branchPrefix()+'近14天已滿，進入預約系統看未來更多時間', color:'var(--red)' };
     return { text:`${branchPrefix()}今日已滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
   if (todaySlots.length <= 3) return { text:`${branchPrefix()}今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
@@ -626,6 +711,12 @@ function paintCards(containerId, slots) {
   document.getElementById(containerId).innerHTML =
     padded.map((s,i) => cardHTML(s, i+1, classes[i], todayFull)).join('');
 }
+// 近 14 天完全沒空位時的空狀態（附「前往預約系統」按鈕）
+function emptyStateHTML() {
+  return `<div style="width:100%;padding:20px 14px 10px;text-align:center">
+    <button onclick="openSheet(null)" style="padding:9px 18px;border-radius:8px;background:var(--cocoa);color:var(--cream);border:1px solid #7d4a37;font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)">前往預約系統</button>
+  </div>`;
+}
 function setFetchedAt(isoString) {
   const el = document.getElementById('ft-fetched');
   if (!el || !isoString) return;
@@ -658,12 +749,43 @@ function renderToday() {
   const status = computeTodayStatus(earliestPerTeacher);
   renderStatus('status-today', status.text, status.color);
   const label = document.getElementById('label-today');
-  if (label) label.textContent = `最早可約 · ${Math.min(earliestPerTeacher.length,3)} 位老師`;
   const top3 = earliestPerTeacher.slice(0, 3);
   tabSlots.today = top3;
+  if (top3.length === 0) {
+    if (label) label.textContent = '';
+    document.getElementById('cards-today').innerHTML = emptyStateHTML();
+    return;
+  }
+  if (label) label.textContent = `最早可約 · ${top3.length} 位老師`;
   paintCards('cards-today', top3);
 }
 
+// ── 培訓新師時長鎖定 ─────────────────────────────────────────
+function isTraineeId(id) { const s = roster.find(x => x.staffId === id); return !!(s && s.isTrainee); }
+function recomputeDurs() {
+  const picks = (currentTab==='staff') ? staffPicked : [];
+  const allTrainee = picks.length>0 && picks.every(isTraineeId);
+  const hasTrainee = picks.some(isTraineeId);
+  if (allTrainee)      selectedDurs = [120];                            // 純選培訓師：只 120
+  else if (hasTrainee) selectedDurs = [...new Set([...userDurs, 120])]; // 混選：保底 120、其餘照使用者
+  else                 selectedDurs = userDurs.slice();
+  [120,90,60].forEach(x => {
+    const el = document.getElementById('pill-'+x); if (!el) return;
+    el.classList.toggle('on', selectedDurs.includes(x));
+    el.classList.toggle('cbx-locked', allTrainee && x !== 120);        // 只有純選培訓師才凍結 60/90
+  });
+}
+// 指定老師：改動後補資料再渲染（防過時渲染）
+async function refreshStaff() {
+  const my = ++refreshSeq;
+  renderStaff();
+  await ensureRankingProgressive();
+  if (my !== refreshSeq || currentTab !== 'staff') return;
+  rebuildSlots(); renderStaff();
+  await ensurePills(staffPicked.slice());
+  if (my !== refreshSeq || currentTab !== 'staff') return;
+  rebuildSlots(); renderStaff();
+}
 // ── 老師膠囊：兩模式共用同一列 ────────────────────────────────
 function onStaffCapsule(staffId) {
   if (currentTab === 'today') {
@@ -676,42 +798,57 @@ function onStaffCapsule(staffId) {
     syncCapsuleSelection();
     renderToday();
   } else {
-    // 指定老師：單選
-    activeStaffId = staffId;
+    // 指定老師：多選，最多 3 位（滿了再點新的就把最早選的擠掉）
+    const i = staffPicked.indexOf(staffId);
+    if (i >= 0) staffPicked.splice(i, 1);
+    else { staffPicked.push(staffId); if (staffPicked.length > 3) staffPicked.shift(); }
+    recomputeDurs(); // 依所選（純培訓/混選）重算時長鎖定
     syncCapsuleSelection();
     const el = document.querySelector(`#staff-tabs .stab[data-sid="${staffId}"]`);
     if (el) el.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-    renderStaff();
+    refreshStaff();
   }
 }
 function syncCapsuleSelection() {
   document.querySelectorAll('#staff-tabs .stab').forEach(b => {
     const sid = b.dataset.sid;
-    const on = currentTab==='today' ? todayStaff.has(sid) : (sid===activeStaffId);
+    const on = currentTab==='today' ? todayStaff.has(sid) : staffPicked.includes(sid);
     b.classList.toggle('active', on);
   });
 }
 function renderStaff() {
   const label = document.getElementById('label-staff');
-  if (!activeStaffId) {
-    renderStatus('status-staff', '請點選上方老師，查看其最早可約時段', 'var(--gray)');
+  if (staffPicked.length === 0) {
+    renderStatus('status-staff', '請點選老師（可多選最多 3 位）', 'var(--gray)');
     if (label) label.textContent = '';
     tabSlots.staff = [];
-    document.getElementById('cards-staff').innerHTML =
-      `<div style="width:100%;padding:24px 14px;text-align:center;font-size:12px;color:var(--gray2)">請點選上方任一位老師</div>`;
+    paintCards('cards-staff', []); // 顯示虛線空卡片，不重複文字
     return;
   }
-  if (label) label.textContent = '最早可約 3 筆';
-  const s = staffById(activeStaffId);
-  const name = s ? s.name : '';
-  const filtered = allData.slots
-    .filter(x => x.staffId === activeStaffId)
-    .filter(x => x.durations.some(d => selectedDurs.includes(d)))
-    .slice(0, 3);
-  const status = computeStaffStatus(filtered, name);
+  const durOk = x => x.durations.some(d => selectedDurs.includes(d));
+  const pool = allData.slots
+    .filter(x => staffPicked.includes(x.staffId) && durOk(x))
+    .sort((a,b) => a.dateKey!==b.dateKey ? (a.dateKey<b.dateKey?-1:1) : (a.time<b.time?-1:1));
+  // 先讓每位所選老師至少出現最早一筆，名額未滿再用最早的往下補，最多 3 張
+  const chosen = [], seen = new Set();
+  for (const x of pool) { if (!seen.has(x.staffId)) { chosen.push(x); seen.add(x.staffId); } if (chosen.length>=3) break; }
+  if (chosen.length < 3) { for (const x of pool) { if (chosen.indexOf(x)>=0) continue; chosen.push(x); if (chosen.length>=3) break; } }
+  chosen.sort((a,b) => a.dateKey!==b.dateKey ? (a.dateKey<b.dateKey?-1:1) : (a.time<b.time?-1:1));
+  const tk = todayKey();
+  const todayN = pool.filter(x => x.dateKey===tk).length;
+  let status;
+  if (pool.length === 0) status = { text:'所選老師近14天已滿，進入預約系統看未來更多時間', color:'var(--red)' };
+  else if (todayN === 0)  status = { text:`所選老師今日已滿，最早在${dateMeta(pool[0].dateKey).nearLabel}`, color:'var(--red)' };
+  else                    status = { text:`所選老師今日有 ${todayN} 個空位`, color:'var(--green)' };
   renderStatus('status-staff', status.text, status.color);
-  tabSlots.staff = filtered;
-  paintCards('cards-staff', filtered);
+  tabSlots.staff = chosen;
+  if (chosen.length === 0) {
+    if (label) label.textContent = '';
+    document.getElementById('cards-staff').innerHTML = emptyStateHTML();
+    return;
+  }
+  if (label) label.textContent = `已選 ${staffPicked.length} 位 · 最早 ${chosen.length} 筆`;
+  paintCards('cards-staff', chosen);
 }
 
 function buildStaffTabs() {
@@ -825,25 +962,36 @@ async function init() {
   showScanning('cards-today', 'status-today');
   showScanning('cards-staff', 'status-staff');
   try {
-    let data = readCache();
-    if (!data) { data = await loadAll(); writeCache(data); }
-    allData = data;
-    roster  = data.roster;
+    const menu = await getMenu();
+    CATALOG = Object.values(buildCatalog(menu));
+    roster  = buildRoster(CATALOG);
+    allData = { slots: [], roster, fetchedAt: null };
+    const cached = readCache(); // { g, f, dd }
+    if (cached) { GROUPED = cached.g || {}; FETCHED = cached.f || {}; teacherDays = cached.dd || {}; }
+    buildStaffTabs();
     todayStaff = new Set(visibleRoster().map(s=>s.staffId)); // 今日模式預設全選
+    // 第一階段：排序資料（每位老師最短被選時長，7→14），仍在載入遮罩下
+    await ensureRankingProgressive();
+    rebuildSlots();
+    renderToday();
+    renderStaff();
+    // 第二階段：補「今日/最早」顯示中 3 位的時長標籤
+    await ensurePills(tabSlots.today.map(s=>s.staffId));
+    rebuildSlots();
+    renderToday();
     stopScanning('cards-today');
     stopScanning('cards-staff');
-    buildStaffTabs();
-    renderToday();
-    renderStaff(); // 指定老師模式：預設未選，顯示提示
-    setFetchedAt(data.fetchedAt);
+    allData.fetchedAt = new Date().toISOString();
+    setFetchedAt(allData.fetchedAt);
+    writeCache({ g:GROUPED, f:FETCHED, dd:teacherDays });
   } catch(e) {
     stopScanning('cards-today');
     stopScanning('cards-staff');
-    renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
-    document.getElementById('cards-today').innerHTML =
-      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
-    document.getElementById('cards-staff').innerHTML =
-      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
+    renderStatus('status-today', '暫時連不上預約系統，請稍後再試', 'var(--red)');
+    renderStatus('status-staff', '暫時連不上預約系統，請稍後再試', 'var(--red)');
+    const failHTML = `<div style="width:100%;padding:22px 14px;text-align:center;font-size:12px;color:var(--gray);line-height:1.7">暫時取得不到資料，請稍後再開一次</div>`;
+    document.getElementById('cards-today').innerHTML = failHTML;
+    document.getElementById('cards-staff').innerHTML = failHTML;
   }
 }
 init();
