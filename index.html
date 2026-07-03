@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>空位查詢</title>
+<title>小泰空位儀表板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -32,6 +32,9 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .tab{flex:1;padding:5px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
 .tab.active{background:#fff;color:var(--black);font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 .filters{flex-shrink:0;border-bottom:1px solid #ebebeb;background:var(--bg3)}
+.branch-bar{display:flex;gap:5px;padding:5px 14px 0}
+.bpill{flex:1;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:#aaa;cursor:pointer;transition:all .15s;text-align:center}
+.bpill.on{border-color:var(--black);background:var(--black);color:#fff;font-weight:500}
 .filter-bar{display:flex;gap:5px;padding:5px 14px 5px}
 .filter-pill{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 0;border-radius:5px;border:1.5px solid #e0e0e0;background:#fff;cursor:pointer;transition:all .15s}
 .filter-pill.on-120{border-color:var(--d120);background:var(--d120-bg)}
@@ -69,6 +72,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;line-height:1.5}
 .near-badge.today{background:var(--black);color:#fff}
 .near-badge.other{background:#e0e0e0;color:#444}
+.branch-chip{font-family:'Noto Sans TC',sans-serif;font-size:8px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:#fff;border:1px solid #ddd;color:#888;white-space:nowrap}
 .full-badge{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
 .card-date-row{display:flex;align-items:baseline;gap:3px;margin-bottom:3px;flex-shrink:0}
 .card-mmdd{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#333}
@@ -94,10 +98,11 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
 .stab-group-wrap{display:flex;align-items:center;padding:6px 14px 7px;overflow-x:auto;scrollbar-width:none}
 .stab-group-wrap::-webkit-scrollbar{display:none}
-.stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--tr-text);letter-spacing:.04em;background:var(--tr-bg);border:1px solid var(--tr-bdr);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;}
+.stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:#8a8a8a;letter-spacing:.04em;background:#f2f2f2;border:1px solid #e4e4e4;padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px}
 .stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
-.stab{flex-shrink:0;padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;}
+.stab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:20px;border:1px solid var(--line);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;}
 .stab:last-child{margin-right:0}
+.stab-av{width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#e8e8e8}
 .stab.active{background:var(--black);border-color:var(--black);color:#fff}
 .stab.tr-pill{border-color:var(--tr-bdr);color:var(--tr-text)}
 .stab.tr-pill.active{background:var(--tr-dark);border-color:var(--tr-dark);color:#fff}
@@ -133,7 +138,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
   <div class="handle"><div class="handle-bar"></div></div>
   <div class="hd">
     <div class="hd-top">
-      <div class="hd-name">小泰空位查詢機器人</div>
+      <div class="hd-name">小泰空位儀表板</div>
       <div class="hd-live"><div class="live-dot"></div>LIVE</div>
     </div>
     <div class="tabs">
@@ -142,6 +147,11 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     </div>
   </div>
   <div class="filters">
+    <div class="branch-bar">
+      <button class="bpill on" id="bpill-all" onclick="setBranch('all')">全部分店</button>
+      <button class="bpill" id="bpill-南京三民" onclick="setBranch('南京三民')">南京三民 G18</button>
+      <button class="bpill" id="bpill-中山" onclick="setBranch('中山')">中山 R11/G14</button>
+    </div>
     <div class="filter-bar">
       <button class="filter-pill on-120" id="pill-120" onclick="toggleDur(120)">
         <div class="pill-box"><svg class="pill-check" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.2 5.7L6.5 2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -171,7 +181,7 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
     </div>
   </div>
   <div class="footer">
-    <div class="ft-note">AI 即時抓取。本機器人可能有誤差，實際以預約系統為準。</div>
+    <div class="ft-note">AI 即時抓取。本儀表板可能有誤差，實際以預約系統為準。</div>
     <span id="ft-fetched" style="font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray3);flex-shrink:0;white-space:nowrap"></span>
     <div class="ft-disc" onclick="openSheet(null)">注意事項</div>
   </div>
@@ -179,12 +189,12 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 <div class="mask" id="mask" onclick="handleMaskClick(event)">
   <div class="sheet">
     <div class="sheet-tag">NOTICE</div>
-    <div class="sheet-title">本機器人無法直接新增預約</div>
+    <div class="sheet-title" id="sheet-title">本儀表板無法直接新增預約</div>
     <div id="slot-summary-wrap"></div>
-    <div class="sheet-body">
-      請依序<b>記下方案、老師、日期與時段</b>，點下方按鈕前往預約系統完成預約。此工具由小泰空小編開發，AI 抓取最早 3 筆空位資訊供參考。其他時段請於預約系統查詢。
+    <div class="sheet-body" id="sheet-body">
+      本工具僅供查詢，<b>未與預約系統連動</b>。請點下方按鈕前往預約系統完成預約，實際空位以預約系統為準。
     </div>
-    <button class="sheet-btn" onclick="goBooking()">前往預約系統</button>
+    <button class="sheet-btn" id="sheet-btn" onclick="goBooking()">前往預約系統</button>
     <span class="sheet-close" onclick="closeSheet()">關閉</span>
   </div>
 </div>
@@ -192,24 +202,28 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 <script>
 const GAS_URL = 'https://green-art-030a.nick810303.workers.dev';
 const LIFF_ID = '2009610906-9zraEtAy';
+const LIFF_BOOKING = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N';
 const WD = ['日','一','二','三','四','五','六'];
+const BRANCH_SHORT = { '南京三民':'南京', '中山':'中山' };
 const TEACHER_COLOR = {
   '令 Ling':'#6B7A8D','曜 Yao':'#7A6B6B','澈 Che':'#5C7A6E',
   '源 Yuan':'#7A6B52','鍛 Duan':'#6B5C7A','書 Shu':'#7A6B5C',
-  '柏 Bo':'#5C6B7A','獺 Ta':'#7A5C6B',
+  '柏 Bo':'#5C6B7A','獺 Ta':'#7A5C6B','悟 Wu':'#5C6E7A',
+  '沐 Mu':'#6E7A5C','椰 Ye':'#5C7A62','寧 Ning':'#7A755C',
 };
 const DUR_CONFIG = {
   120:{ cls:'d120', short:'120min', full:'120min 泰空經典' },
   90: { cls:'d90',  short:'90min',  full:'90min 泰空調和'  },
   60: { cls:'d60',  short:'60min',  full:'60min 泰空輕行'  },
 };
-const STAFF_TRAINEE = ['椰 Ye','寧 Ning','沐 Mu'];
-const STAFF_REGULAR = ['令 Ling','曜 Yao','澈 Che','源 Yuan','鍛 Duan','書 Shu','柏 Bo','獺 Ta'];
-let selectedDurs = [60, 90, 120];
-let activeStaff  = STAFF_TRAINEE[0];
-let currentTab   = 'today';
-const tabSlots   = { today: [], staff: [] };
-const cache      = { today: null, staff: {} };
+let selectedDurs   = [60, 90, 120];
+let selectedBranch = 'all';
+let roster         = [];   // 由 worker 動態提供
+let activeStaffId  = null;
+let currentTab     = 'today';
+let sheetSlot      = null;
+const tabSlots     = { today: [], staff: [] };
+const cache        = { today: null, staff: {} };
 
 function dateMeta(dateKey) {
   const [y,m,d] = dateKey.split('-').map(Number);
@@ -231,6 +245,15 @@ function callGAS(params) {
   return fetch(GAS_URL + '?' + qs).then(r => r.json());
 }
 function warmupGAS() { fetch(GAS_URL + '?action=ping').catch(() => {}); }
+function hashColor(name) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return `hsl(${h}, 16%, 44%)`;
+}
+function bannerBg(slot) {
+  return slot.isTrainee ? 'var(--tr-dark)' : (TEACHER_COLOR[slot.teacher] || hashColor(slot.teacher));
+}
+function staffById(id) { return roster.find(s => s.staffId === id); }
 
 function skeletonCardHTML() {
   return `
@@ -257,7 +280,7 @@ function skeletonCardHTML() {
 const SCAN_STEPS = [
   {av:'🤖', msg:'機器人出動中…',      sub:'SCANNING',   pct:10},
   {av:'📡', msg:'連線預約系統中…',     sub:'CONNECTING', pct:28},
-  {av:'🔍', msg:'掃描所有老師時段…',   sub:'FETCHING',   pct:52},
+  {av:'🔍', msg:'掃描兩分店老師時段…', sub:'FETCHING',   pct:52},
   {av:'⚙️', msg:'比對可預約時間…',     sub:'PROCESSING', pct:75},
   {av:'📋', msg:'整理資料中，快好了…', sub:'SORTING',    pct:92},
 ];
@@ -317,15 +340,38 @@ function stopScanning(containerId) {
   if (overlay) { overlay.style.opacity='0'; setTimeout(()=>overlay.remove(), 380); }
 }
 
+// ── 篩選 ─────────────────────────────────────────────────────
 function toggleDur(d) {
   if(selectedDurs.includes(d) && selectedDurs.length===1) return;
   selectedDurs = selectedDurs.includes(d) ? selectedDurs.filter(x=>x!==d) : [...selectedDurs,d];
   [120,90,60].forEach(x => {
     document.getElementById('pill-'+x).className = 'filter-pill'+(selectedDurs.includes(x)?' on-'+x:'');
   });
-  if(cache.today) renderTodayFromData(cache.today);
-  if(cache.staff[activeStaff]) renderStaffFromData(cache.staff[activeStaff]);
+  rerenderAll();
 }
+function setBranch(b) {
+  if (selectedBranch === b) return;
+  selectedBranch = b;
+  ['all','南京三民','中山'].forEach(x => {
+    document.getElementById('bpill-'+x).className = 'bpill'+(selectedBranch===x?' on':'');
+  });
+  buildStaffTabs();
+  rerenderAll();
+}
+function rerenderAll() {
+  if (cache.today) renderTodayFromData(cache.today);
+  // 指定老師分頁：若目前老師被分店篩掉，換成第一位可見老師
+  const visible = visibleRoster();
+  if (visible.length && !visible.some(s => s.staffId === activeStaffId)) {
+    selectStaff(visible[0].staffId);
+  } else if (activeStaffId && cache.staff[activeStaffId]) {
+    renderStaffFromData(cache.staff[activeStaffId]);
+  }
+}
+function visibleRoster() {
+  return roster.filter(s => selectedBranch==='all' || s.branch===selectedBranch);
+}
+
 function switchTab(id, btn) {
   currentTab = id;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -337,30 +383,31 @@ function renderStatus(elId, text, color) {
   document.getElementById(elId).innerHTML =
     `<div class="status-dot" style="background:${color}"></div><span class="status-text" style="color:${color}">${text}</span>`;
 }
+function branchPrefix() {
+  return selectedBranch==='all' ? '' : `${selectedBranch}｜`;
+}
 function computeTodayStatus(slots) {
   const tk = todayKey();
   const todaySlots = slots.filter(s => s.dateKey === tk);
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
-    if (!fut) return { text:'近期暫無可預約時段', color:'var(--red)' };
-    return { text:`今日已滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
+    if (!fut) return { text:branchPrefix()+'近期暫無可預約時段', color:'var(--red)' };
+    return { text:`${branchPrefix()}今日已滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
-  if (todaySlots.length <= 3) return { text:`今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
-  return { text:'今日有多個時段可預約', color:'var(--green)' };
+  if (todaySlots.length <= 3) return { text:`${branchPrefix()}今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
+  return { text:branchPrefix()+'今日有多個時段可預約', color:'var(--green)' };
 }
-function computeStaffStatus(slots) {
+function computeStaffStatus(slots, staffName) {
   const tk = todayKey();
   const todayOk = slots.filter(s => s.dateKey === tk);
-  if (slots.length === 0) return { text:`${activeStaff} 近期暫無可預約時段`, color:'var(--red)' };
+  if (slots.length === 0) return { text:`${staffName} 近期暫無可預約時段`, color:'var(--red)' };
   if (todayOk.length === 0) {
     const next = slots[0];
-    return { text:`今日已滿，${activeStaff} 最早空位在${dateMeta(next.dateKey).nearLabel}`, color:'var(--red)' };
+    return { text:`今日已滿，${staffName} 最早空位在${dateMeta(next.dateKey).nearLabel}`, color:'var(--red)' };
   }
-  return { text:`${activeStaff} 今日有 ${todayOk.length} 個空位`, color:'var(--green)' };
+  return { text:`${staffName} 今日有 ${todayOk.length} 個空位`, color:'var(--green)' };
 }
-function bannerBg(slot) {
-  return slot.isTrainee ? 'var(--tr-dark)' : (TEACHER_COLOR[slot.teacher] || '#666');
-}
+
 function cardHTML(slot, rank, flipCls, todayFull) {
   if (!slot) return `<div class="card-empty"><div class="card-empty-inner"><div class="card-empty-line"></div></div></div>`;
   const { mmdd, wd, nearLabel, diff } = dateMeta(slot.dateKey);
@@ -368,7 +415,8 @@ function cardHTML(slot, rank, flipCls, todayFull) {
   const durPills = slot.durations.map(d =>
     `<span class="dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
   ).join('');
-  const badgeHTML = slot.isTrainee ? `<span class="trainee-badge">培訓新師</span>` : '';
+  const badgeHTML  = slot.isTrainee ? `<span class="trainee-badge">培訓新師</span>` : '';
+  const branchChip = `<span class="branch-chip">${BRANCH_SHORT[slot.branch]||slot.branch}</span>`;
   return `
   <div class="card">
     <div class="card-inner ${flipCls}" onclick="openSheet(${rank-1})">
@@ -379,6 +427,7 @@ function cardHTML(slot, rank, flipCls, todayFull) {
       <div class="card-body">
         <div class="card-near-row">
           <span class="near-badge ${isToday?'today':'other'}">${nearLabel}</span>
+          ${branchChip}
           ${(!isToday&&todayFull)?'<span class="full-badge">今日已滿</span>':''}
         </div>
         <div class="card-date-row">
@@ -409,27 +458,48 @@ function setFetchedAt(isoString) {
   });
   el.textContent = `資料時間 ${hhmm}`;
 }
+function applyFilters(slots) {
+  return (slots || [])
+    .filter(s => s.durations.some(d => selectedDurs.includes(d)))
+    .filter(s => selectedBranch==='all' || s.branch===selectedBranch);
+}
 
+// ── 今日 / 最早時段 ──────────────────────────────────────────
 async function loadToday() {
   showScanning('cards-today', 'status-today');
   try {
     const data = await callGAS({ action:'today' });
     cache.today = data;
+    if (data.staff && data.staff.length) {
+      roster = data.staff;
+      buildStaffTabs();
+      if (!activeStaffId) {
+        const first = visibleRoster()[0];
+        if (first) selectStaff(first.staffId);
+      }
+    } else {
+      stopScanning('cards-staff');
+      renderStatus('status-staff', '老師名單載入失敗，請重新整理', 'var(--red)');
+    }
     stopScanning('cards-today');
     renderTodayFromData(data);
   } catch(e) {
     stopScanning('cards-today');
+    stopScanning('cards-staff');
     renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
     document.getElementById('cards-today').innerHTML =
+      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
+    document.getElementById('cards-staff').innerHTML =
       `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
   }
 }
 function renderTodayFromData(data) {
-  const allSlots = (data.slots || []).filter(s => s.durations.some(d => selectedDurs.includes(d)));
-  const seenTeachers = new Set();
+  const allSlots = applyFilters(data.slots);
+  const seen = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
-    if (seenTeachers.has(s.teacher)) return false;
-    seenTeachers.add(s.teacher);
+    const k = s.staffId || s.teacher;
+    if (seen.has(k)) return false;
+    seen.add(k);
     return true;
   });
   earliestPerTeacher.sort((a, b) => {
@@ -444,15 +514,23 @@ function renderTodayFromData(data) {
   if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
-async function loadStaff(name) {
-  activeStaff = name;
-  if (cache.staff[name]) { renderStaffFromData(cache.staff[name]); return; }
+// ── 指定老師 ─────────────────────────────────────────────────
+function selectStaff(staffId) {
+  activeStaffId = staffId;
+  document.querySelectorAll('.stab').forEach(b => {
+    b.classList.toggle('active', b.dataset.sid === staffId);
+    if (b.dataset.sid === staffId) b.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+  });
+  loadStaff(staffId);
+}
+async function loadStaff(staffId) {
+  if (cache.staff[staffId]) { renderStaffFromData(cache.staff[staffId]); return; }
   showScanning('cards-staff', 'status-staff');
   try {
-    const data = await callGAS({ action:'staff', staff:name });
-    cache.staff[name] = data;
+    const data = await callGAS({ action:'staff', staff:staffId });
+    cache.staff[staffId] = data;
     stopScanning('cards-staff');
-    renderStaffFromData(data);
+    if (staffId === activeStaffId) renderStaffFromData(data);
   } catch(e) {
     stopScanning('cards-staff');
     document.getElementById('cards-staff').innerHTML =
@@ -460,19 +538,62 @@ async function loadStaff(name) {
   }
 }
 function renderStaffFromData(data) {
-  const filtered = (data.slots || []).filter(s => s.durations.some(d => selectedDurs.includes(d))).slice(0, 3);
-  const status = computeStaffStatus(filtered);
+  const s = staffById(activeStaffId);
+  const name = s ? s.name : '';
+  const filtered = (data.slots || []).filter(x => x.durations.some(d => selectedDurs.includes(d))).slice(0, 3);
+  const status = computeStaffStatus(filtered, name);
   renderStatus('status-staff', status.text, status.color);
   tabSlots.staff = filtered;
   paintCards('cards-staff', filtered);
   if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
+function buildStaffTabs() {
+  const wrap = document.getElementById('staff-tabs');
+  wrap.innerHTML = '';
+  const branches = ['南京三民','中山'].filter(b => selectedBranch==='all' || selectedBranch===b);
+  let addedAny = false;
+  branches.forEach(b => {
+    const members = roster.filter(s => s.branch === b);
+    if (!members.length) return;
+    if (addedAny) {
+      const divider = document.createElement('div');
+      divider.className = 'stab-divider';
+      wrap.appendChild(divider);
+    }
+    const label = document.createElement('div');
+    label.className = 'stab-group-label';
+    label.textContent = b;
+    wrap.appendChild(label);
+    members.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'stab' + (s.isTrainee ? ' tr-pill' : '');
+      btn.dataset.sid = s.staffId;
+      const av = document.createElement('img');
+      av.className = 'stab-av';
+      av.src = s.avatar || '';
+      av.loading = 'lazy';
+      av.onerror = function(){ this.remove(); };
+      btn.appendChild(av);
+      btn.appendChild(document.createTextNode(s.name + (s.isTrainee ? '・培訓' : '')));
+      btn.onclick = () => selectStaff(s.staffId);
+      if (s.staffId === activeStaffId) btn.classList.add('active');
+      wrap.appendChild(btn);
+    });
+    addedAny = true;
+  });
+}
+
+// ── 免責 / 前往預約 ──────────────────────────────────────────
 function openSheet(slotIndex) {
-  const wrap = document.getElementById('slot-summary-wrap');
+  const wrap  = document.getElementById('slot-summary-wrap');
+  const body  = document.getElementById('sheet-body');
+  const btn   = document.getElementById('sheet-btn');
   const slots = tabSlots[currentTab] || [];
-  if (slotIndex !== null && slots[slotIndex]) {
-    const slot = slots[slotIndex];
+  sheetSlot = (slotIndex !== null && slots[slotIndex]) ? slots[slotIndex] : null;
+
+  if (sheetSlot) {
+    const slot = sheetSlot;
     const { mmdd, wd, nearLabel } = dateMeta(slot.dateKey);
     const pills = slot.durations.map(d =>
       `<span class="slot-dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
@@ -484,12 +605,19 @@ function openSheet(slotIndex) {
         <span class="slot-time-big">${slot.time}</span>
         <div class="slot-meta">
           <div class="slot-meta-name">${slot.teacher}${traineeBadge}</div>
-          <div class="slot-meta-date">${nearLabel}　${mmdd}　${wd}</div>
+          <div class="slot-meta-date">${nearLabel}　${mmdd}　${wd}　${slot.branch}</div>
         </div>
         <div class="slot-dur-pills">${pills}</div>
       </div>`;
+    body.innerHTML =
+      `本工具僅供查詢，<b>未與預約系統連動</b>。點下方按鈕會開啟 <b>${slot.teacher}</b> 的專屬預約頁（老師已選好），` +
+      `請記下<b>日期與時段</b>，進入後選擇方案與時間即可完成預約。實際空位以預約系統為準。`;
+    btn.textContent = `前往預約（已選 ${slot.teacher}）`;
   } else {
     wrap.innerHTML = '';
+    body.innerHTML =
+      `本工具僅供查詢，<b>未與預約系統連動</b>。請點下方按鈕前往預約系統完成預約，實際空位以預約系統為準。`;
+    btn.textContent = '前往預約系統';
   }
   document.getElementById('mask').classList.add('show');
 }
@@ -497,58 +625,18 @@ function closeSheet() { document.getElementById('mask').classList.remove('show')
 function handleMaskClick(e) { if(e.target.id==='mask') closeSheet(); }
 function goBooking() {
   closeSheet();
-  const url = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu';
+  const url = (sheetSlot && sheetSlot.staffId)
+    ? `${LIFF_BOOKING}/${sheetSlot.staffId}/menu`
+    : `${LIFF_BOOKING}/menu`;
   if (typeof liff !== 'undefined' && liff.isInClient()) liff.openWindow({ url, external:false });
   else location.href = url;
-}
-
-function buildStaffTabs() {
-  const wrap = document.getElementById('staff-tabs');
-  const label = document.createElement('div');
-  label.className = 'stab-group-label';
-  label.textContent = '培訓新師';
-  wrap.appendChild(label);
-  const spacer = document.createElement('div');
-  spacer.style.cssText = 'width:6px;flex-shrink:0';
-  wrap.appendChild(spacer);
-  let firstBtn = null;
-  STAFF_TRAINEE.forEach(name => {
-    const btn = document.createElement('button');
-    btn.className = 'stab tr-pill';
-    btn.textContent = name;
-    btn.onclick = () => {
-      document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      btn.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-      loadStaff(name);
-    };
-    if (!firstBtn) firstBtn = btn;
-    wrap.appendChild(btn);
-  });
-  const divider = document.createElement('div');
-  divider.className = 'stab-divider';
-  wrap.appendChild(divider);
-  STAFF_REGULAR.forEach(name => {
-    const btn = document.createElement('button');
-    btn.className = 'stab';
-    btn.textContent = name;
-    btn.onclick = () => {
-      document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      btn.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
-      loadStaff(name);
-    };
-    wrap.appendChild(btn);
-  });
-  if (firstBtn) firstBtn.classList.add('active');
 }
 
 function init() {
   warmupGAS();
   if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
-  buildStaffTabs();
+  showScanning('cards-staff', 'status-staff'); // 老師分頁先放載入動畫，roster 到了再接手
   loadToday();
-  loadStaff(STAFF_TRAINEE[0]);
 }
 init();
 </script>
