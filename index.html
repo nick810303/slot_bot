@@ -200,9 +200,14 @@ html,body{height:100%;overflow:hidden;background:#fff;font-family:'Noto Sans TC'
 </div>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
-const GAS_URL = 'https://green-art-030a.nick810303.workers.dev';
+// v3：前端直連客立樂 API（客立樂 WAF 會擋 Cloudflare Worker 的 POST，
+//     但瀏覽器直連完全正常且 CORS 開放，所以不再經過 worker）
+const BOOKING_CODE = 'a33MS6uxvrwXxin2jHTk4N';
+const API_BASE     = 'https://booking-api.qlieer.app';
 const LIFF_ID = '2009610906-9zraEtAy';
 const LIFF_BOOKING = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N';
+const BRANCHES     = ['南京三民', '中山'];
+const CACHE_TTL_MS = 3 * 60 * 1000; // 3 分鐘
 const WD = ['日','一','二','三','四','五','六'];
 const BRANCH_SHORT = { '南京三民':'南京', '中山':'中山' };
 const TEACHER_COLOR = {
@@ -218,12 +223,12 @@ const DUR_CONFIG = {
 };
 let selectedDurs   = [60, 90, 120];
 let selectedBranch = 'all';
-let roster         = [];   // 由 worker 動態提供
+let roster         = [];   // 從客立樂選單動態解析
+let allData        = null; // { slots, roster, fetchedAt }
 let activeStaffId  = null;
 let currentTab     = 'today';
 let sheetSlot      = null;
 const tabSlots     = { today: [], staff: [] };
-const cache        = { today: null, staff: {} };
 
 function dateMeta(dateKey) {
   const [y,m,d] = dateKey.split('-').map(Number);
@@ -240,11 +245,109 @@ function todayKey() {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
-function callGAS(params) {
-  const qs = Object.keys(params).map(k => k+'='+encodeURIComponent(params[k])).join('&');
-  return fetch(GAS_URL + '?' + qs).then(r => r.json());
+// ── 客立樂 API 資料層（原 worker 邏輯搬到前端）────────────────
+function tpeTodayParts() {
+  const s = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Taipei' }).format(new Date());
+  return s.split('-').map(Number); // [y, m, d]
 }
-function warmupGAS() { fetch(GAS_URL + '?action=ping').catch(() => {}); }
+function dayStartEpoch() {
+  const [y,m,d] = tpeTodayParts();
+  return Math.floor(Date.UTC(y, m-1, d, -8, 0, 0) / 1000); // TPE 00:00
+}
+function dayEndEpoch(days) {
+  const [y,m,d] = tpeTodayParts();
+  return Math.floor(Date.UTC(y, m-1, d+days, 15, 59, 59) / 1000); // TPE 23:59:59
+}
+function tsToKey(ts) {
+  const s = new Intl.DateTimeFormat('en-CA', {
+    timeZone:'Asia/Taipei', year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', hour12:false,
+  }).format(new Date(ts * 1000)); // "2026-07-04, 13:00"
+  const [dateKey, timeStr] = s.split(', ');
+  return { dateKey, timeStr };
+}
+async function getMenu() {
+  const r = await fetch(`${API_BASE}/bookings/menu/service?code=${BOOKING_CODE}`);
+  if (!r.ok) throw new Error('menu ' + r.status);
+  return (await r.json()).data;
+}
+function buildCatalog(menu) {
+  const users = {};
+  for (const u of menu.users || []) users[u.id] = { name:(u.name||'').trim(), avatar:u.avatar||'' };
+  const staff = {};
+  for (const p of menu.products || []) {
+    const pname  = p.name || '';
+    const branch = BRANCHES.find(b => pname.startsWith(b));
+    if (!branch || pname.includes('不指定') || ![120,90,60].includes(p.duration)) continue;
+    const isTraineeProduct = pname.includes('培訓');
+    for (const pr of p.providers || []) {
+      if (!pr.isProvided) continue;
+      const u = users[pr.userId];
+      if (!u) continue;
+      if (!staff[pr.userId]) staff[pr.userId] = { staffId:pr.userId, name:u.name, avatar:u.avatar, branch, isTrainee:false, jobs:[] };
+      const s = staff[pr.userId];
+      if (isTraineeProduct) s.isTrainee = true;
+      s.jobs.push({ productId:p.id, dur:p.duration, branch });
+    }
+  }
+  return staff;
+}
+async function fetchSlotCells(productId, userId, startTime, endTime) {
+  const r = await fetch(`${API_BASE}/bookings/duration?code=${BOOKING_CODE}`, {
+    method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ startTime, endTime, events:[{ productId, addOnIds:[], userId, isAssigned:true }], parallel:false, customerCount:1 }),
+  });
+  if (!r.ok) return {};
+  return (await r.json()).result || {};
+}
+async function loadAll() {
+  const menu    = await getMenu();
+  const catalog = buildCatalog(menu);
+  const st = dayStartEpoch(), et = dayEndEpoch(14);
+  const tasks = [], meta = [];
+  for (const s of Object.values(catalog)) {
+    for (const job of s.jobs) {
+      tasks.push(fetchSlotCells(job.productId, s.staffId, st, et).catch(() => ({})));
+      meta.push({ s, job });
+    }
+  }
+  const results = await Promise.all(tasks);
+  const grouped = {};
+  results.forEach((data, i) => {
+    const { s, job } = meta[i];
+    for (const k of Object.keys(data)) {
+      const info = data[k];
+      if (info.status !== 'Available' || !info.cells || !info.cells.length) continue;
+      for (const ts of info.cells) {
+        const { dateKey, timeStr } = tsToKey(ts);
+        const key = `${s.staffId}__${job.branch}__${dateKey}__${timeStr}`;
+        if (!grouped[key]) grouped[key] = { teacher:s.name, staffId:s.staffId, avatar:s.avatar, branch:job.branch, time:timeStr, dateKey, durations:[], isTrainee:s.isTrainee };
+        if (!grouped[key].durations.includes(job.dur)) grouped[key].durations.push(job.dur);
+      }
+    }
+  });
+  const slots = Object.values(grouped);
+  slots.forEach(x => x.durations.sort((a,b) => b-a));
+  slots.sort((a,b) => a.dateKey !== b.dateKey ? (a.dateKey < b.dateKey ? -1 : 1) : (a.time < b.time ? -1 : 1));
+  const rlist = Object.values(catalog).map(s => ({ staffId:s.staffId, name:s.name, avatar:s.avatar, branch:s.branch, isTrainee:s.isTrainee }));
+  rlist.sort((a,b) => {
+    const bi = BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch);
+    if (bi) return bi;
+    if (a.isTrainee !== b.isTrainee) return a.isTrainee ? 1 : -1;
+    return a.name < b.name ? -1 : 1;
+  });
+  return { slots, roster:rlist, fetchedAt:new Date().toISOString() };
+}
+function readCache() {
+  try {
+    const c = JSON.parse(sessionStorage.getItem('slotdash_v3') || 'null');
+    if (c && Date.now() - c.t < CACHE_TTL_MS) return c.d;
+  } catch(e) {}
+  return null;
+}
+function writeCache(d) {
+  try { sessionStorage.setItem('slotdash_v3', JSON.stringify({ t:Date.now(), d })); } catch(e) {}
+}
 function hashColor(name) {
   let h = 0;
   for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
@@ -359,13 +462,14 @@ function setBranch(b) {
   rerenderAll();
 }
 function rerenderAll() {
-  if (cache.today) renderTodayFromData(cache.today);
+  if (!allData) return;
+  renderToday();
   // 指定老師分頁：若目前老師被分店篩掉，換成第一位可見老師
   const visible = visibleRoster();
   if (visible.length && !visible.some(s => s.staffId === activeStaffId)) {
     selectStaff(visible[0].staffId);
-  } else if (activeStaffId && cache.staff[activeStaffId]) {
-    renderStaffFromData(cache.staff[activeStaffId]);
+  } else if (activeStaffId) {
+    renderStaff();
   }
 }
 function visibleRoster() {
@@ -465,36 +569,8 @@ function applyFilters(slots) {
 }
 
 // ── 今日 / 最早時段 ──────────────────────────────────────────
-async function loadToday() {
-  showScanning('cards-today', 'status-today');
-  try {
-    const data = await callGAS({ action:'today' });
-    cache.today = data;
-    if (data.staff && data.staff.length) {
-      roster = data.staff;
-      buildStaffTabs();
-      if (!activeStaffId) {
-        const first = visibleRoster()[0];
-        if (first) selectStaff(first.staffId);
-      }
-    } else {
-      stopScanning('cards-staff');
-      renderStatus('status-staff', '老師名單載入失敗，請重新整理', 'var(--red)');
-    }
-    stopScanning('cards-today');
-    renderTodayFromData(data);
-  } catch(e) {
-    stopScanning('cards-today');
-    stopScanning('cards-staff');
-    renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
-    document.getElementById('cards-today').innerHTML =
-      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
-    document.getElementById('cards-staff').innerHTML =
-      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
-  }
-}
-function renderTodayFromData(data) {
-  const allSlots = applyFilters(data.slots);
+function renderToday() {
+  const allSlots = applyFilters(allData.slots);
   const seen = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
     const k = s.staffId || s.teacher;
@@ -511,41 +587,28 @@ function renderTodayFromData(data) {
   const top3 = earliestPerTeacher.slice(0, 3);
   tabSlots.today = top3;
   paintCards('cards-today', top3);
-  if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
-// ── 指定老師 ─────────────────────────────────────────────────
+// ── 指定老師（資料已全部在手，切換零延遲）─────────────────────
 function selectStaff(staffId) {
   activeStaffId = staffId;
   document.querySelectorAll('.stab').forEach(b => {
     b.classList.toggle('active', b.dataset.sid === staffId);
     if (b.dataset.sid === staffId) b.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
   });
-  loadStaff(staffId);
+  renderStaff();
 }
-async function loadStaff(staffId) {
-  if (cache.staff[staffId]) { renderStaffFromData(cache.staff[staffId]); return; }
-  showScanning('cards-staff', 'status-staff');
-  try {
-    const data = await callGAS({ action:'staff', staff:staffId });
-    cache.staff[staffId] = data;
-    stopScanning('cards-staff');
-    if (staffId === activeStaffId) renderStaffFromData(data);
-  } catch(e) {
-    stopScanning('cards-staff');
-    document.getElementById('cards-staff').innerHTML =
-      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料</div>`;
-  }
-}
-function renderStaffFromData(data) {
+function renderStaff() {
   const s = staffById(activeStaffId);
   const name = s ? s.name : '';
-  const filtered = (data.slots || []).filter(x => x.durations.some(d => selectedDurs.includes(d))).slice(0, 3);
+  const filtered = allData.slots
+    .filter(x => x.staffId === activeStaffId)
+    .filter(x => x.durations.some(d => selectedDurs.includes(d)))
+    .slice(0, 3);
   const status = computeStaffStatus(filtered, name);
   renderStatus('status-staff', status.text, status.color);
   tabSlots.staff = filtered;
   paintCards('cards-staff', filtered);
-  if (data.fetchedAt) setFetchedAt(data.fetchedAt);
 }
 
 function buildStaffTabs() {
@@ -632,11 +695,31 @@ function goBooking() {
   else location.href = url;
 }
 
-function init() {
-  warmupGAS();
+async function init() {
   if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
-  showScanning('cards-staff', 'status-staff'); // 老師分頁先放載入動畫，roster 到了再接手
-  loadToday();
+  showScanning('cards-today', 'status-today');
+  showScanning('cards-staff', 'status-staff');
+  try {
+    let data = readCache();
+    if (!data) { data = await loadAll(); writeCache(data); }
+    allData = data;
+    roster  = data.roster;
+    stopScanning('cards-today');
+    stopScanning('cards-staff');
+    buildStaffTabs();
+    renderToday();
+    const first = visibleRoster()[0];
+    if (first) selectStaff(first.staffId);
+    setFetchedAt(data.fetchedAt);
+  } catch(e) {
+    stopScanning('cards-today');
+    stopScanning('cards-staff');
+    renderStatus('status-today', '連線失敗，請重新整理', 'var(--red)');
+    document.getElementById('cards-today').innerHTML =
+      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
+    document.getElementById('cards-staff').innerHTML =
+      `<div style="padding:16px 0;font-size:12px;color:var(--red)">❌ 無法取得資料，請重新整理</div>`;
+  }
 }
 init();
 </script>
