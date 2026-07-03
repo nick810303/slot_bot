@@ -74,11 +74,20 @@ async function getMenuData() {
   return json.data || null;
 }
 
+// 模擬瀏覽器的 headers（客立樂 API 會擋沒有 UA/Origin 的伺服器請求）
+const BROWSER_HEADERS = {
+  "Content-Type": "application/json",
+  "Accept": "application/json, text/plain, */*",
+  "Origin": "https://booking.qlieer.com",
+  "Referer": "https://booking.qlieer.com/",
+  "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+};
+
 async function fetchSlots(productId, userId, startTime, endTime) {
   const url = `${BOOKING_API_BASE}/bookings/duration?code=${BOOKING_CODE}`;
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: BROWSER_HEADERS,
     body: JSON.stringify({
       startTime, endTime,
       events: [{ productId, addOnIds: [], userId, isAssigned: true }],
@@ -297,13 +306,29 @@ export default {
         roster: roster.map(r => `${r.branch}|${r.name}${r.isTrainee ? "(培訓)" : ""}`),
         ok: roster.length > 0,
       });
-      // 抽測第一位老師的第一個方案
-      const first = Object.values(catalog)[0];
+      // 抽測一位正規老師的第一個方案（回報 HTTP 狀態碼與回應片段）
+      const first = Object.values(catalog).find(s => !s.isTrainee) || Object.values(catalog)[0];
       if (first) {
         try {
-          const r = await fetchSlots(first.jobs[0].productId, first.staffId, dayStart(now, 0), dayEnd(now, 14));
-          const slotCount = Object.values(r).reduce((a, v) => a + (v.cells?.length ?? 0), 0);
-          report.steps.push({ step: "slot_sample", staff: first.name, slotCount, ok: true });
+          const res = await fetch(`${BOOKING_API_BASE}/bookings/duration?code=${BOOKING_CODE}`, {
+            method: "POST",
+            headers: BROWSER_HEADERS,
+            body: JSON.stringify({
+              startTime: dayStart(now, 0), endTime: dayEnd(now, 14),
+              events: [{ productId: first.jobs[0].productId, addOnIds: [], userId: first.staffId, isAssigned: true }],
+              parallel: false, customerCount: 1,
+            }),
+          });
+          const bodyText  = await res.text();
+          let slotCount = 0;
+          try {
+            const j = JSON.parse(bodyText);
+            slotCount = Object.values(j.result || {}).reduce((a, v) => a + (v.cells?.length ?? 0), 0);
+          } catch (e) { /* 非 JSON 回應 */ }
+          report.steps.push({
+            step: "slot_sample", staff: first.name, httpCode: res.status,
+            slotCount, bodyHead: bodyText.slice(0, 120), ok: res.ok && slotCount >= 0,
+          });
         } catch (e) {
           report.steps.push({ step: "slot_sample", error: String(e), ok: false });
         }
@@ -315,12 +340,12 @@ export default {
 
     if (action === "today") {
       const dateKey = formatDateKey(now);
-      return withCache(`v2_today_${dateKey}`, CACHE_TTL, () => handleToday(now));
+      return withCache(`v21_today_${dateKey}`, CACHE_TTL, () => handleToday(now));
     }
 
     if (action === "staff" && staff) {
       const dateKey = formatDateKey(now);
-      return withCache(`v2_staff_${encodeURIComponent(staff)}_${dateKey}`, CACHE_TTL, () => handleStaff(staff, now));
+      return withCache(`v21_staff_${encodeURIComponent(staff)}_${dateKey}`, CACHE_TTL, () => handleStaff(staff, now));
     }
 
     return jsonResp({ error: "unknown action" });
