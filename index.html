@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v3.3 -->
+<!-- 小泰空位儀表板 v3.4 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -85,6 +85,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .status-row .sec-label{padding:0;flex-shrink:0;text-align:right;white-space:nowrap}
 .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .status-text{font-size:13px;font-weight:500;line-height:1.3}
+.status-line{flex:1;min-width:0}
+.status-caret{display:inline-block;width:9px;height:2px;margin-left:1px;border-radius:1px;vertical-align:baseline;transition:opacity .45s ease;animation:caretblink 1.05s step-end infinite}
+.status-caret.frozen{animation:none;opacity:0}
+@keyframes caretblink{0%,50%{opacity:1}51%,100%{opacity:0}}
 .sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
 .card-row{display:flex;gap:6px;padding:0 12px}
 .card{flex:1 1 0;min-width:0;cursor:pointer}
@@ -640,9 +644,35 @@ function switchTab(id, btn) {
     renderStaff();
   }
 }
+const _statusTyper  = {}; // elId -> timeout（打字中）
+const _statusLast   = {}; // elId -> 上次文字（相同不重播）
+const _statusFreeze = {}; // elId -> timeout（打完後定住游標）
+function _scheduleCaretFreeze(elId, caret) {
+  if (_statusFreeze[elId]) clearTimeout(_statusFreeze[elId]);
+  _statusFreeze[elId] = setTimeout(() => { if (caret) caret.classList.add('frozen'); _statusFreeze[elId] = null; }, 1600);
+}
 function renderStatus(elId, text, color) {
-  document.getElementById(elId).innerHTML =
-    `<div class="status-dot" style="background:${color}"></div><span class="status-text" style="color:${color}">${text}</span>`;
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const same = _statusLast[elId] === text;
+  if (same && _statusTyper[elId]) return; // 同文字且正在打字→讓它打完
+  if (_statusTyper[elId])  { clearTimeout(_statusTyper[elId]);  _statusTyper[elId]  = null; }
+  if (_statusFreeze[elId]) { clearTimeout(_statusFreeze[elId]); _statusFreeze[elId] = null; }
+  _statusLast[elId] = text;
+  el.innerHTML =
+    `<div class="status-dot" style="background:${color}"></div>` +
+    `<span class="status-line"><span class="status-text" style="color:${color}"></span><span class="status-caret" style="background:${color}"></span></span>`;
+  const span  = el.querySelector('.status-text');
+  const caret = el.querySelector('.status-caret');
+  if (same) { span.textContent = text; _scheduleCaretFreeze(elId, caret); return; } // 同文字直接顯示
+  // 終端機打字機：逐字輸出（速度含人性化抖動），游標先自然閃爍、打完稍後 freeze 定住
+  let i = 0;
+  const step = () => {
+    if (i >= text.length) { _statusTyper[elId] = null; _scheduleCaretFreeze(elId, caret); return; }
+    span.textContent += text.charAt(i++);
+    _statusTyper[elId] = setTimeout(step, 55 + Math.random() * 70); // 約 55–125ms/字
+  };
+  step();
 }
 function branchPrefix() {
   return selectedBranches.length===1 ? `${selectedBranches[0]}｜` : '';
