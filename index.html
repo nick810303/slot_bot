@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v3.9.1 -->
+<!-- 小泰空位儀表板 v4.1 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>小泰空位儀表板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -105,9 +105,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:7px;font-weight:500;padding:1px 3px;border-radius:2px;background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);line-height:1.5;white-space:nowrap;flex-shrink:0;}
 .card-body{flex:1;padding:4px 7px 4px;display:flex;flex-direction:column;background:var(--card)}
 .card-near-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;flex-shrink:0}
-.card-branch-banner{flex-shrink:0;text-align:center;font-family:'Noto Sans TC',sans-serif;font-size:9.5px;font-weight:500;color:var(--cream);letter-spacing:.06em;line-height:1.5;padding:2px 6px;border-top:1px solid rgba(248,242,238,.35)}
-.card-branch-banner.bc-nj{background:var(--nj)}
-.card-branch-banner.bc-zs{background:var(--zs)}
+.card-branch-banner{flex-shrink:0;text-align:center;font-family:'Noto Sans TC',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.06em;line-height:1.5;padding:2px 6px}
+.card-branch-banner.bc-nj{background:#E3DED3;color:var(--nj);border-bottom:1px solid var(--nj-bdr)}
+.card-branch-banner.bc-zs{background:#EBDAD1;color:var(--zs);border-bottom:1px solid var(--zs-bdr)}
 .near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;line-height:1.6}
 .near-badge.today{background:var(--black);color:#fff}
 .near-badge.other{background:#e7ddce;color:#6b5d4d}
