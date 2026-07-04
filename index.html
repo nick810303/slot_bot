@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v3.6 -->
+<!-- 小泰空位儀表板 v3.7 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -35,8 +35,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg)}
 .handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
-.hd{flex-shrink:0;padding:5px 14px 8px}
-.hd-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px}
+.hd{flex-shrink:0;padding:4px 14px 5px}
+.hd-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
 .hd-name{font-size:11px;color:var(--gray);flex:1;min-width:0;line-height:1.45}
 .hd-sub{font-size:9px;color:var(--gray2);letter-spacing:.01em}
 .hd-sub a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
@@ -44,11 +44,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
 .tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(62,42,33,.13)}
-.tab{flex:1;padding:5px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
+.tab{flex:1;padding:4px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
 .tab.active{background:var(--card);color:var(--black);font-weight:500;box-shadow:0 1px 2px rgba(62,42,33,.18),inset 0 1px 0 rgba(255,255,255,.75)}
 .filters{flex-shrink:0;border-bottom:1px solid var(--line2);background:var(--bg3);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
 /* 分店＋時長：一列五個勾選框（左分店、右時長，中間分隔）*/
-.filter-row{display:flex;align-items:stretch;gap:5px;padding:5px 12px 6px}
+.filter-row{display:flex;align-items:stretch;gap:5px;padding:4px 12px 5px}
 .cbx{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:4px 3px;border-radius:6px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;transition:all .15s;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 1px rgba(62,42,33,.07)}
 .cbx.on{box-shadow:inset 0 1px 2px rgba(62,42,33,.17)}
 .cbx:active{transform:scale(.97)}
@@ -81,12 +81,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .pane{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .15s;padding-bottom:6px}
 .pane.active{opacity:1;pointer-events:all}
 .pane::-webkit-scrollbar{display:none}
-.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:7px 12px;padding:8px 11px;background:var(--bg2);border:1px solid var(--line2);border-radius:7px}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 12px;padding:5px 11px;background:var(--bg2);border:1px solid var(--line2);border-radius:7px}
 .status-bar{display:flex;align-items:center;gap:6px;padding:6px 14px 4px}
 .status-row .status-bar{padding:0;flex:1;min-width:0}
 .status-row .sec-label{padding:0;flex-shrink:0;text-align:right;white-space:nowrap}
 .status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transform:translateY(1.5px)}
-.status-text{font-size:13px;font-weight:500;line-height:1.15}
+.status-text{font-size:13px;font-weight:500;line-height:1.1}
 .status-line{flex:1;min-width:0}
 .status-caret{display:inline-block;width:9px;height:2px;margin-left:1px;border-radius:1px;vertical-align:baseline;transition:opacity .45s ease;animation:caretblink 1.05s step-end infinite}
 .status-caret.frozen{animation:none;opacity:0}
@@ -96,14 +96,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .card{flex:1 1 0;min-width:0;cursor:pointer}
 .card-inner{height:156px;background:var(--card);border:1px solid var(--card-bdr);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;box-shadow:0 1px 2px rgba(62,42,33,.14),inset 0 1px 0 rgba(255,255,255,.5)}
 .card-inner:active{background:#f3ebe0}
-.card-teacher-banner{flex-shrink:0;height:25px;padding:0 7px;display:flex;align-items:center;justify-content:space-between;gap:5px;background:var(--header)}
+.card-teacher-banner{flex-shrink:0;height:23px;padding:0 7px;display:flex;align-items:center;justify-content:space-between;gap:5px;background:var(--header)}
 .banner-left{display:flex;align-items:center;gap:5px;min-width:0}
 .card-hd-av{width:17px;height:17px;border-radius:50%;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4)}
 .card-teacher-name{font-size:10.5px;font-weight:500;color:var(--cream);letter-spacing:.01em;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .banner-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
 .trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:7px;font-weight:500;padding:1px 3px;border-radius:2px;background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);line-height:1.5;white-space:nowrap;flex-shrink:0;}
-.card-body{flex:1;padding:5px 7px 5px;display:flex;flex-direction:column;background:var(--card)}
+.card-body{flex:1;padding:4px 7px 4px;display:flex;flex-direction:column;background:var(--card)}
 .card-near-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;flex-shrink:0}
 .card-branch-banner{flex-shrink:0;text-align:center;font-family:'Noto Sans TC',sans-serif;font-size:9.5px;font-weight:500;color:var(--cream);letter-spacing:.06em;line-height:1.5;padding:2px 6px;border-top:1px solid rgba(248,242,238,.35)}
 .card-branch-banner.bc-nj{background:var(--nj)}
@@ -140,7 +140,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .flip-3{animation:flipin .4s cubic-bezier(.4,0,.2,1) .22s both}
 @keyframes spin{to{transform:rotate(360deg)}}
 .scan-spin{width:34px;height:34px;border-radius:50%;border:2.5px solid rgba(174,108,86,.16);border-top-color:var(--clay);animation:spin .85s linear infinite;flex-shrink:0}
-.stab-group-wrap{flex-shrink:0;display:flex;align-items:center;padding:7px 14px;overflow-x:auto;scrollbar-width:none;background:var(--bg3);border-bottom:1px solid var(--line2);box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.stab-group-wrap{flex-shrink:0;display:flex;align-items:center;padding:5px 14px;overflow-x:auto;scrollbar-width:none;background:var(--bg3);border-bottom:1px solid var(--line2);box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
 .stab-group-wrap::-webkit-scrollbar{display:none}
 .stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--gray);letter-spacing:.04em;background:var(--bg2);border:1px solid var(--line);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px}
 .stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
