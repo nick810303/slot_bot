@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.5 -->
+<!-- 小泰空位儀表板 v4.6 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -927,7 +927,7 @@ function buildStaffTabs() {
     const facepile = document.createElement('span');
     facepile.className = 'stab-facepile';
     facepile.setAttribute('aria-hidden','true');
-    members.slice(0,3).forEach(s => {
+    members.forEach(s => {
       if (!s.avatar) return;
       const mi = document.createElement('img');
       mi.src = s.avatar;
