@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.4 -->
+<!-- 小泰空位儀表板 v4.5 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -700,10 +700,10 @@ function computeTodayStatus(slots) {
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
     if (!fut) return { text:branchPrefix()+'近14天已滿，進入預約系統看未來更多時間', color:'var(--red)' };
-    return { text:`${branchPrefix()}今日已滿，最早空位在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
+    return { text:`${branchPrefix()}今日已滿，最早在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
-  if (todaySlots.length <= 3) return { text:`${branchPrefix()}今日僅剩 ${todaySlots.length} 個時段`, color:'var(--red)' };
-  return { text:branchPrefix()+'今日有多個時段可預約', color:'var(--green)' };
+  if (todaySlots.length >= 4) return { text:branchPrefix()+'今日尚有多個空位', color:'var(--green)' };
+  return { text:`${branchPrefix()}今日剩下${todaySlots.length}個空位`, color:'var(--red)' };
 }
 function computeStaffStatus(slots, staffName) {
   const tk = todayKey();
@@ -886,9 +886,10 @@ function renderStaff() {
   const tk = todayKey();
   const todayN = pool.filter(x => x.dateKey===tk).length;
   let status;
-  if (pool.length === 0) status = { text:'所選老師近14天已滿，進入預約系統看未來更多時間', color:'var(--red)' };
-  else if (todayN === 0)  status = { text:`所選老師今日已滿，最早在${dateMeta(pool[0].dateKey).nearLabel}`, color:'var(--red)' };
-  else                    status = { text:`所選老師今日有 ${todayN} 個空位`, color:'var(--green)' };
+  if (pool.length === 0)  status = { text:'近14天已滿，進入預約系統看未來更多時間', color:'var(--red)' };
+  else if (todayN === 0)  status = { text:`今日已滿，最早在${dateMeta(pool[0].dateKey).nearLabel}`, color:'var(--red)' };
+  else if (todayN >= 4)   status = { text:'今日尚有多個空位', color:'var(--green)' };
+  else                    status = { text:`今日剩下${todayN}個空位`, color:'var(--red)' };
   renderStatus('status-staff', status.text, status.color);
   tabSlots.staff = chosen;
   if (chosen.length === 0) {
