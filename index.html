@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.2 -->
+<!-- 小泰空位儀表板 v4.3 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -280,6 +280,8 @@ const BOOKING_CODE = 'a33MS6uxvrwXxin2jHTk4N';
 const API_BASE     = 'https://booking-api.qlieer.app';
 const LIFF_ID = '2009610906-9zraEtAy';
 const LIFF_BOOKING = 'https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N';
+const STORE_ID = '42b3de80-7f2f-11f0-8bf2-f187a636cb9b';
+const LIFF_STORE = `${LIFF_BOOKING}/${STORE_ID}/store`;
 const BRANCHES     = ['南京三民', '中山'];
 const CACHE_TTL_MS = 4 * 60 * 1000; // 4 分鐘（localStorage 快取）
 const WINDOW_DAYS_1 = 7;   // 開場先問最近 7 天
@@ -1035,7 +1037,7 @@ function handleMaskClick(e) { if(e.target.id==='mask') closeSheet(); }
 function goBooking() {
   closeSheet();
   const url = (sheetSlot && sheetSlot.staffId)
-    ? `${LIFF_BOOKING}/${sheetSlot.staffId}/menu`
+    ? LIFF_STORE
     : `${LIFF_BOOKING}/menu`;
   if (typeof liff !== 'undefined' && liff.isInClient()) liff.openWindow({ url, external:false });
   else location.href = url;
