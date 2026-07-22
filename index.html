@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.1.1 -->
+<!-- 小泰空位儀表板 v4.2 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -142,7 +142,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .scan-spin{width:34px;height:34px;border-radius:50%;border:2.5px solid rgba(174,108,86,.16);border-top-color:var(--clay);animation:spin .85s linear infinite;flex-shrink:0}
 .stab-group-wrap{flex-shrink:0;display:flex;align-items:center;padding:5px 14px;overflow-x:auto;scrollbar-width:none;background:var(--bg3);border-bottom:1px solid var(--line2);box-shadow:inset 0 1px 2px rgba(62,42,33,.07)}
 .stab-group-wrap::-webkit-scrollbar{display:none}
-.stab-group-label{flex-shrink:0;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--gray);letter-spacing:.04em;background:var(--bg2);border:1px solid var(--line);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px}
+.stab-group{flex-shrink:0;display:flex;align-items:center}
+.stab-group-label{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--gray);letter-spacing:.04em;background:var(--bg2);border:1px solid var(--line);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px;cursor:pointer;transition:background .12s,color .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.stab-group-label:active{background:var(--bg3)}
+.stab-group.collapsed .stab-group-label{color:var(--gray2)}
+.stab-group-count{font-family:'DM Mono',monospace;font-size:8px;color:var(--gray2);letter-spacing:0}
+.stab-group:not(.collapsed) .stab-group-count{display:none}
+.stab-facepile{display:none;align-items:center;margin-left:2px}
+.stab-group.collapsed .stab-facepile{display:inline-flex}
+.stab-facepile img{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--bg2);margin-left:-5px;object-fit:cover;background:#e8e8e8}
+.stab-facepile img:first-child{margin-left:1px}
+.stab-group-pills{display:grid;grid-template-columns:1fr;transition:grid-template-columns .6s cubic-bezier(.37,0,.24,1),opacity .42s ease}
+.stab-pills-inner{display:flex;align-items:center;overflow:hidden;min-width:0;padding:4px 0;margin:-4px 0}
+.stab-group.collapsed .stab-group-pills{grid-template-columns:0fr;opacity:0}
 .stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
 .stab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:20px;border:1px solid transparent;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;box-shadow:none}
 .stab:last-child{margin-right:0}
@@ -888,6 +900,7 @@ function renderStaff() {
   paintCards('cards-staff', chosen);
 }
 
+const collapsedBranches = new Set();
 function buildStaffTabs() {
   const wrap = document.getElementById('staff-tabs');
   wrap.innerHTML = '';
@@ -901,10 +914,41 @@ function buildStaffTabs() {
       divider.className = 'stab-divider';
       wrap.appendChild(divider);
     }
-    const label = document.createElement('div');
+    const group = document.createElement('div');
+    group.className = 'stab-group' + (collapsedBranches.has(b) ? ' collapsed' : '');
+    group.dataset.branch = b;
+
+    const label = document.createElement('button');
     label.className = 'stab-group-label';
-    label.textContent = b;
-    wrap.appendChild(label);
+    label.type = 'button';
+    label.setAttribute('aria-label', b + '（點按收合或展開）');
+    label.appendChild(document.createTextNode(b));
+    const facepile = document.createElement('span');
+    facepile.className = 'stab-facepile';
+    facepile.setAttribute('aria-hidden','true');
+    members.slice(0,3).forEach(s => {
+      if (!s.avatar) return;
+      const mi = document.createElement('img');
+      mi.src = s.avatar;
+      mi.loading = 'lazy';
+      mi.onerror = function(){ this.remove(); };
+      facepile.appendChild(mi);
+    });
+    label.appendChild(facepile);
+    const count = document.createElement('span');
+    count.className = 'stab-group-count';
+    count.textContent = members.length;
+    label.appendChild(count);
+    label.onclick = () => {
+      const nowCollapsed = group.classList.toggle('collapsed');
+      if (nowCollapsed) collapsedBranches.add(b); else collapsedBranches.delete(b);
+    };
+    group.appendChild(label);
+
+    const pills = document.createElement('div');
+    pills.className = 'stab-group-pills';
+    const pillsInner = document.createElement('div');
+    pillsInner.className = 'stab-pills-inner';
     members.forEach(s => {
       const btn = document.createElement('button');
       btn.className = 'stab' + (s.isTrainee ? ' tr-pill' : '');
@@ -918,8 +962,11 @@ function buildStaffTabs() {
       btn.appendChild(document.createTextNode(s.name));
       if (s.isTrainee) { const tg = document.createElement('span'); tg.className = 'stab-tr-tag'; tg.textContent = '培訓新師'; btn.appendChild(tg); }
       btn.onclick = () => onStaffCapsule(s.staffId);
-      wrap.appendChild(btn);
+      pillsInner.appendChild(btn);
     });
+    pills.appendChild(pillsInner);
+    group.appendChild(pills);
+    wrap.appendChild(group);
     addedAny = true;
   });
   syncCapsuleSelection();
