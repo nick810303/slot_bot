@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.9 -->
+<!-- 小泰空位儀表板 v5.0 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -40,13 +40,41 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .hd-name{font-size:11px;color:var(--gray);flex:1;min-width:0;line-height:1.45}
 .hd-sub{font-size:9px;color:var(--gray2);letter-spacing:.01em}
 .hd-sub a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
-.hd-live{display:flex;align-items:center;gap:4px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent}
-.stats-bubble{position:absolute;top:26px;right:12px;z-index:60;min-width:158px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 11px;box-shadow:0 5px 16px rgba(62,42,33,.24),inset 0 1px 0 rgba(255,255,255,.6);opacity:0;transform:translateY(-5px) scale(.95);pointer-events:none;transition:opacity .2s ease,transform .2s cubic-bezier(.4,0,.2,1)}
-.stats-bubble.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.sb-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gray);line-height:1.7}
-.sb-row b{font-size:15px;color:var(--cocoa);font-weight:500;letter-spacing:.03em}
-.sb-sub{margin-top:6px;padding-top:6px;border-top:1px solid var(--line2);font-family:'DM Mono',monospace;font-size:8px;color:var(--gray2);line-height:1.6}
-.sb-load{font-family:'DM Mono',monospace;font-size:11px;color:var(--gray2)}
+.hd-live{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;padding:6px 8px;margin:-6px -8px;border:none;background:transparent;border-radius:7px;touch-action:manipulation}
+.hd-live:active{opacity:.55}
+.stats-sheet{max-height:88%;overflow-y:auto}
+.stx-head{display:flex;align-items:center;justify-content:space-between;margin:2px 0 10px}
+.stx-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--gray2)}
+.stx-x{font-size:15px;color:var(--gray2);cursor:pointer;line-height:1;padding:4px 8px;margin:-4px -8px}
+.stx-visitors{display:flex;gap:18px;padding:1px 2px 8px;border-bottom:1px solid var(--line2)}
+.stx-vis{display:flex;align-items:baseline;gap:6px}
+.stx-vis .l{font-size:10px;color:var(--gray2)}
+.stx-vis .n{font-family:'DM Mono',monospace;font-size:13px;font-weight:400;color:var(--gray);letter-spacing:.02em}
+.stx-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:6px 2px;border-bottom:1px solid var(--line2)}
+.stx-row .k{font-size:10px;color:var(--gray2)}
+.stx-row .v{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);white-space:nowrap}
+.stx-row .v i{color:var(--gray3);font-style:normal}
+.stx-faint{margin-top:7px}
+.stx-frow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:3px 2px}
+.stx-frow .k{font-size:9px;color:var(--gray3)}
+.stx-frow .v{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray3);white-space:nowrap}
+.stx-admin{text-align:right;margin-top:10px}
+.stx-admin a{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray3);cursor:pointer;letter-spacing:.05em;padding:4px}
+.stx-pw{display:none;align-items:center;justify-content:flex-end;gap:6px;margin-top:10px}
+.stx-pw.show{display:flex}
+.stx-pw input{width:120px;height:32px;border:1px solid var(--line);border-radius:7px;background:var(--bg3);padding:0 9px;font-family:'DM Mono',monospace;font-size:13px;color:var(--black);outline:none}
+.stx-pw input:focus{border-color:var(--clay)}
+.stx-pw button{height:32px;padding:0 12px;border:1px solid #7d4a37;border-radius:7px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer}
+.stx-rank{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.stx-rank.show{display:block}
+.stx-rank-t{font-size:11px;color:var(--gray);margin-bottom:6px}
+.stx-rk{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:5px 2px;border-bottom:1px solid var(--line2);font-size:12px}
+.stx-rk:last-child{border-bottom:none}
+.stx-rk .nm{color:#6b5d4d}
+.stx-rk .nm b{font-family:'DM Mono',monospace;color:var(--gray3);font-weight:400;margin-right:6px;font-size:10px}
+.stx-rk .c{font-family:'DM Mono',monospace;color:#7a6a58;white-space:nowrap}
+.stx-rk .c i{color:var(--gray3);font-style:normal}
+.sb-load{font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray2);padding:10px 2px}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
 .tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(62,42,33,.13)}
@@ -215,9 +243,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
   <div class="hd">
     <div class="hd-top">
       <div class="hd-name">小泰空位儀表板<span class="hd-sub"> / 僅供快速查詢最早的空位，更多時段請至<a href="https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu" onclick="return openBooking()">預約系統</a></span></div>
-      <div class="hd-live" onclick="showStatsBubble()"><div class="live-dot"></div>LIVE</div>
+      <button class="hd-live" type="button" onclick="openStats()"><div class="live-dot"></div>LIVE</button>
     </div>
-    <div id="stats-bubble" class="stats-bubble" onclick="this.classList.remove('show')"></div>
     <div class="tabs">
       <button class="tab active" onclick="switchTab('today',this)">今日 / 最早時段</button>
       <button class="tab" onclick="switchTab('staff',this)">指定老師</button>
@@ -282,7 +309,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
     <button class="sheet-btn" id="sheet-btn" onclick="goBooking()">前往預約系統</button>
     <span class="sheet-close" onclick="closeSheet()">關閉</span>
   </div>
-</div><script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</div>
+<div class="mask" id="stats-mask" onclick="if(event.target.id==='stats-mask')closeStats()">
+  <div class="sheet stats-sheet">
+    <div class="stx-head"><span class="stx-title">USAGE / 使用統計</span><span class="stx-x" onclick="closeStats()">✕</span></div>
+    <div id="stx-body"><div class="sb-load">讀取中…</div></div>
+  </div>
+</div>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
 // v3：前端直連客立樂 API（客立樂 WAF 會擋 Cloudflare Worker 的 POST，
 //     但瀏覽器直連完全正常且 CORS 開放，所以不再經過 worker）
@@ -866,7 +900,7 @@ function onStaffCapsule(staffId) {
     // 指定老師：多選，最多 3 位（滿了再點新的就把最早選的擠掉）
     const i = staffPicked.indexOf(staffId);
     if (i >= 0) staffPicked.splice(i, 1);
-    else { staffPicked.push(staffId); if (staffPicked.length > 3) staffPicked.shift(); }
+    else { staffPicked.push(staffId); if (staffPicked.length > 3) staffPicked.shift(); sbTrack('staff:'+staffId); }
     recomputeDurs(); // 依所選（純培訓/混選）重算時長鎖定
     syncCapsuleSelection();
     const el = document.querySelector(`#staff-tabs .stab[data-sid="${staffId}"]`);
@@ -1153,22 +1187,56 @@ function trackMode(tab) {
   try { if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k,'1'); } catch(e) {}
   sbTrack(tab === 'staff' ? 'mode_staff' : 'mode_today');
 }
-let _statsBubbleTimer = null;
-function showStatsBubble() {
-  const b = document.getElementById('stats-bubble'); if (!b) return;
-  b.classList.add('show');
-  b.innerHTML = '<div class="sb-load">讀取中…</div>';
+let _statsData = null;
+function openStats() {
+  const m = document.getElementById('stats-mask'); if (!m) return;
+  document.getElementById('stx-body').innerHTML = '<div class="sb-load">讀取中…</div>';
+  m.classList.add('show');
   fetch(SB_URL + '/rest/v1/rpc/get_tool_stats', { method:'POST',
     headers:{ 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY, 'Content-Type':'application/json' }, body:'{}' })
-    .then(r => r.json()).then(s => {
-      const n = x => String(x ?? 0).padStart(4,'0');
-      b.innerHTML =
-        `<div class="sb-row"><span>本日訪客</span><b>${n(s.visit_today)}</b></div>` +
-        `<div class="sb-row"><span>累計訪客</span><b>${n(s.unique_total)}</b></div>` +
-        `<div class="sb-sub">今日新客 ${s.new_today}｜轉換 ${s.convert_today}／${s.convert_total}｜提醒 ${s.remind_total}<br>模式 今日 ${s.mode_today_total}／指定 ${s.mode_staff_total}</div>`;
-    }).catch(()=>{ b.innerHTML = '<div class="sb-load">讀取失敗</div>'; });
-  clearTimeout(_statsBubbleTimer);
-  _statsBubbleTimer = setTimeout(() => b.classList.remove('show'), 6000);
+    .then(r => r.json()).then(s => { _statsData = s; renderStatsBody(s); })
+    .catch(()=>{ document.getElementById('stx-body').innerHTML = '<div class="sb-load">讀取失敗，請稍後再試</div>'; });
+}
+function closeStats() { const m = document.getElementById('stats-mask'); if (m) m.classList.remove('show'); }
+function renderStatsBody(s) {
+  const p4 = x => String(x ?? 0).padStart(4,'0');
+  const p3 = x => String(x ?? 0).padStart(3,'0');
+  document.getElementById('stx-body').innerHTML =
+    `<div class="stx-visitors">` +
+      `<div class="stx-vis"><span class="l">今日訪客</span><span class="n">${p4(s.visit_today)}</span></div>` +
+      `<div class="stx-vis"><span class="l">累計訪客</span><span class="n">${p4(s.unique_total)}</span></div>` +
+    `</div>` +
+    `<div class="stx-row"><span class="k">點擊「指定老師」頁面人數</span><span class="v">今日 ${p3(s.staffpage_today)}<i> ／ 累計 ${p3(s.staffpage_total)}</i></span></div>` +
+    `<div class="stx-row"><span class="k">點擊「前往預約」人數</span><span class="v">今日 ${p3(s.convert_today)}<i> ／ 累計 ${p3(s.convert_total)}</i></span></div>` +
+    `<div class="stx-faint">` +
+      `<div class="stx-frow"><span class="k">今日新進訪客</span><span class="v">${p4(s.new_today)}</span></div>` +
+      `<div class="stx-frow"><span class="k">點擊「加入開放提醒」人數</span><span class="v">今日 ${p3(s.remind_today)}／累計 ${p3(s.remind_total)}</span></div>` +
+    `</div>` +
+    `<div class="stx-admin" id="stx-admin"><a onclick="showStatsPw()">管理員</a></div>` +
+    `<div class="stx-pw" id="stx-pw"><input id="stx-pwin" type="password" inputmode="numeric" placeholder="管理員密碼" onkeydown="if(event.key==='Enter')tryStatsPw()"><button onclick="tryStatsPw()">解鎖</button></div>` +
+    `<div class="stx-rank" id="stx-rank"></div>`;
+}
+function showStatsPw() {
+  const a = document.getElementById('stx-admin'), p = document.getElementById('stx-pw');
+  if (a) a.style.display = 'none';
+  if (p) { p.classList.add('show'); const i = document.getElementById('stx-pwin'); if (i) i.focus(); }
+}
+function tryStatsPw() {
+  const i = document.getElementById('stx-pwin'); if (!i) return;
+  if (i.value === '88618861') { document.getElementById('stx-pw').classList.remove('show'); renderStatsRank(); }
+  else { i.value = ''; i.placeholder = '密碼錯誤，再試'; }
+}
+function renderStatsRank() {
+  const rank = (_statsData && _statsData.staff_rank) || {};
+  const p3 = x => String(x ?? 0).padStart(3,'0');
+  const rows = Object.keys(rank).map(id => {
+    const st = staffById(id);
+    return { name: (st && st.name) || id, t: (rank[id] && rank[id].t) || 0, a: (rank[id] && rank[id].a) || 0 };
+  }).sort((x,y) => y.a - x.a);
+  let html = `<div class="stx-rank-t">指定老師 · 各老師被點次數</div>`;
+  if (rows.length === 0) html += `<div class="stx-rk"><span class="nm">尚無資料</span></div>`;
+  rows.forEach((r,i) => { html += `<div class="stx-rk"><span class="nm"><b>${i+1}</b>${r.name}</span><span class="c">今日 ${p3(r.t)}<i> ／ 累計 ${p3(r.a)}</i></span></div>`; });
+  const el = document.getElementById('stx-rank'); el.innerHTML = html; el.classList.add('show');
 }
 
 init();
