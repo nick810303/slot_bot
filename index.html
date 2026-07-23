@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.7 -->
+<!-- 小泰空位儀表板 v4.8 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -197,11 +197,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;border:1px solid #7d4a37;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
 .sheet-btn:active{box-shadow:inset 0 1px 3px rgba(0,0,0,.28);opacity:.96}
 .sheet-close{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--gray2);cursor:pointer;padding:4px}
-.rc-scope{flex:1;padding:8px 6px;border-radius:7px;border:1px solid var(--line);background:var(--bg2);font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);cursor:pointer;transition:all .13s}
-.rc-scope.active{background:var(--card);border-color:var(--clay);color:var(--cocoa);font-weight:500;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 2px rgba(62,42,33,.12)}
-.rc-cal{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:9px;font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
-.rc-cal.rc-primary{background:var(--cocoa);color:var(--cream);border:1px solid #7d4a37;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
-.rc-cal.rc-secondary{background:var(--card);color:var(--cocoa);border:1px solid var(--clay)}
 .empty-open{font-size:12px;color:var(--gray);line-height:1.7;margin-bottom:12px}
 .empty-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .empty-book-btn{padding:9px 16px;border-radius:8px;background:var(--cocoa);color:var(--cream);border:1px solid #7d4a37;font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
@@ -280,11 +275,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
     <button class="sheet-btn" id="sheet-btn" onclick="goBooking()">前往預約系統</button>
     <span class="sheet-close" onclick="closeSheet()">關閉</span>
   </div>
-</div>
-<div class="mask" id="remind-mask" onclick="handleRemindMaskClick(event)">
-  <div class="sheet" id="remind-sheet"></div>
-</div>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</div><script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
 // v3：前端直連客立樂 API（客立樂 WAF 會擋 Cloudflare Worker 的 POST，
 //     但瀏覽器直連完全正常且 CORS 開放，所以不再經過 worker）
@@ -779,7 +770,7 @@ function emptyStateHTML() {
     <div class="empty-open">下個月預約將於<br><b style="color:var(--cocoa);font-size:13px">${lbl}</b> 開放</div>
     <div class="empty-actions">
       <button class="empty-book-btn" onclick="openSheet(null)">前往預約系統</button>
-      <button class="empty-remind-btn" onclick="openRemind()">${BELL}加入開放提醒</button>
+      <button class="empty-remind-btn" onclick="addReminder()">${BELL}加入開放提醒</button>
     </div>
   </div>`;
 }
@@ -1053,7 +1044,6 @@ function handleMaskClick(e) { if(e.target.id==='mask') closeSheet(); }
 
 // ── 開放提醒（加入行事曆）──────────────────────────────────────
 const BELL = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
-let remindScope = 'monthly';
 // 下一次開放時間＝最近的未來「某月 25 日 13:00」（過了本月 25 日 13:00 就算下個月）
 function nextReleaseDate() {
   const now = new Date();
@@ -1065,82 +1055,14 @@ function releaseLabel(d) {
   const wd = ['日','一','二','三','四','五','六'][d.getDay()];
   return `${d.getMonth()+1}/25（${wd}）13:00`;
 }
-function detectOS() {
-  const ua = navigator.userAgent || '', p = navigator.platform || '';
-  if (/iPhone|iPad|iPod/.test(ua) || (p === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
-  if (/Android/i.test(ua)) return 'android';
-  if (/Mac/i.test(p)) return 'mac';
-  if (/Win/i.test(p)) return 'windows';
-  return 'other';
-}
-function buildICS(scope) {
-  const d = nextReleaseDate(), pad = n => String(n).padStart(2,'0');
-  const ymd = `${d.getFullYear()}${pad(d.getMonth()+1)}25`;
-  const now = new Date();
-  const stamp = `${now.getUTCFullYear()}${pad(now.getUTCMonth()+1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
-  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//xiaotaikong//slotbot//TW','CALSCALE:GREGORIAN','METHOD:PUBLISH',
-    'BEGIN:VTIMEZONE','TZID:Asia/Taipei','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0800','TZOFFSETTO:+0800','TZNAME:CST','END:STANDARD','END:VTIMEZONE',
-    'BEGIN:VEVENT',
-    `UID:xiaotaikong-${scope}-${ymd}-${Date.now()}@slot_bot`,
-    `DTSTAMP:${stamp}`,
-    `DTSTART;TZID=Asia/Taipei:${ymd}T130000`,
-    `DTEND;TZID=Asia/Taipei:${ymd}T131500`];
-  if (scope === 'monthly') lines.push('RRULE:FREQ=MONTHLY;BYMONTHDAY=25');
-  lines.push('SUMMARY:小泰空開放下月預約',
-    'DESCRIPTION:每月 25 日 13:00 開放下個月預約。前往預約系統：' + LIFF_BOOKING + '/menu',
-    'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:小泰空開放下月預約','TRIGGER:-PT5M','END:VALARM',
-    'END:VEVENT','END:VCALENDAR');
-  return lines.join('\r\n');
-}
-function addToAppleCal() {
-  const blob = new Blob([buildICS(remindScope)], { type:'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = '小泰空開放提醒.ics';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-  closeRemind();
-}
-function addToGoogleCal() {
-  const d = nextReleaseDate(), pad = n => String(n).padStart(2,'0');
-  const ymd = `${d.getFullYear()}${pad(d.getMonth()+1)}25`;
-  let url = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
-    + '&text=' + encodeURIComponent('小泰空開放下月預約')
-    + '&dates=' + `${ymd}T130000/${ymd}T131500`
-    + '&ctz=Asia/Taipei'
-    + '&details=' + encodeURIComponent('每月 25 日 13:00 開放下個月預約。前往預約系統：' + LIFF_BOOKING + '/menu');
-  if (remindScope === 'monthly') url += '&recur=' + encodeURIComponent('RRULE:FREQ=MONTHLY;BYMONTHDAY=25');
+// 靜態每月循環 .ics（LINE 內強制外開 Safari 才能穩定跳「加入行事曆」；桌面直接開）
+function addReminder() {
+  const url = new URL('remind.ics', location.href).href;
   try {
     if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) liff.openWindow({ url, external:true });
-    else window.open(url, '_blank', 'noopener');
-  } catch(e) { window.open(url, '_blank', 'noopener'); }
-  closeRemind();
+    else window.open(url, '_blank');
+  } catch(e) { window.open(url, '_blank'); }
 }
-function setScope(s) {
-  remindScope = s;
-  document.querySelectorAll('#remind-sheet .rc-scope').forEach(b => b.classList.toggle('active', b.dataset.scope === s));
-}
-function openRemind() {
-  const lbl = releaseLabel(nextReleaseDate()), os = detectOS();
-  const appleLabel = os === 'windows' ? '加入行事曆（Outlook / 系統）' : '加入 Apple 行事曆';
-  const appleFirst = os !== 'android';
-  const appleBtn = `<button class="rc-cal ${appleFirst?'rc-primary':'rc-secondary'}" onclick="addToAppleCal()">${BELL}${appleLabel}</button>`;
-  const googleBtn = `<button class="rc-cal ${appleFirst?'rc-secondary':'rc-primary'}" onclick="addToGoogleCal()">${BELL}加入 Google 行事曆</button>`;
-  document.getElementById('remind-sheet').innerHTML = `
-    <div class="sheet-tag">提醒</div>
-    <div class="sheet-title">加入開放提醒</div>
-    <div class="sheet-body">每月 25 日 13:00 開放下個月預約。加入行事曆、開放前 5 分鐘提醒你來搶時段。<br>下一次：<b style="color:var(--cocoa)">${lbl}</b></div>
-    <div style="display:flex;gap:6px;margin-bottom:14px">
-      <button class="rc-scope active" data-scope="monthly" onclick="setScope('monthly')">每月都提醒</button>
-      <button class="rc-scope" data-scope="once" onclick="setScope('once')">只提醒下一次</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px">${appleFirst ? appleBtn+googleBtn : googleBtn+appleBtn}</div>
-    <span class="sheet-close" onclick="closeRemind()">關閉</span>`;
-  remindScope = 'monthly';
-  document.getElementById('remind-mask').classList.add('show');
-}
-function closeRemind() { document.getElementById('remind-mask').classList.remove('show'); }
-function handleRemindMaskClick(e) { if(e.target.id==='remind-mask') closeRemind(); }
 function goBooking() {
   closeSheet();
   const url = (sheetSlot && sheetSlot.staffId)
