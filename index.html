@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.1 -->
+<!-- 小泰空位儀表板 v5.2 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -65,14 +65,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .stx-pw input{width:120px;height:32px;border:1px solid var(--line);border-radius:7px;background:var(--bg3);padding:0 9px;font-family:'DM Mono',monospace;font-size:13px;color:var(--black);outline:none}
 .stx-pw input:focus{border-color:var(--clay)}
 .stx-pw button{height:32px;padding:0 12px;border:1px solid #7d4a37;border-radius:7px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer}
-.rk-t{font-size:10px;color:var(--gray);margin-bottom:6px}
-.rk-list{column-count:2;column-gap:14px}
-.rk{break-inside:avoid;-webkit-column-break-inside:avoid;display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:2.5px 0;border-bottom:1px solid var(--line2);font-size:10px;min-width:0}
-.rk .nm{color:#6b5d4d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.rk .nm b{font-family:'DM Mono',monospace;color:var(--gray3);font-weight:400;margin-right:5px;font-size:9px}
-.rk .c{font-family:'DM Mono',monospace;color:#7a6a58;white-space:nowrap;flex-shrink:0;font-size:9px}
-.rk .c i{color:var(--gray3);font-style:normal;margin-right:3px}
-.rk-empty{font-size:11px;color:var(--gray2);padding:4px 2px}
+.stx-rank{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.stx-rank.show{display:block}
+.stx-rank-t{font-size:10px;color:var(--gray);margin-bottom:6px}
+.stx-rk{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 2px;border-bottom:1px solid var(--line2);font-size:11px}
+.stx-rk:last-child{border-bottom:none}
+.stx-rk .nm{color:#6b5d4d}
+.stx-rk .nm b{font-family:'DM Mono',monospace;color:var(--gray3);font-weight:400;margin-right:6px;font-size:9px}
+.stx-rk .c{font-family:'DM Mono',monospace;color:#7a6a58;white-space:nowrap;font-size:10px}
+.stx-rk .c i{color:var(--gray3);font-style:normal}
 .sb-load{font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray2);padding:10px 2px}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
@@ -314,15 +315,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
     <div class="stx-head"><span class="stx-title">USAGE / 使用統計</span><span class="stx-x" onclick="closeStats()">✕</span></div>
     <div id="stx-body"><div class="sb-load">讀取中…</div></div>
   </div>
-</div>
-<div class="mask" id="rank-mask" onclick="if(event.target.id==='rank-mask')closeRank()">
-  <div class="sheet stats-sheet">
-    <div class="stx-head"><span class="stx-title">指定老師 · 各老師被點次數</span><span class="stx-x" onclick="closeRank()">✕</span></div>
-    <div class="rk-t">今日 ／ 累計</div>
-    <div class="rk-list" id="rk-list"></div>
-  </div>
-</div>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</div><script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script>
 // v3：前端直連客立樂 API（客立樂 WAF 會擋 Cloudflare Worker 的 POST，
 //     但瀏覽器直連完全正常且 CORS 開放，所以不再經過 worker）
@@ -1226,7 +1219,8 @@ function renderStatsBody(s) {
       `<div class="stx-frow"><span class="k">點擊「加入開放提醒」人數</span><span class="v">今日 ${p3(s.remind_today)}／累計 ${p3(s.remind_total)}</span></div>` +
     `</div>` +
     `<div class="stx-admin" id="stx-admin"><a onclick="showStatsPw()">管理員</a></div>` +
-    `<div class="stx-pw" id="stx-pw"><input id="stx-pwin" type="password" inputmode="numeric" placeholder="管理員密碼" onkeydown="if(event.key==='Enter')tryStatsPw()"><button onclick="tryStatsPw()">解鎖</button></div>`;
+    `<div class="stx-pw" id="stx-pw"><input id="stx-pwin" type="password" inputmode="numeric" placeholder="管理員密碼" onkeydown="if(event.key==='Enter')tryStatsPw()"><button onclick="tryStatsPw()">解鎖</button></div>` +
+    `<div class="stx-rank" id="stx-rank"></div>`;
 }
 function showStatsPw() {
   const a = document.getElementById('stx-admin'), p = document.getElementById('stx-pw');
@@ -1235,11 +1229,11 @@ function showStatsPw() {
 }
 function tryStatsPw() {
   const i = document.getElementById('stx-pwin'); if (!i) return;
-  if (i.value === '88618861') { document.getElementById('stats-mask').classList.remove('show'); openRank(); }
+  if (i.value === '88618861') { document.getElementById('stx-pw').classList.remove('show'); renderStatsRank(); }
   else { i.value = ''; i.placeholder = '密碼錯誤，再試'; }
 }
-// 各老師點擊排行＝獨立卡片（LINE 半版不能捲，故兩欄緊湊、左欄由上往下）
-function openRank() {
+// 各老師點擊排行＝就地在同一張卡片展開（單欄；卡片 max-height 88% 可下滑）
+function renderStatsRank() {
   const rank = (_statsData && _statsData.staff_rank) || {};
   const p2 = x => String(x ?? 0).padStart(2,'0');
   const p3 = x => String(x ?? 0).padStart(3,'0');
@@ -1247,17 +1241,10 @@ function openRank() {
     const st = staffById(id);
     return { name: (st && st.name) || id, t: (rank[id] && rank[id].t) || 0, a: (rank[id] && rank[id].a) || 0 };
   }).sort((x,y) => y.a - x.a);
-  const list = document.getElementById('rk-list');
-  list.innerHTML = rows.length === 0
-    ? '<div class="rk-empty">尚無資料</div>'
-    : rows.map((r,i) => `<div class="rk"><span class="nm"><b>${i+1}</b>${r.name}</span><span class="c"><i>今${p2(r.t)}</i>累${p3(r.a)}</span></div>`).join('');
-  document.getElementById('rank-mask').classList.add('show');
-}
-// 排行卡按 ✕/點外面＝退回統計頁（不是全關）
-function closeRank() {
-  document.getElementById('rank-mask').classList.remove('show');
-  if (_statsData) renderStatsBody(_statsData);
-  document.getElementById('stats-mask').classList.add('show');
+  let html = `<div class="stx-rank-t">指定老師 · 各老師被點次數（今日／累計）</div>`;
+  if (rows.length === 0) html += `<div class="stx-rk"><span class="nm">尚無資料</span></div>`;
+  rows.forEach((r,i) => { html += `<div class="stx-rk"><span class="nm"><b>${i+1}</b>${r.name}</span><span class="c">今${p2(r.t)}<i> ／ 累${p3(r.a)}</i></span></div>`; });
+  const el = document.getElementById('stx-rank'); el.innerHTML = html; el.classList.add('show');
 }
 
 init();
