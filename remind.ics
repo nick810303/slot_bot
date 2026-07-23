@@ -19,7 +19,8 @@ DTSTART;TZID=Asia/Taipei:20250125T130000
 DTEND;TZID=Asia/Taipei:20250125T131500
 RRULE:FREQ=MONTHLY;BYMONTHDAY=25
 SUMMARY:小泰空開放下月預約
-DESCRIPTION:每月 25 日 13:00 開放下個月預約。前往預約系統：https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu
+URL:https://page.line.me/spacethai.tw
+DESCRIPTION:每月 25 日 13:00 開放下個月預約。\n小泰空 LINE 官方帳號：https://page.line.me/spacethai.tw\n前往預約系統：https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:小泰空開放下月預約
