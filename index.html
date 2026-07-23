@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.2 -->
+<!-- 小泰空位儀表板 v5.3 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -1237,10 +1237,11 @@ function renderStatsRank() {
   const rank = (_statsData && _statsData.staff_rank) || {};
   const p2 = x => String(x ?? 0).padStart(2,'0');
   const p3 = x => String(x ?? 0).padStart(3,'0');
-  const rows = Object.keys(rank).map(id => {
-    const st = staffById(id);
-    return { name: (st && st.name) || id, t: (rank[id] && rank[id].t) || 0, a: (rank[id] && rank[id].a) || 0 };
-  }).sort((x,y) => y.a - x.a);
+  const src = (roster && roster.length) ? roster : (CATALOG || []);
+  const rows = src.map(s => {
+    const r = rank[s.staffId] || {};
+    return { name: s.name, t: r.t || 0, a: r.a || 0 };
+  }).sort((x,y) => (y.a - x.a) || (y.t - x.t));
   let html = `<div class="stx-rank-t">指定老師 · 各老師被點次數（今日／累計）</div>`;
   if (rows.length === 0) html += `<div class="stx-rk"><span class="nm">尚無資料</span></div>`;
   rows.forEach((r,i) => { html += `<div class="stx-rk"><span class="nm"><b>${i+1}</b>${r.name}</span><span class="c">今${p2(r.t)}<i> ／ 累${p3(r.a)}</i></span></div>`; });
