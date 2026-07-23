@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v4.8 -->
+<!-- 小泰空位儀表板 v4.9 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -35,12 +35,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg)}
 .handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
-.hd{flex-shrink:0;padding:4px 14px 5px}
+.hd{flex-shrink:0;padding:4px 14px 5px;position:relative}
 .hd-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px}
 .hd-name{font-size:11px;color:var(--gray);flex:1;min-width:0;line-height:1.45}
 .hd-sub{font-size:9px;color:var(--gray2);letter-spacing:.01em}
 .hd-sub a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
-.hd-live{display:flex;align-items:center;gap:4px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--green)}
+.hd-live{display:flex;align-items:center;gap:4px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.stats-bubble{position:absolute;top:26px;right:12px;z-index:60;min-width:158px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 11px;box-shadow:0 5px 16px rgba(62,42,33,.24),inset 0 1px 0 rgba(255,255,255,.6);opacity:0;transform:translateY(-5px) scale(.95);pointer-events:none;transition:opacity .2s ease,transform .2s cubic-bezier(.4,0,.2,1)}
+.stats-bubble.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.sb-row{display:flex;align-items:center;justify-content:space-between;gap:14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gray);line-height:1.7}
+.sb-row b{font-size:15px;color:var(--cocoa);font-weight:500;letter-spacing:.03em}
+.sb-sub{margin-top:6px;padding-top:6px;border-top:1px solid var(--line2);font-family:'DM Mono',monospace;font-size:8px;color:var(--gray2);line-height:1.6}
+.sb-load{font-family:'DM Mono',monospace;font-size:11px;color:var(--gray2)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
 .tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(62,42,33,.13)}
@@ -209,8 +215,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
   <div class="hd">
     <div class="hd-top">
       <div class="hd-name">小泰空位儀表板<span class="hd-sub"> / 僅供快速查詢最早的空位，更多時段請至<a href="https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu" onclick="return openBooking()">預約系統</a></span></div>
-      <div class="hd-live"><div class="live-dot"></div>LIVE</div>
+      <div class="hd-live" onclick="showStatsBubble()"><div class="live-dot"></div>LIVE</div>
     </div>
+    <div id="stats-bubble" class="stats-bubble" onclick="this.classList.remove('show')"></div>
     <div class="tabs">
       <button class="tab active" onclick="switchTab('today',this)">今日 / 最早時段</button>
       <button class="tab" onclick="switchTab('staff',this)">指定老師</button>
@@ -645,6 +652,7 @@ function visibleRoster() {
 
 function switchTab(id, btn) {
   currentTab = id;
+  trackMode(id);
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
@@ -1057,6 +1065,7 @@ function releaseLabel(d) {
 }
 // 靜態每月循環 .ics（LINE 內強制外開 Safari 才能穩定跳「加入行事曆」；桌面直接開）
 function addReminder() {
+  sbTrack('remind');
   const url = new URL('remind.ics', location.href).href;
   try {
     if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) liff.openWindow({ url, external:true });
@@ -1065,6 +1074,7 @@ function addReminder() {
 }
 function goBooking() {
   closeSheet();
+  sbTrack('convert');
   const url = (sheetSlot && sheetSlot.staffId)
     ? `${LIFF_BOOKING}/${sheetSlot.staffId}/store`
     : `${LIFF_BOOKING}/menu`;
@@ -1073,6 +1083,7 @@ function goBooking() {
 }
 // 標題列「預約系統」連結：開客立樂預約總頁（LINE 內 in-client 開，否則新分頁）
 function openBooking() {
+  sbTrack('convert');
   const url = `${LIFF_BOOKING}/menu`;
   try {
     if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) liff.openWindow({ url, external:false });
@@ -1083,6 +1094,7 @@ function openBooking() {
 
 async function init() {
   if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
+  trackVisit(); trackMode('today');
   showScanning('cards-today', 'status-today');
   showScanning('cards-staff', 'status-staff');
   try {
@@ -1118,6 +1130,47 @@ async function init() {
     document.getElementById('cards-staff').innerHTML = failHTML;
   }
 }
+
+// ── 訪客/使用統計（Supabase RPC，僅管理員點 LIVE 查看）────────────
+const SB_URL = 'https://lyphciitrhfomquorhfm.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
+function sbTrack(metric) {
+  try {
+    fetch(SB_URL + '/rest/v1/rpc/track_stat', { method:'POST', keepalive:true,
+      headers:{ 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify({ p_metric: metric }) }).catch(()=>{});
+  } catch(e) {}
+}
+function trackVisit() {
+  try {
+    const today = new Date().toLocaleDateString('en-CA', { timeZone:'Asia/Taipei' });
+    if (localStorage.getItem('stats_lastDay') !== today) { sbTrack('visit'); localStorage.setItem('stats_lastDay', today); }
+    if (!localStorage.getItem('stats_seen')) { sbTrack('visit_new'); localStorage.setItem('stats_seen','1'); }
+  } catch(e) { sbTrack('visit'); }
+}
+function trackMode(tab) {
+  const k = 'stats_mode_' + tab;
+  try { if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k,'1'); } catch(e) {}
+  sbTrack(tab === 'staff' ? 'mode_staff' : 'mode_today');
+}
+let _statsBubbleTimer = null;
+function showStatsBubble() {
+  const b = document.getElementById('stats-bubble'); if (!b) return;
+  b.classList.add('show');
+  b.innerHTML = '<div class="sb-load">讀取中…</div>';
+  fetch(SB_URL + '/rest/v1/rpc/get_tool_stats', { method:'POST',
+    headers:{ 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY, 'Content-Type':'application/json' }, body:'{}' })
+    .then(r => r.json()).then(s => {
+      const n = x => String(x ?? 0).padStart(4,'0');
+      b.innerHTML =
+        `<div class="sb-row"><span>本日訪客</span><b>${n(s.visit_today)}</b></div>` +
+        `<div class="sb-row"><span>累計訪客</span><b>${n(s.unique_total)}</b></div>` +
+        `<div class="sb-sub">今日新客 ${s.new_today}｜轉換 ${s.convert_today}／${s.convert_total}｜提醒 ${s.remind_total}<br>模式 今日 ${s.mode_today_total}／指定 ${s.mode_staff_total}</div>`;
+    }).catch(()=>{ b.innerHTML = '<div class="sb-load">讀取失敗</div>'; });
+  clearTimeout(_statsBubbleTimer);
+  _statsBubbleTimer = setTimeout(() => b.classList.remove('show'), 6000);
+}
+
 init();
 </script>
 </body>
