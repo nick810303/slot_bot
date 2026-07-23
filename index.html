@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.3 -->
+<!-- 小泰空位儀表板 v5.4 -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -42,7 +42,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .hd-sub a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
 .hd-live{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;padding:6px 8px;margin:-6px -8px;border:none;background:transparent;border-radius:7px;touch-action:manipulation}
 .hd-live:active{opacity:.55}
-.stats-sheet{max-height:88%;overflow-y:auto}
+.stats-sheet{max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .stx-head{display:flex;align-items:center;justify-content:space-between;margin:2px 0 10px}
 .stx-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--gray2)}
 .stx-x{font-size:15px;color:var(--gray2);cursor:pointer;line-height:1;padding:4px 8px;margin:-4px -8px}
@@ -1244,7 +1244,7 @@ function renderStatsRank() {
   }).sort((x,y) => (y.a - x.a) || (y.t - x.t));
   let html = `<div class="stx-rank-t">指定老師 · 各老師被點次數（今日／累計）</div>`;
   if (rows.length === 0) html += `<div class="stx-rk"><span class="nm">尚無資料</span></div>`;
-  rows.forEach((r,i) => { html += `<div class="stx-rk"><span class="nm"><b>${i+1}</b>${r.name}</span><span class="c">今${p2(r.t)}<i> ／ 累${p3(r.a)}</i></span></div>`; });
+  rows.forEach((r,i) => { html += `<div class="stx-rk"><span class="nm"><b>${i+1}</b>${r.name}</span><span class="c">今日 ${p2(r.t)}<i> ／ 累計 ${p3(r.a)}</i></span></div>`; });
   const el = document.getElementById('stx-rank'); el.innerHTML = html; el.classList.add('show');
 }
 
