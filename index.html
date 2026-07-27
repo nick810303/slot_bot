@@ -1132,34 +1132,48 @@ function openBooking() {
   return false;
 }
 
+// v6：改打我們自己的五層引擎（Supabase Edge Function `slots`），完全不呼叫客立樂。
+//     一次拿回全部老師 14 天的可約時段，格式與原本 GROUPED/roster 一致，UI 照舊。
+async function loadFromEngine(days) {
+  const r = await fetch(`https://lyphciitrhfomquorhfm.supabase.co/functions/v1/slots?days=${days}`, { cache:'no-store' });
+  if (!r.ok) throw new Error('slots ' + r.status);
+  const data = await r.json();
+  if (data.error) throw new Error(data.error);
+  // CATALOG：供時長篩選/排序邏輯（培訓師只做 120，其餘 120/90/60）
+  CATALOG = (data.roster || []).map(t => ({
+    staffId:t.staffId, name:t.name, avatar:'', branch:t.branch, isTrainee:!!t.isTrainee,
+    jobs:(t.isTrainee ? [120] : [120,90,60]).map(dur => ({ productId:null, dur, branch:t.branch })),
+  }));
+  roster = buildRoster(CATALOG);
+  // GROUPED：沿用原本 key 格式，rebuildSlots 等照舊運作
+  GROUPED = {};
+  for (const s of (data.slots || [])) {
+    const key = `${s.staffId}__${s.branch}__${s.dateKey}__${s.time}`;
+    GROUPED[key] = { teacher:s.teacher, staffId:s.staffId, avatar:'', branch:s.branch, time:s.time, dateKey:s.dateKey, durations:[...s.durations], isTrainee:!!s.isTrainee };
+  }
+  // 標記全部老師×時長皆已抓滿 → ensureRanking/ensurePills 變 no-op（不再打客立樂）
+  FETCHED = {}; teacherDays = {};
+  for (const t of CATALOG) { for (const j of t.jobs) FETCHED[`${t.staffId}:${j.dur}`] = days; teacherDays[t.staffId] = days; }
+  allData = { slots:[], roster, fetchedAt:new Date().toISOString() };
+  rebuildSlots();
+}
+
 async function init() {
   if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
   trackVisit(); trackMode('today');
   showScanning('cards-today', 'status-today');
   showScanning('cards-staff', 'status-staff');
   try {
-    const menu = await getMenu();
-    CATALOG = Object.values(buildCatalog(menu));
-    roster  = buildRoster(CATALOG);
-    allData = { slots: [], roster, fetchedAt: null };
-    const cached = readCache(); // { g, f, dd }
-    if (cached) { GROUPED = cached.g || {}; FETCHED = cached.f || {}; teacherDays = cached.dd || {}; }
+    // 一次向我們的引擎拿全部老師 14 天資料（完全不碰客立樂）
+    await loadFromEngine(WINDOW_DAYS_2);
     todayStaff = new Set(visibleRoster().map(s=>s.staffId)); // 今日模式預設全選
     buildStaffTabs(); // 需在 todayStaff 設好後才建，膠囊才會標成已選
-    // 第一階段：排序資料（每位老師最短被選時長，7→14），仍在載入遮罩下
-    await ensureRankingProgressive();
     rebuildSlots();
     renderToday();
     renderStaff();
-    // 第二階段：補「今日/最早」顯示中 3 位的時長標籤
-    await ensurePills(tabSlots.today.map(s=>s.staffId));
-    rebuildSlots();
-    renderToday();
     stopScanning('cards-today');
     stopScanning('cards-staff');
-    allData.fetchedAt = new Date().toISOString();
     setFetchedAt(allData.fetchedAt);
-    writeCache({ g:GROUPED, f:FETCHED, dd:teacherDays });
   } catch(e) {
     stopScanning('cards-today');
     stopScanning('cards-staff');
