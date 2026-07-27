@@ -159,8 +159,10 @@ function renderSync(){
   clearBar();
   app.innerHTML=`<div class="synx">
     <p style="color:var(--cocoa);font-weight:600;font-size:14px">資料同步</p>
-    <p>・<b>開放格子</b>：在「開放格子」分頁手動維護（打勾即存）。</p>
-    <p>・<b>排班／工時</b>：每月 25 日客立樂開放下月班表後需更新一次。此同步機制正在建置。</p>
+    <p>・<b>開放格子</b>：在「開放格子」分頁手動維護（打勾即存），隨時可改。</p>
+    <p>・<b>排班／工時</b>：每月 25 日客立樂開放下月班表後，需重新同步一次（讀客立樂排班/工時 → 更新資料庫）。</p>
+    <p style="margin-top:6px">目前流程：<b>跟 Claude 說「同步排班」</b>，由 Claude 協助執行即可。一鍵自助工具為未來工程。</p>
+    <p style="color:var(--gray2);font-size:11.5px;margin-top:8px">可約算法完全獨立於客立樂；此同步只是每月更新「誰哪天上班、班尾到幾點」。</p>
   </div>`;
 }
 function renderLogin(){
