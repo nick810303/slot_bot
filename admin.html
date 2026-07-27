@@ -1,60 +1,61 @@
 <!DOCTYPE html><html lang="zh-Hant"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>小泰空位 · 第三層後台</title>
-<!-- v1.0 開放預約格子編輯器 -->
+<!-- v1.1 開放預約格子編輯器（手機為主・保留整週格表） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--cream:#F8F2EE;--clay:#AE6C56;--cocoa:#91563E;--bg:#F4ECE3;--bg2:#EADFD1;--bg3:#F0E7DC;--line:#E0D4C4;--line2:#E7DDCE;--black:#3E2A21;--gray:#8b7d6b;--gray2:#b3a58f;--gray3:#cbbca6;--card:#FCF8F3;--sand:#D1CBBF;--green:#5C7A50;--nj:#8a6d4b;--zs:#6d7a8a;}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--black);-webkit-text-size-adjust:100%}
-.wrap{max-width:960px;margin:0 auto;padding:14px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px 14px;border-bottom:1px solid var(--line2);margin-bottom:14px}
-.ttl{font-weight:500;font-size:16px}
-.ttl small{display:block;font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);font-weight:400;margin-top:2px;letter-spacing:.04em}
-.who{font-family:'DM Mono',monospace;font-size:11px;color:var(--gray);text-align:right}
-.who a{color:var(--clay);cursor:pointer;text-decoration:none;display:inline-block;margin-top:3px}
-.btn{border:1px solid #7d4a37;border-radius:8px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC';font-size:13px;font-weight:500;padding:8px 16px;cursor:pointer}
+html,body{margin:0}
+body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--black);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;padding:10px 10px 90px}
+.topbar{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:8px 2px 10px;border-bottom:1px solid var(--line2);margin-bottom:10px}
+.ttl{font-weight:500;font-size:15px;line-height:1.2}
+.ttl small{display:block;font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);font-weight:400;margin-top:3px;letter-spacing:.06em}
+.who{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);text-align:right;line-height:1.5;max-width:44%;word-break:break-all}
+.who a{color:var(--clay);cursor:pointer;text-decoration:none;display:inline-block;margin-top:2px}
+.btn{border:1px solid #7d4a37;border-radius:9px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC';font-size:14px;font-weight:500;padding:11px 20px;cursor:pointer}
 .btn.ghost{background:transparent;color:var(--cocoa)}
 .btn:active{opacity:.7}
 .btn:disabled{opacity:.4;cursor:default}
-.center{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
-.gbtn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#3c4043;font-size:14px;font-weight:500;padding:11px 18px;cursor:pointer;font-family:'Noto Sans TC'}
+.center{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 20px}
+.gbtn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;background:#fff;color:#3c4043;font-size:15px;font-weight:500;padding:13px 20px;cursor:pointer;font-family:'Noto Sans TC'}
 .gbtn:active{background:#f4f4f4}
 .gbtn svg{width:18px;height:18px}
-.msg{font-size:13px;color:var(--gray);line-height:1.7}
-/* teacher tabs */
-.tsec{margin-bottom:12px}
-.tsec-h{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.08em;margin:6px 2px 6px}
+.msg{font-size:13px;color:var(--gray);line-height:1.8}
+.tsec{margin-bottom:10px}
+.tsec-h{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:.08em;margin:4px 2px 5px}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
-.pill{border:1px solid var(--line);border-radius:20px;background:var(--bg3);color:#6b5d4d;font-size:13px;padding:6px 13px;cursor:pointer;font-weight:400}
+.pill{border:1px solid var(--line);border-radius:20px;background:var(--bg3);color:#6b5d4d;font-size:14px;padding:7px 14px;cursor:pointer;font-weight:400}
 .pill.on{border-color:var(--cocoa);background:var(--cocoa);color:var(--cream);font-weight:500}
 .pill .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
 .pill.bnj .dot{background:var(--nj)}.pill.bzs .dot{background:var(--zs)}
 .pill.on .dot{background:var(--cream)}
-/* grid */
-.gridcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 8px 14px;overflow-x:auto}
-.gridhint{font-size:11px;color:var(--gray);margin:2px 4px 10px;line-height:1.6}
-table.grid{border-collapse:collapse;width:100%;min-width:520px}
+.tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 2px 8px}
+.tool{border:1px solid var(--line);border-radius:8px;background:var(--bg3);color:#6b5d4d;font-size:12px;padding:7px 11px;cursor:pointer}
+.tool:active{background:var(--bg2)}
+.tools .sep{color:var(--gray3);font-size:11px}
+select.cpsel{border:1px solid var(--line);border-radius:8px;background:var(--bg3);color:#6b5d4d;font-size:12px;padding:7px 6px}
+.gridcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 6px 12px}
+.gridhint{font-size:11px;color:var(--gray);margin:2px 4px 9px;line-height:1.6}
+table.grid{border-collapse:collapse;width:100%;table-layout:fixed}
 table.grid th,table.grid td{text-align:center;padding:0}
-table.grid thead th{position:sticky;top:0;font-family:'Noto Sans TC';font-size:12px;font-weight:500;color:var(--black);padding:4px 0 7px;cursor:pointer;user-select:none}
-table.grid thead th.tcol{width:52px}
-table.grid thead th:hover{color:var(--clay)}
-.tlabel{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--gray);white-space:nowrap;padding-right:8px !important;text-align:right;width:52px;cursor:pointer;user-select:none}
-.tlabel:hover{color:var(--clay)}
-.cell{height:19px;border:1px solid var(--line2);border-radius:3px;cursor:pointer;background:var(--bg);margin:2px;transition:background .06s}
-td.cellwrap{padding:0 2px}
+table.grid thead th{position:sticky;top:52px;z-index:3;background:var(--card);font-family:'Noto Sans TC';font-size:14px;font-weight:500;color:var(--black);padding:3px 0 7px;cursor:pointer;user-select:none}
+table.grid thead th:active{color:var(--clay)}
+.tlabel{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray);white-space:nowrap;text-align:right;padding-right:4px !important;cursor:pointer;user-select:none}
+.tlabel:active{color:var(--clay)}
+td.cellwrap{padding:1.5px}
+.cell{display:block;width:100%;height:26px;border:1px solid var(--line2);border-radius:4px;cursor:pointer;background:var(--bg);transition:background .05s}
 .cell.on{background:var(--clay);border-color:var(--clay)}
 .cell.on.hh{background:var(--cocoa)}
-.rowhh .cell{border-top-color:var(--sand)}
-.savebar{position:sticky;bottom:0;display:flex;align-items:center;gap:12px;justify-content:flex-end;padding:12px 2px 8px;background:linear-gradient(transparent,var(--bg) 40%)}
+.rowhh td.cellwrap .cell{border-top:2px solid var(--sand)}
+.rowhh .tlabel{color:var(--black);font-weight:500}
+.savebar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:center;gap:10px;justify-content:flex-end;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}
+.savebar .inner{width:100%;max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px}
 .savebar .dirty{font-size:12px;color:var(--clay);margin-right:auto;font-weight:500}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--black);color:var(--cream);font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s}
+.toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%) translateY(20px);background:var(--black);color:var(--cream);font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.25s;z-index:20}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.tools{display:flex;flex-wrap:wrap;gap:6px;margin:0 2px 10px}
-.tool{border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:#6b5d4d;font-size:11.5px;padding:5px 10px;cursor:pointer}
-.tool:active{background:var(--bg2)}
-select.cpsel{border:1px solid var(--line);border-radius:7px;background:var(--bg3);color:#6b5d4d;font-size:11.5px;padding:5px 8px}
 </style></head>
 <body>
 <div class="wrap">
@@ -72,8 +73,7 @@ const SB_URL='https://lyphciitrhfomquorhfm.supabase.co';
 const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5cGhjaWl0cmhmb21xdW9yaGZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzA3MDYsImV4cCI6MjA5MzA0NjcwNn0.IGl3kQij2zAwQaNXKdBhlL-mp5knAumcRaPwOBo1KFk';
 const ALLOW=['nick810303@gmail.com','rush0635@gmail.com','spacethai.tw@gmail.com'];
 const BRANCHES=['南京三民','中山'];
-const WD=[['一',1],['二',2],['三',3],['四',4],['五',5],['六',6],['日',0]]; // 顯示週一→週日
-// 時間格：12:00–22:45，每 15 分
+const WD=[['一',1],['二',2],['三',3],['四',4],['五',5],['六',6],['日',0]];
 const TICKS=(()=>{const a=[];for(let h=12;h<23;h++)for(let m=0;m<60;m+=15)a.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);return a;})();
 const sb=createClient(SB_URL,SB_ANON);
 const $=s=>document.querySelector(s), app=$('#app'), who=$('#who');
@@ -92,7 +92,7 @@ async function boot(){
   renderEditor();
 }
 function renderLogin(){
-  who.innerHTML='';
+  who.innerHTML='';clearBar();
   app.innerHTML=`<div class="center">
     <div class="msg">請以授權帳號登入<br>（Nick / Eric / 小泰空）</div>
     <button class="gbtn" id="glogin"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.5 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.5 3-2.2 5.5-4.7 7.2l7.3 5.7C43.8 37.9 46.5 31.8 46.5 24.5z"/><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.7 2.2-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z"/></svg>使用 Google 登入</button>
@@ -119,9 +119,9 @@ function loadGrid(){
   for(const [,wd] of WD){ state.grid[wd]=new Set(m[wd]?[...m[wd]]:[]); }
   state.dirty=false;
 }
+function clearBar(){ document.querySelectorAll('.savebar').forEach(e=>e.remove()); }
 function renderEditor(){
-  app.innerHTML='';
-  // teacher pills grouped by branch
+  app.innerHTML='';clearBar();
   const tsec=document.createElement('div');
   for(const b of BRANCHES){
     const list=state.teachers.filter(t=>t.branch===b);
@@ -141,21 +141,20 @@ function renderEditor(){
   app.appendChild(tsec);
   if(!state.cur){ app.insertAdjacentHTML('beforeend','<div class="msg">沒有老師資料</div>'); return; }
   if(!Object.keys(state.grid).length) loadGrid();
-  // tools
   const tools=document.createElement('div');tools.className='tools';
   tools.innerHTML=`<button class="tool" data-a="allon">全開</button><button class="tool" data-a="alloff">全關</button>
-    <span style="align-self:center;color:var(--gray3);font-size:11px">複製</span>
+    <span class="sep">複製</span>
     <select class="cpsel" id="cpfrom">${WD.map(([l,w])=>`<option value="${w}">週${l}</option>`).join('')}</select>
-    <span style="align-self:center;color:var(--gray3);font-size:11px">→</span>
+    <span class="sep">→</span>
     <select class="cpsel" id="cpto"><option value="all">全部</option>${WD.map(([l,w])=>`<option value="${w}">週${l}</option>`).join('')}</select>
     <button class="tool" data-a="copy">套用</button>`;
   app.appendChild(tools);
-  // grid
   const card=document.createElement('div');card.className='gridcard';
-  card.innerHTML=`<div class="gridhint">點格子＝開放/關閉該老師「可從此時間起約」。點<b>時間</b>或<b>星期</b>標題可整列/整欄切換。橘色＝開放；深色＝整點。改完按儲存。</div>`;
+  card.innerHTML=`<div class="gridhint">點格子＝開放/關閉「可從此時間起約」。點<b>星期</b>整欄切換、點<b>時間</b>整列切換。橘＝開放，深橘＝整點。改完按下方儲存。</div>`;
   const tbl=document.createElement('table');tbl.className='grid';
-  let head='<thead><tr><th class="tcol"></th>';
-  for(const [l,w] of WD) head+=`<th data-col="${w}">週${l}</th>`;
+  let cg='<colgroup><col style="width:32px">'+WD.map(()=>'<col>').join('')+'</colgroup>';
+  let head='<thead><tr><th></th>';
+  for(const [l,w] of WD) head+=`<th data-col="${w}">${l}</th>`;
   head+='</tr></thead>';
   let body='<tbody>';
   for(const tk of TICKS){
@@ -168,12 +167,10 @@ function renderEditor(){
     body+='</tr>';
   }
   body+='</tbody>';
-  tbl.innerHTML=head+body;card.appendChild(tbl);app.appendChild(card);
-  // save bar
+  tbl.innerHTML=cg+head+body;card.appendChild(tbl);app.appendChild(card);
   const bar=document.createElement('div');bar.className='savebar';
-  bar.innerHTML=`<span class="dirty" id="dirtylbl"></span><button class="btn ghost" id="reload">重新載入</button><button class="btn" id="save">儲存</button>`;
-  app.appendChild(bar);
-  // interactions
+  bar.innerHTML=`<div class="inner"><span class="dirty" id="dirtylbl"></span><button class="btn ghost" id="reload">重新載入</button><button class="btn" id="save">儲存</button></div>`;
+  document.body.appendChild(bar);
   const setCell=(el,on)=>{const w=+el.dataset.w,t=el.dataset.t;if(on){state.grid[w].add(t);el.classList.add('on');if(t.endsWith(':00'))el.classList.add('hh');}else{state.grid[w].delete(t);el.classList.remove('on','hh');}markDirty();};
   tbl.querySelectorAll('.cell').forEach(el=>el.onclick=()=>setCell(el,!el.classList.contains('on')));
   tbl.querySelectorAll('th[data-col]').forEach(th=>th.onclick=()=>{const w=+th.dataset.col;const cells=[...tbl.querySelectorAll(`.cell[data-w="${w}"]`)];const anyoff=cells.some(c=>!c.classList.contains('on'));cells.forEach(c=>setCell(c,anyoff));});
@@ -195,7 +192,6 @@ async function save(){
   const { error } = await sb.from('teacher_schedule').upsert(rows,{onConflict:'staff_id,weekday'});
   btn.textContent='儲存';
   if(error){ toast('儲存失敗：'+error.message); btn.disabled=false; return; }
-  // reflect saved state
   state.sched[state.cur]={};for(const [,w] of WD) state.sched[state.cur][w]=new Set(state.grid[w]);
   state.dirty=false; updateDirty(); toast('已儲存');
 }
