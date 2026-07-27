@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="zh-Hant"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>小泰空位 · 第三層後台</title>
+<title>小泰空位儀表板</title>
 <!-- v1.3 開放預約格子編輯器（手機為主・整週格表・核取方塊・角落顯示老師名） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -84,7 +84,7 @@ td.cellwrap{padding:1px}
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="ttl">小泰空位 · 後台<small>ADMIN</small></div>
+    <div class="ttl">小泰空位儀表板</div>
     <div class="who" id="who"></div>
   </div>
   <nav id="nav" class="nav" style="display:none"></nav>
@@ -168,7 +168,6 @@ function renderSync(){
 function renderLogin(){
   who.innerHTML='';clearBar();
   app.innerHTML=`<div class="center">
-    <div class="msg">請以授權帳號登入<br>（Nick / Eric / 小泰空）</div>
     <button class="gbtn" id="glogin"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.5 2.6 30.1 0 24 0 14.6 0 6.4 5.4 2.5 13.3l7.8 6.1C12.2 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.5 3-2.2 5.5-4.7 7.2l7.3 5.7C43.8 37.9 46.5 31.8 46.5 24.5z"/><path fill="#FBBC05" d="M10.3 28.6c-.5-1.5-.8-3-.8-4.6s.3-3.1.8-4.6l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.5 10.7l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.1 0 11.3-2 15-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.7 2.2-6.4 0-11.8-3.7-13.7-9.4l-7.8 6.1C6.4 42.6 14.6 48 24 48z"/></svg>使用 Google 登入</button>
   </div>`;
   $('#glogin').onclick=()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href.split('#')[0]}});
@@ -176,7 +175,7 @@ function renderLogin(){
 function renderNoAccess(email){
   who.innerHTML=`<a id="logout">登出</a>`;
   $('#logout').onclick=async()=>{ await sb.auth.signOut(); location.reload(); };
-  app.innerHTML=`<div class="center"><div class="msg">此帳號 <b>${email}</b> 沒有後台權限。<br>請用 Nick / Eric / 小泰空 的帳號登入。</div></div>`;
+  app.innerHTML=`<div class="center"><div class="msg">此帳號沒有存取權限，請改用其他帳號。</div></div>`;
 }
 async function loadData(){
   const { data:tea, error:e1 } = await sb.from('teachers').select('staff_id,name,branch,sort').eq('active',true).order('sort').order('name');
