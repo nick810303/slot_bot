@@ -1141,7 +1141,7 @@ async function loadFromEngine(days) {
   if (data.error) throw new Error(data.error);
   // CATALOG：供時長篩選/排序邏輯（培訓師只做 120，其餘 120/90/60）
   CATALOG = (data.roster || []).map(t => ({
-    staffId:t.staffId, name:t.name, avatar:'', branch:t.branch, isTrainee:!!t.isTrainee,
+    staffId:t.staffId, name:t.name, avatar:t.avatar||'', branch:t.branch, isTrainee:!!t.isTrainee,
     jobs:(t.isTrainee ? [120] : [120,90,60]).map(dur => ({ productId:null, dur, branch:t.branch })),
   }));
   roster = buildRoster(CATALOG);
@@ -1149,7 +1149,7 @@ async function loadFromEngine(days) {
   GROUPED = {};
   for (const s of (data.slots || [])) {
     const key = `${s.staffId}__${s.branch}__${s.dateKey}__${s.time}`;
-    GROUPED[key] = { teacher:s.teacher, staffId:s.staffId, avatar:'', branch:s.branch, time:s.time, dateKey:s.dateKey, durations:[...s.durations], isTrainee:!!s.isTrainee };
+    GROUPED[key] = { teacher:s.teacher, staffId:s.staffId, avatar:s.avatar||'', branch:s.branch, time:s.time, dateKey:s.dateKey, durations:[...s.durations], isTrainee:!!s.isTrainee };
   }
   // 標記全部老師×時長皆已抓滿 → ensureRanking/ensurePills 變 no-op（不再打客立樂）
   FETCHED = {}; teacherDays = {};
