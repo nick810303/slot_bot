@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="zh-Hant"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>小泰空位 · 第三層後台</title>
-<!-- v1.2 開放預約格子編輯器（手機為主・整週格表・核取方塊） -->
+<!-- v1.3 開放預約格子編輯器（手機為主・整週格表・核取方塊・角落顯示老師名） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -43,6 +43,7 @@ table.grid{border-collapse:collapse;width:100%;table-layout:fixed}
 table.grid th,table.grid td{text-align:center;padding:0}
 table.grid thead th{position:sticky;top:52px;z-index:3;background:var(--card);font-family:'Noto Sans TC';font-size:14px;font-weight:500;color:var(--black);padding:3px 0 7px;cursor:pointer;user-select:none}
 table.grid thead th:active{color:var(--clay)}
+table.grid thead th.cornerh{font-size:11px;font-weight:600;color:var(--cocoa);line-height:1.12;white-space:normal;padding:2px 3px 6px;cursor:default}
 .tlabel{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray);white-space:nowrap;text-align:right;padding-right:4px !important;cursor:pointer;user-select:none}
 .tlabel:active{color:var(--clay)}
 td.cellwrap{padding:1px}
@@ -156,8 +157,9 @@ function renderEditor(){
   const card=document.createElement('div');card.className='gridcard';
   card.innerHTML=`<div class="gridhint">勾選＝開放「可從此時間起約」。點<b>星期</b>可整欄切換、點<b>時間</b>可整列切換。改完按下方儲存。</div>`;
   const tbl=document.createElement('table');tbl.className='grid';
-  let cg='<colgroup><col style="width:32px">'+WD.map(()=>'<col>').join('')+'</colgroup>';
-  let head='<thead><tr><th></th>';
+  const curName=(state.teachers.find(t=>t.staff_id===state.cur)||{}).name||'';
+  let cg='<colgroup><col style="width:60px">'+WD.map(()=>'<col>').join('')+'</colgroup>';
+  let head=`<thead><tr><th class="cornerh">${curName}</th>`;
   for(const [l,w] of WD) head+=`<th data-col="${w}">${l}</th>`;
   head+='</tr></thead>';
   let body='<tbody>';
