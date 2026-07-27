@@ -378,6 +378,22 @@ function todayKey() {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
+// 實際可查詢窗口：要 14 天，但被「班表邊界」卡住（每月 25 日 13:00 才開放下月）→ 月底前只到本月底
+function windowInfo() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate(), h = now.getHours();
+  const bm = (d > 25 || (d === 25 && h >= 13)) ? m + 1 : m;   // 已開放到哪個月
+  const boundary = new Date(y, bm + 1, 0);                     // 該月最後一天
+  const plan14   = new Date(y, m, d + 13);                     // 今天 +13 = 14 天
+  const to = plan14 < boundary ? plan14 : boundary;
+  const days = Math.round((new Date(to.getFullYear(), to.getMonth(), to.getDate()) - new Date(y, m, d)) / 86400000) + 1;
+  return { days, to };
+}
+// 全窗口皆滿時的動態文案頭：滿 14 天說「近14天」，被月底卡住就講到幾號
+function fullHead() {
+  const w = windowInfo();
+  return w.days >= 14 ? '近14天已滿' : `到 ${w.to.getMonth() + 1}/${w.to.getDate()} 前已滿`;
+}
 // ── 客立樂 API 資料層（原 worker 邏輯搬到前端）────────────────
 function tpeTodayParts() {
   const s = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Taipei' }).format(new Date());
@@ -744,7 +760,7 @@ function computeTodayStatus(slots) {
   const todaySlots = slots.filter(s => s.dateKey === tk);
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
-    if (!fut) return { text:branchPrefix()+'近14天已滿，下月預約 25 日 13:00 開放', color:'var(--red)' };
+    if (!fut) return { text:branchPrefix()+fullHead()+'，下月預約 25 日 13:00 開放', color:'var(--red)' };
     return { text:`${branchPrefix()}今日已滿，最早在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
   if (todaySlots.length >= 4) return { text:branchPrefix()+'今日尚有多個空位', color:'var(--green)' };
@@ -936,7 +952,7 @@ function renderStaff() {
   const tk = todayKey();
   const todayN = pool.filter(x => x.dateKey===tk).length;
   let status;
-  if (pool.length === 0)  status = { text:'近14天已滿，下月預約 25 日 13:00 開放', color:'var(--red)' };
+  if (pool.length === 0)  status = { text:fullHead()+'，下月預約 25 日 13:00 開放', color:'var(--red)' };
   else if (todayN === 0)  status = { text:`今日已滿，最早在${dateMeta(pool[0].dateKey).nearLabel}`, color:'var(--red)' };
   else if (todayN >= 4)   status = { text:'今日尚有多個空位', color:'var(--green)' };
   else                    status = { text:`今日剩下${todayN}個空位`, color:'var(--red)' };
