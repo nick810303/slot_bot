@@ -744,7 +744,7 @@ function computeTodayStatus(slots) {
   const todaySlots = slots.filter(s => s.dateKey === tk);
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
-    if (!fut) return { text:branchPrefix()+'近期已滿，下月預約 25 日 13:00 開放', color:'var(--red)' };
+    if (!fut) return { text:branchPrefix()+'近14天已滿，下月預約 25 日 13:00 開放', color:'var(--red)' };
     return { text:`${branchPrefix()}今日已滿，最早在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
   }
   if (todaySlots.length >= 4) return { text:branchPrefix()+'今日尚有多個空位', color:'var(--green)' };
@@ -936,7 +936,7 @@ function renderStaff() {
   const tk = todayKey();
   const todayN = pool.filter(x => x.dateKey===tk).length;
   let status;
-  if (pool.length === 0)  status = { text:'近期已滿，下月預約 25 日 13:00 開放', color:'var(--red)' };
+  if (pool.length === 0)  status = { text:'近14天已滿，下月預約 25 日 13:00 開放', color:'var(--red)' };
   else if (todayN === 0)  status = { text:`今日已滿，最早在${dateMeta(pool[0].dateKey).nearLabel}`, color:'var(--red)' };
   else if (todayN >= 4)   status = { text:'今日尚有多個空位', color:'var(--green)' };
   else                    status = { text:`今日剩下${todayN}個空位`, color:'var(--red)' };
