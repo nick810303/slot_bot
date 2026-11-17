@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.10.0（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.10.1（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -535,6 +535,7 @@ const I18N = {
     ],
     nt_end:'We are by appointment only, and your slot is reserved for you. We look forward to seeing you!',
     bk_send:'Continue in LINE', bk_hello:'Hello, I would like to book this slot.',
+    bk_remind:'⚠️ Please press Send and wait for our reply. Your booking is NOT confirmed yet, so please do not come until we confirm.',
     bk_e_dur:'Please choose a duration.', bk_e_name:'Please enter your name.', bk_e_tel:'Please enter your phone number with country code (e.g. +1).',
   },
   ja:{
@@ -574,6 +575,7 @@ const I18N = {
     ],
     nt_end:'当店は完全予約制で、ご予約の時間はお客様のために確保しています。ご来店をお待ちしております。',
     bk_send:'LINEで送信へ進む', bk_hello:'こんにちは、こちらの枠を予約したいです。',
+    bk_remind:'⚠️ このメッセージを送信し、当店からの返信をお待ちください。ご予約はまだ確定していません。確定前のご来店はご遠慮ください。',
     bk_e_dur:'コース（時間）を選択してください。', bk_e_name:'お名前を入力してください。', bk_e_tel:'国番号つきの電話番号を入力してください（例：+81）。',
   },
   ko:{
@@ -613,6 +615,7 @@ const I18N = {
     ],
     nt_end:'저희는 100% 예약제로 운영되며, 예약하신 시간은 고객님을 위해 비워 둡니다. 방문을 기다리겠습니다!',
     bk_send:'LINE에서 보내기', bk_hello:'안녕하세요, 이 시간으로 예약하고 싶습니다.',
+    bk_remind:'⚠️ 이 메시지를 전송한 뒤 저희 답장을 기다려 주세요. 예약은 아직 확정되지 않았습니다. 확정 전에는 방문하지 말아 주세요.',
     bk_e_dur:'코스(시간)를 선택해 주세요.', bk_e_name:'이름을 입력해 주세요.', bk_e_tel:'국가번호를 포함한 전화번호를 입력해 주세요 (예: +82).',
   },
 };
@@ -1703,6 +1706,8 @@ function buildBookingText(slot, dur, name, phone) {
     `Date 日期: ${slot.dateKey} (${WD_EN[wi]} 週${WD_ZH[wi]})`,
     `Time 時間: ${slot.time}`,
     `Duration 時長: ${dur} min`,
+    '',
+    T('bk_remind'),
   ].join('\n');
 }
 function sendBooking() {
