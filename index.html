@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.12.1（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.12.2（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -338,6 +338,12 @@ html[lang=en] .card-branch-banner{letter-spacing:.02em}
 /* v5.9：Manrope 的數字比原本等寬字寬，大時間略縮才不會在窄螢幕被裁 */
 .card-time{font-size:22px;letter-spacing:-1.1px;line-height:1.04}
 .card-when{gap:5px}
+/* v5.12.2：卡片高度貼合內容（同一列以最高的那張為準），底部不留白 */
+.card,.card-empty{display:flex;flex-direction:column}
+.card-inner{height:auto;flex:1 0 auto}
+.card-empty-inner{height:auto;flex:1 0 auto;min-height:124px}
+.card-body{padding-bottom:5px}
+.card-durs{flex:0 0 auto}
 </style>
 </head>
 <body>
