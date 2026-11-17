@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.4.1（2026-09-15 新帳號部署測試） -->
+<!-- 小泰空位儀表板 v5.10.0（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>小泰空位儀表板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -29,9 +29,11 @@
   --d120:#C4857A;--d120-bg:rgba(196,133,122,.10);--d120-bdr:rgba(196,133,122,.28);
   --d90:#A8906E; --d90-bg:rgba(168,144,110,.10); --d90-bdr:rgba(168,144,110,.28);
   --d60:#D4A882; --d60-bg:rgba(212,168,130,.10); --d60-bdr:rgba(212,168,130,.28);
+  --sans:'Manrope','Noto Sans TC',sans-serif;
+  --mono:'Manrope','Noto Sans TC',sans-serif;
   --tr:#ADC99A;--tr-dark:#6E7B4E;--tr-bg:rgba(110,123,78,.12);--tr-bdr:rgba(110,123,78,.42);--tr-text:#5A6640;
 }
-html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:var(--black)}
+html,body{font-variant-numeric:tabular-nums;height:100%;overflow:hidden;background:var(--bg);font-family:var(--sans);color:var(--black)}
 .app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg)}
 .handle{flex-shrink:0;padding:5px 0 0;display:flex;justify-content:center}
 .handle-bar{width:28px;height:3px;background:var(--line);border-radius:2px}
@@ -40,45 +42,45 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .hd-name{font-size:11px;color:var(--gray);flex:1;min-width:0;line-height:1.45}
 .hd-sub{font-size:9px;color:var(--gray2);letter-spacing:.01em}
 .hd-sub a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:.5px}
-.hd-live{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;padding:6px 8px;margin:-6px -8px;border:none;background:transparent;border-radius:7px;touch-action:manipulation}
+.hd-live{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--green);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;padding:6px 8px;margin:-6px -8px;border:none;background:transparent;border-radius:7px;touch-action:manipulation}
 .hd-live:active{opacity:.55}
 .stats-sheet{max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .stx-head{display:flex;align-items:center;justify-content:space-between;margin:2px 0 10px}
-.stx-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--gray2)}
+.stx-title{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--gray2)}
 .stx-x{font-size:15px;color:var(--gray2);cursor:pointer;line-height:1;padding:4px 8px;margin:-4px -8px}
 .stx-visitors{display:flex;gap:18px;padding:1px 2px 8px;border-bottom:1px solid var(--line2)}
 .stx-vis{display:flex;align-items:baseline;gap:6px}
 .stx-vis .l{font-size:10px;color:var(--gray2)}
-.stx-vis .n{font-family:'DM Mono',monospace;font-size:13px;font-weight:400;color:var(--gray);letter-spacing:.02em}
+.stx-vis .n{font-family:var(--mono);font-size:13px;font-weight:400;color:var(--gray);letter-spacing:.02em}
 .stx-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:6px 2px;border-bottom:1px solid var(--line2)}
 .stx-row .k{font-size:10px;color:var(--gray2)}
-.stx-row .v{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);white-space:nowrap}
+.stx-row .v{font-family:var(--mono);font-size:10px;color:var(--gray);white-space:nowrap}
 .stx-row .v i{color:var(--gray3);font-style:normal}
 .stx-faint{margin-top:7px}
 .stx-frow{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:3px 2px}
 .stx-frow .k{font-size:9px;color:var(--gray3)}
-.stx-frow .v{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray3);white-space:nowrap}
+.stx-frow .v{font-family:var(--mono);font-size:9px;color:var(--gray3);white-space:nowrap}
 .stx-admin{text-align:right;margin-top:10px}
-.stx-admin a{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray3);cursor:pointer;letter-spacing:.05em;padding:4px}
+.stx-admin a{font-family:var(--mono);font-size:9px;color:var(--gray3);cursor:pointer;letter-spacing:.05em;padding:4px}
 .stx-pw{display:none;align-items:center;justify-content:flex-end;gap:6px;margin-top:10px}
 .stx-pw.show{display:flex}
-.stx-pw input{width:120px;height:32px;border:1px solid var(--line);border-radius:7px;background:var(--bg3);padding:0 9px;font-family:'DM Mono',monospace;font-size:13px;color:var(--black);outline:none}
+.stx-pw input{width:120px;height:32px;border:1px solid var(--line);border-radius:7px;background:var(--bg3);padding:0 9px;font-family:var(--mono);font-size:13px;color:var(--black);outline:none}
 .stx-pw input:focus{border-color:var(--clay)}
-.stx-pw button{height:32px;padding:0 12px;border:1px solid #7d4a37;border-radius:7px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer}
+.stx-pw button{height:32px;padding:0 12px;border:1px solid #7d4a37;border-radius:7px;background:var(--cocoa);color:var(--cream);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer}
 .stx-rank{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .stx-rank.show{display:block}
 .stx-rank-t{font-size:10px;color:var(--gray);margin-bottom:6px}
 .stx-rk{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 2px;border-bottom:1px solid var(--line2);font-size:11px}
 .stx-rk:last-child{border-bottom:none}
 .stx-rk .nm{color:#6b5d4d}
-.stx-rk .nm b{font-family:'DM Mono',monospace;color:var(--gray3);font-weight:400;margin-right:6px;font-size:9px}
-.stx-rk .c{font-family:'DM Mono',monospace;color:#7a6a58;white-space:nowrap;font-size:10px}
+.stx-rk .nm b{font-family:var(--mono);color:var(--gray3);font-weight:400;margin-right:6px;font-size:9px}
+.stx-rk .c{font-family:var(--mono);color:#7a6a58;white-space:nowrap;font-size:10px}
 .stx-rk .c i{color:var(--gray3);font-style:normal}
-.sb-load{font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray2);padding:10px 2px}
+.sb-load{font-family:var(--sans);font-size:12px;color:var(--gray2);padding:10px 2px}
 .live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:livepulse 2.5s ease-in-out infinite}
 @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.2}}
 .tabs{display:flex;background:var(--bg2);border-radius:7px;padding:2px;gap:2px;box-shadow:inset 0 1px 2px rgba(62,42,33,.13)}
-.tab{flex:1;padding:4px 0;border:none;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
+.tab{flex:1;padding:4px 0;border:none;background:transparent;font-family:var(--sans);font-size:12px;color:var(--gray);border-radius:5px;cursor:pointer;transition:all .15s}
 .tab.active{background:var(--card);color:var(--black);font-weight:500;box-shadow:0 1px 2px rgba(62,42,33,.18),inset 0 1px 0 rgba(255,255,255,.75)}
 .filters{flex-shrink:0;border-bottom:1px solid var(--line2);background:var(--bg3);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
 /* 分店＋時長：一列五個勾選框（左分店、右時長，中間分隔）*/
@@ -90,8 +92,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .cbx-check{display:none}
 .cbx.on .cbx-check{display:block}
 .cbx-label{font-size:11px;color:#a79d8f;line-height:1;white-space:nowrap;transition:color .15s}
-.cbx-dur .cbx-label{font-family:'DM Mono',monospace;font-size:10px}
-.cbx-branch{flex:1.2 1 0}
+.cbx-dur .cbx-label{font-family:var(--mono);font-size:10px}
+.cbx-branch{flex:1.36 1 0}
+.cbx-dur{padding-left:2px;padding-right:2px;gap:3px}
+.filter-row{gap:4px}
+.cbx-sep{margin-left:1px;margin-right:1px}
 .cbx-locked{opacity:.38;pointer-events:none}
 .cbx-sep{width:1px;background:var(--line);flex-shrink:0;margin:3px 3px;align-self:stretch}
 /* 分店 on 狀態（品牌分店色）*/
@@ -125,7 +130,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .status-caret{display:inline-block;width:9px;height:2px;margin-left:1px;border-radius:1px;vertical-align:baseline;transition:opacity .45s ease;animation:caretblink 1.05s step-end infinite}
 .status-caret.frozen{animation:none;opacity:0}
 @keyframes caretblink{0%,50%{opacity:1}51%,100%{opacity:0}}
-.sec-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
+.sec-label{font-family:var(--mono);font-size:9px;color:var(--gray2);letter-spacing:.07em;padding:0 14px 5px}
 .card-row{display:flex;gap:6px;padding:0 12px}
 .card{flex:1 1 0;min-width:0;cursor:pointer}
 .card-inner{height:156px;background:var(--card);border:1px solid var(--card-bdr);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:background .12s;position:relative;box-shadow:0 1px 2px rgba(62,42,33,.14),inset 0 1px 0 rgba(255,255,255,.5)}
@@ -135,28 +140,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .card-hd-av{width:17px;height:17px;border-radius:50%;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4)}
 .card-teacher-name{font-size:10.5px;font-weight:500;color:var(--cream);letter-spacing:.01em;line-height:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .banner-right{display:flex;align-items:center;gap:4px;flex-shrink:0}
-.card-rank{font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.6)}
-.trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:7px;font-weight:500;padding:1px 3px;border-radius:2px;background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);line-height:1.5;white-space:nowrap;flex-shrink:0;}
+.card-rank{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.6)}
+.trainee-badge{font-family:var(--sans);font-size:7px;font-weight:500;padding:1px 3px;border-radius:2px;background:rgba(255,255,255,.20);color:rgba(255,255,255,.92);border:1px solid rgba(255,255,255,.28);line-height:1.5;white-space:nowrap;flex-shrink:0;}
 .card-body{flex:1;padding:4px 7px 4px;display:flex;flex-direction:column;background:var(--card)}
 .card-near-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;flex-shrink:0}
-.card-branch-banner{flex-shrink:0;text-align:center;font-family:'Noto Sans TC',sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.06em;line-height:1.5;padding:2px 6px}
+.card-branch-banner{flex-shrink:0;text-align:center;font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.06em;line-height:1.5;padding:2px 6px}
 .card-branch-banner.bc-nj{background:#E3DED3;color:var(--nj);border-bottom:1px solid var(--nj-bdr)}
 .card-branch-banner.bc-zs{background:#EBDAD1;color:var(--zs);border-bottom:1px solid var(--zs-bdr)}
-.near-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;line-height:1.6}
+.near-badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;line-height:1.6}
 .near-badge.today{background:var(--black);color:#fff}
 .near-badge.other{background:#e7ddce;color:#6b5d4d}
-.branch-chip{font-family:'Noto Sans TC',sans-serif;font-size:8px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:#fff;border:1px solid #ddd;color:#888;white-space:nowrap}
+.branch-chip{font-family:var(--sans);font-size:8px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:#fff;border:1px solid #ddd;color:#888;white-space:nowrap}
 .branch-chip.bc-nj{color:var(--nj);border-color:var(--nj-bdr);background:var(--nj-bg)}
 .branch-chip.bc-zs{color:var(--zs);border-color:var(--zs-bdr);background:var(--zs-bg)}
-.full-badge{font-family:'DM Mono',monospace;font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
+.full-badge{font-family:var(--mono);font-size:8.5px;font-weight:500;padding:1px 4px;border-radius:3px;line-height:1.5;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red)}
 .card-when{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-shrink:0}
 .card-date{display:flex;flex-direction:column;line-height:1.12}
-.card-mmdd{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:#6b5240}
-.card-wd{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray)}
-.card-time{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:.95}
+.card-mmdd{font-family:var(--mono);font-size:11px;font-weight:500;color:#6b5240}
+.card-wd{font-family:var(--mono);font-size:9.5px;color:var(--gray)}
+.card-time{font-family:var(--mono);font-size:24px;font-weight:500;color:var(--black);letter-spacing:-1px;line-height:.95}
 .card-div{height:1px;background:var(--line);flex-shrink:0;margin-bottom:5px}
 .card-durs{display:flex;flex-wrap:wrap;gap:4px;flex:1;align-content:flex-start;overflow:hidden}
-.dur-pill{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;line-height:1.6;white-space:nowrap;display:inline-block}
+.dur-pill{font-family:var(--mono);font-size:9px;font-weight:500;padding:1px 5px;border-radius:3px;line-height:1.6;white-space:nowrap;display:inline-block}
 .dur-pill.d120{color:var(--d120);background:rgba(196,133,122,.13);border:1px solid var(--d120-bdr)}
 .dur-pill.d90 {color:var(--d90); background:rgba(168,144,110,.13);border:1px solid var(--d90-bdr)}
 .dur-pill.d60 {color:var(--d60); background:rgba(212,168,130,.13);border:1px solid var(--d60-bdr)}
@@ -177,10 +182,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .stab-group-wrap{flex-shrink:0;display:flex;align-items:center;padding:5px 14px;overflow-x:auto;scrollbar-width:none;background:var(--bg3);border-bottom:1px solid var(--line2);box-shadow:inset 0 1px 2px rgba(62,42,33,.07)}
 .stab-group-wrap::-webkit-scrollbar{display:none}
 .stab-group{flex-shrink:0;display:flex;align-items:center}
-.stab-group-label{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:8.5px;color:var(--gray);letter-spacing:.04em;background:var(--bg2);border:1px solid var(--line);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px;cursor:pointer;transition:background .12s,color .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.stab-group-label{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-size:8.5px;color:var(--gray);letter-spacing:.04em;background:var(--bg2);border:1px solid var(--line);padding:3px 7px;border-radius:4px;white-space:nowrap;align-self:center;line-height:1.4;margin-right:6px;cursor:pointer;transition:background .12s,color .12s;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
 .stab-group-label:active{background:var(--bg3)}
 .stab-group.collapsed .stab-group-label{color:var(--gray2)}
-.stab-group-count{font-family:'DM Mono',monospace;font-size:8px;color:var(--gray2);letter-spacing:0}
+.stab-group-count{font-family:var(--mono);font-size:8px;color:var(--gray2);letter-spacing:0}
 .stab-group:not(.collapsed) .stab-group-count{display:none}
 .stab-facepile{display:none;align-items:center;margin-left:2px}
 .stab-group.collapsed .stab-facepile{display:inline-flex}
@@ -190,51 +195,146 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
 .stab-pills-inner{display:flex;align-items:center;overflow:hidden;min-width:0;padding:4px 0;margin:-4px 0}
 .stab-group.collapsed .stab-group-pills{grid-template-columns:0fr;opacity:0}
 .stab-divider{flex-shrink:0;width:1px;height:24px;background:var(--line);margin:0 8px;align-self:center}
-.stab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:20px;border:1px solid transparent;background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;box-shadow:none}
+.stab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:20px;border:1px solid transparent;background:transparent;font-family:var(--sans);font-size:11px;color:var(--gray);cursor:pointer;transition:all .13s;white-space:nowrap;margin-right:5px;box-shadow:none}
 .stab:last-child{margin-right:0}
 .stab-av{width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#e8e8e8;filter:grayscale(.9);opacity:.5;transition:filter .15s,opacity .15s,box-shadow .15s}
 .stab.active .stab-av{filter:none;opacity:1;box-shadow:0 0 0 1.5px rgba(62,42,33,.10)}
 .stab.active{background:var(--card);border-color:var(--card);color:var(--black);font-weight:500;box-shadow:0 1px 2px rgba(62,42,33,.18),inset 0 1px 0 rgba(255,255,255,.75)}
-.stab-tr-tag{font-family:'Noto Sans TC',sans-serif;font-size:7.5px;font-weight:500;line-height:1.6;padding:1px 4px;border-radius:2px;margin-left:3px;flex-shrink:0;white-space:nowrap;background:rgba(174,108,86,.13);color:var(--clay);border:1px solid rgba(174,108,86,.30)}
+.stab-tr-tag{font-family:var(--sans);font-size:7.5px;font-weight:500;line-height:1.6;padding:1px 4px;border-radius:2px;margin-left:3px;flex-shrink:0;white-space:nowrap;background:rgba(174,108,86,.13);color:var(--clay);border:1px solid rgba(174,108,86,.30)}
 .stab.active .stab-tr-tag{background:rgba(174,108,86,.14);color:var(--clay);border-color:rgba(174,108,86,.32)}
 .footer{flex-shrink:0;padding:5px 14px max(5px,env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg)}
 .ft-note{font-size:9.5px;color:var(--gray2);line-height:1.5;flex:1}
-.ft-disc{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
+.ft-disc{font-family:var(--mono);font-size:10px;color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:3px;flex-shrink:0}
 .mask{position:fixed;inset:0;background:rgba(62,42,33,.30);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s}
 .mask.show{opacity:1;pointer-events:all}
 .sheet{position:relative;width:100%;max-width:480px;background:var(--card);border:1px solid #d3c3ac;border-bottom:none;border-radius:12px 12px 0 0;padding:22px 22px max(20px,env(safe-area-inset-bottom));transform:translateY(14px);transition:transform .2s;box-shadow:0 -3px 18px rgba(62,42,33,.22),inset 0 1px 0 rgba(255,255,255,.7)}
 .sheet::before{content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);width:34px;height:4px;border-radius:2px;background:var(--sand);box-shadow:inset 0 1px 1px rgba(62,42,33,.2)}
 .mask.show .sheet{transform:translateY(0)}
-.sheet-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;color:var(--cream);letter-spacing:.09em;background:var(--cocoa);padding:2px 7px;border-radius:4px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 1px rgba(62,42,33,.16)}
+.sheet{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.sheet-tag{display:inline-block;font-family:var(--mono);font-size:9px;color:var(--cream);letter-spacing:.09em;background:var(--cocoa);padding:2px 7px;border-radius:4px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 1px rgba(62,42,33,.16)}
 .sheet-title{font-size:16px;font-weight:500;line-height:1.4;margin-bottom:4px}
 .slot-summary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 11px;border-radius:7px;background:var(--bg2);border:1px solid var(--line2);margin:8px 0 12px}
-.slot-time-big{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--black);letter-spacing:-.5px}
+.slot-time-big{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--black);letter-spacing:-.5px}
 .slot-meta{flex:1}
 .slot-meta-name{font-size:12px;color:var(--black);font-weight:500;display:flex;align-items:center;gap:5px}
-.slot-meta-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);margin-top:4px}
+.slot-meta-date{font-family:var(--mono);font-size:10px;color:var(--gray);margin-top:4px}
 .slot-timecol{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0}
 .slot-div{width:1px;align-self:stretch;background:var(--sand);flex-shrink:0;margin:2px 4px}
 .slot-av{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg3);border:1px solid var(--line2)}
-.slot-branch-link{display:inline-flex;align-items:center;gap:3px;font-family:'Noto Sans TC',sans-serif;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;text-decoration:none;color:var(--cream)}
+.slot-branch-link{display:inline-flex;align-items:center;gap:3px;font-family:var(--sans);font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;text-decoration:none;color:var(--cream)}
 .slot-branch-link.bc-nj{background:var(--nj)}
 .slot-branch-link.bc-zs{background:var(--zs)}
 .slot-branch-link .ext{opacity:.85}
-.slot-branch-plain{font-family:'Noto Sans TC',sans-serif;font-size:10.5px;color:var(--gray)}
-.slot-trainee-badge{font-family:'Noto Sans TC',sans-serif;font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:rgba(201,150,60,.15);color:#6b4f0e;border:1px solid rgba(201,150,60,.4);white-space:nowrap;line-height:1.5;flex-shrink:0}
+.slot-branch-plain{font-family:var(--sans);font-size:10.5px;color:var(--gray)}
+.slot-trainee-badge{font-family:var(--sans);font-size:9px;font-weight:500;padding:1px 5px;border-radius:2px;background:rgba(201,150,60,.15);color:#6b4f0e;border:1px solid rgba(201,150,60,.4);white-space:nowrap;line-height:1.5;flex-shrink:0}
 .slot-dur-pills{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
-.slot-dur-pill{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.slot-dur-pill{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 6px;border-radius:3px;white-space:nowrap}
 .slot-dur-pill.d120{color:var(--d120);background:var(--d120-bg);border:1px solid var(--d120-bdr)}
 .slot-dur-pill.d90 {color:var(--d90); background:var(--d90-bg); border:1px solid var(--d90-bdr)}
 .slot-dur-pill.d60 {color:var(--d60); background:var(--d60-bg); border:1px solid var(--d60-bdr)}
 .sheet-body{font-size:13px;color:var(--gray);line-height:1.85;margin-bottom:16px}
 .sheet-body b{color:var(--black);font-weight:500}
-.sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--cocoa);color:var(--cream);font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:500;border:1px solid #7d4a37;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
+.sheet-btn{width:100%;padding:13px;border-radius:9px;background:var(--cocoa);color:var(--cream);font-family:var(--sans);font-size:13px;font-weight:500;border:1px solid #7d4a37;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
 .sheet-btn:active{box-shadow:inset 0 1px 3px rgba(0,0,0,.28);opacity:.96}
 .sheet-close{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--gray2);cursor:pointer;padding:4px}
 .empty-open{font-size:12px;color:var(--gray);line-height:1.7;margin-bottom:12px}
 .empty-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.empty-book-btn{padding:9px 16px;border-radius:8px;background:var(--cocoa);color:var(--cream);border:1px solid #7d4a37;font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
-.empty-remind-btn{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;border-radius:8px;background:var(--card);color:var(--cocoa);border:1px solid var(--clay);font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.empty-book-btn{padding:9px 16px;border-radius:8px;background:var(--cocoa);color:var(--cream);border:1px solid #7d4a37;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 2px rgba(62,42,33,.18)}
+.empty-remind-btn{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;border-radius:8px;background:var(--card);color:var(--cocoa);border:1px solid var(--clay);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+
+/* ── v5.5：卡片橫向滑動（一次仍是 3 張，寬度與原本相同）── */
+.card-row{padding:0 0 3px 12px;margin-bottom:-3px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-left:12px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.card-row::-webkit-scrollbar{display:none}
+.card-row::after{content:'';flex:0 0 6px}
+.card,.card-empty{flex:0 0 calc((100% - 24px)/3);scroll-snap-align:start}
+.pg{display:inline-flex;align-items:center}
+.pg-a{font-family:var(--mono);font-size:14px;line-height:1;padding:6px 7px;margin:-6px 0;color:var(--clay);cursor:pointer;user-select:none}
+.pg-a:last-child{margin-right:-7px}
+.pg-a.off{color:var(--gray3);opacity:.55;pointer-events:none}
+.pg-n{letter-spacing:.03em}
+/* ── v5.5：日期時段篩選（按鈕放在分頁列右側，面板從底部滑出，不增加主畫面高度）── */
+.hd-row{display:flex;gap:5px;align-items:stretch}
+.hd-row .tabs{flex:1;min-width:0}
+.dt-btn{flex-shrink:0;max-width:46%;display:inline-flex;align-items:center;gap:4px;padding:0 9px;border-radius:7px;border:1px solid var(--line);background:var(--card);font-family:var(--sans);font-size:11px;color:var(--gray);cursor:pointer;white-space:nowrap;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 1px rgba(62,42,33,.07)}
+.dt-btn svg{flex-shrink:0}
+.dt-btn span{overflow:hidden;text-overflow:ellipsis}
+.dt-btn:active{transform:scale(.97)}
+.dt-btn.on{border-color:var(--clay);background:rgba(174,108,86,.10);color:var(--cocoa);font-weight:500;box-shadow:inset 0 1px 2px rgba(62,42,33,.17)}
+.dt-sec{display:flex;align-items:baseline;justify-content:space-between;font-size:10px;color:var(--gray2);margin:12px 0 6px}
+.dt-sec b{font-weight:500;color:var(--cocoa);font-size:11px}
+.dt-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dt-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0 6px;border-radius:7px;border:1.5px solid var(--line);background:var(--bg3);cursor:pointer;font-family:var(--sans);color:var(--black);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.dt-day .w{font-size:9px;line-height:1.2;color:var(--gray);white-space:nowrap}
+.dt-day .d{font-family:var(--mono);font-size:14px;font-weight:500;line-height:1}
+.dt-day.none:not(.on){opacity:.36;pointer-events:none;border-style:dashed;box-shadow:none}
+.dt-day.on{border-color:var(--cocoa);background:var(--cocoa);box-shadow:inset 0 1px 2px rgba(0,0,0,.22)}
+.dt-day.on .w,.dt-day.on .d{color:var(--cream)}
+.dt-bands{display:flex;gap:5px}
+.dt-band{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px 7px;border-radius:7px;border:1.5px solid var(--line);background:var(--bg3);cursor:pointer;font-family:var(--sans);color:var(--black);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.dt-band .n{font-size:12px;font-weight:500;line-height:1.2;white-space:nowrap}
+.dt-band .r{font-family:var(--mono);font-size:9px;color:var(--gray);white-space:nowrap}
+.dt-band.none:not(.on){opacity:.36;pointer-events:none;border-style:dashed;box-shadow:none}
+.dt-band.on{border-color:var(--cocoa);background:var(--cocoa);box-shadow:inset 0 1px 2px rgba(0,0,0,.22)}
+.dt-band.on .n,.dt-band.on .r{color:var(--cream)}
+.dt-range{position:relative;height:34px;margin:0 11px}
+.dt-track{position:absolute;left:-11px;right:-11px;top:15px;height:4px;border-radius:2px;background:var(--bg2);box-shadow:inset 0 1px 2px rgba(62,42,33,.2)}
+.dt-fill{position:absolute;top:0;bottom:0;background:var(--clay);border-radius:2px}
+.dt-range input{position:absolute;left:-11px;top:0;width:calc(100% + 22px);height:34px;margin:0;padding:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none;outline:none}
+.dt-range input::-webkit-slider-runnable-track{height:34px;background:none}
+.dt-range input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:22px;height:22px;margin-top:6px;border-radius:50%;background:var(--card);border:2px solid var(--cocoa);box-shadow:0 1px 3px rgba(62,42,33,.3);cursor:grab}
+.dt-range input::-moz-range-track{background:none}
+.dt-range input::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;background:var(--card);border:2px solid var(--cocoa);box-shadow:0 1px 3px rgba(62,42,33,.3);cursor:grab}
+.dt-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--gray2);margin-top:-2px}
+.dt-foot{display:flex;gap:8px;margin-top:16px}
+.dt-clear{flex:0 0 auto;padding:0 16px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--gray);font-family:var(--sans);font-size:13px;cursor:pointer}
+.dt-clear:disabled{opacity:.4}
+/* ── v5.5：語系（預設依裝置語言；切換連結收在「注意事項」面板底部）── */
+html[lang=ja]{--sans:'Manrope','Noto Sans JP','Noto Sans TC',sans-serif}
+html[lang=ko]{--sans:'Manrope','Noto Sans KR','Noto Sans TC',sans-serif}
+.lang-btn{flex-shrink:0;width:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;border:1px solid var(--line);background:var(--card);color:var(--gray);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 1px rgba(62,42,33,.07)}
+.lang-btn:active{transform:scale(.95)}
+.lang-btn.open{border-color:var(--clay);color:var(--cocoa);box-shadow:inset 0 1px 2px rgba(62,42,33,.17)}
+.lang-row{display:none;position:absolute;right:14px;top:100%;margin-top:-2px;z-index:60;flex-direction:column;min-width:108px;padding:4px;background:var(--card);border:1px solid #d3c3ac;border-radius:8px;box-shadow:0 4px 14px rgba(62,42,33,.22),inset 0 1px 0 rgba(255,255,255,.7)}
+.lang-row.show{display:flex}
+.lang-row a{font-size:12px;line-height:1.5;color:var(--gray);cursor:pointer;padding:6px 10px;border-radius:5px}
+.lang-row a.on{color:var(--cocoa);font-weight:500;background:rgba(174,108,86,.10)}
+/* ── v5.6：外語代客登記表單（姓名＋含國碼電話 → 帶到 LINE 官方帳號送出）── */
+.bk{margin-bottom:12px}
+.bk-row{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.bk-l{font-size:11px;color:var(--gray);flex-shrink:0;margin-right:2px}
+.bk-dur{font-family:var(--mono);font-size:11px;font-weight:500;padding:5px 10px;border-radius:6px;border:1.5px solid var(--line);background:var(--bg3);color:var(--gray);cursor:pointer}
+.bk-dur.on{border-color:var(--cocoa);background:var(--cocoa);color:var(--cream)}
+.bk-in{flex:1;min-width:0;height:36px;border:1px solid var(--line);border-radius:7px;background:var(--bg3);padding:0 10px;font-family:var(--sans);font-size:14px;color:var(--black);outline:none;box-shadow:inset 0 1px 2px rgba(62,42,33,.07)}
+.bk-in:focus{border-color:var(--clay)}
+.bk-in.cc{flex:0 0 62px;font-family:var(--mono);padding:0 8px}
+.bk-note{font-size:10.5px;color:var(--gray);line-height:1.5}
+.bk-err{font-size:11px;color:var(--red);line-height:1.5;min-height:0}
+.bk-notes{display:flex;align-items:center;gap:5px;margin-top:6px;padding:6px 9px;border-radius:7px;background:var(--red-bg);border:1px solid var(--red-bdr);color:var(--red);font-size:11.5px;font-weight:500;cursor:pointer}
+.bk-notes .go{margin-left:auto;font-family:var(--mono)}
+.nt-mask{position:fixed;inset:0;z-index:130;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(62,42,33,.34);opacity:0;pointer-events:none;transition:opacity .18s}
+.nt-mask.show{opacity:1;pointer-events:all}
+.nt-pop{position:relative;width:100%;max-width:440px;max-height:100%;display:flex;flex-direction:column;background:var(--card);border:1px solid #d3c3ac;border-radius:14px;box-shadow:0 6px 24px rgba(62,42,33,.30),inset 0 1px 0 rgba(255,255,255,.7);transform:scale(.96);transition:transform .2s}
+.nt-mask.show .nt-pop{transform:scale(1)}
+.nt-head{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;font-size:14px;font-weight:700;color:var(--black)}
+.nt-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 14px 4px}
+.nt-item{padding:7px 0;border-top:1px solid var(--line2)}
+.nt-item b{display:block;font-size:12px;font-weight:700;color:var(--cocoa);line-height:1.45}
+.nt-item span{display:block;font-size:11.5px;color:var(--gray);line-height:1.55}
+.nt-end{padding:8px 0 6px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--black);line-height:1.55}
+.nt-foot{flex-shrink:0;display:flex;gap:8px;padding:8px 14px 12px}
+.nt-faq{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:10px 8px;border-radius:9px;border:1px solid var(--clay);background:var(--card);color:var(--cocoa);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer}
+.nt-ok:disabled{opacity:.45;cursor:default}
+.bk-notes.read{background:rgba(92,122,80,.09);border-color:rgba(92,122,80,.3);color:var(--green)}
+.nt-ok{flex:1.25;padding:10px 8px;border-radius:9px;border:1px solid #7d4a37;background:var(--cocoa);color:var(--cream);font-family:var(--sans);font-size:12.5px;font-weight:500;cursor:pointer}
+html:not([lang=zh-TW]) .status-text{font-size:12px}
+html[lang=en] .tab,html[lang=ko] .tab{font-size:11px}
+html[lang=en] .cbx-branch{padding-top:0;padding-bottom:0}
+html[lang=en] .cbx-branch .cbx-label{font-size:10.5px;letter-spacing:-.01em}
+html[lang=en] .cbx-branch[data-branch="南京三民"] .cbx-label{font-size:10px;line-height:.98;white-space:normal;text-align:left}
+html[lang=en] .card-branch-banner{letter-spacing:.02em}
+/* v5.9：Manrope 的數字比原本等寬字寬，大時間略縮才不會在窄螢幕被裁 */
+.card-time{font-size:22px;letter-spacing:-1.1px;line-height:1.04}
+.card-when{gap:5px}
 </style>
 </head>
 <body>
@@ -242,13 +342,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
   <div class="handle"><div class="handle-bar"></div></div>
   <div class="hd">
     <div class="hd-top">
-      <div class="hd-name">小泰空位儀表板<span class="hd-sub"> / 僅供快速查詢最早的空位，更多時段請至<a href="https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu" onclick="return openBooking()">預約系統</a></span></div>
+      <div class="hd-name"><span id="i-app">小泰空位儀表板</span><span class="hd-sub" id="i-sub"> / 僅供快速查詢最早的空位，更多時段請至<a href="https://liff.line.me/2007603682-rDEPkdA2/a33MS6uxvrwXxin2jHTk4N/menu" onclick="return openBooking()">預約系統</a></span></div>
       <button class="hd-live" type="button" onclick="openAdmin()"><div class="live-dot"></div>LIVE</button>
     </div>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('today',this)">今日 / 最早時段</button>
-      <button class="tab" onclick="switchTab('staff',this)">指定老師</button>
+    <div class="hd-row">
+      <div class="tabs">
+        <button class="tab active" id="i-tab-today" onclick="switchTab('today',this)">今日 / 最早時段</button>
+        <button class="tab" id="i-tab-staff" onclick="switchTab('staff',this)">指定老師</button>
+      </div>
+      <button class="dt-btn" id="dt-btn" type="button" onclick="openDT()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="dt-btn-t">日期時段</span></button>
+      <button class="lang-btn" id="lang-btn" type="button" aria-label="Language" onclick="toggleLangMenu(event)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.4 3.9 5.4 3.9 9s-1.3 6.6-3.9 9c-2.6-2.4-3.9-5.4-3.9-9S9.400 5.400 12 3z"/></svg></button>
     </div>
+    <div class="lang-row" id="lang-row"></div>
   </div>
   <div class="filters">
     <div class="filter-row">
@@ -280,22 +385,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
     <div class="pane active" id="pane-today">
       <div class="status-row">
         <div class="status-bar" id="status-today"></div>
-        <div class="sec-label" id="label-today">最早可約 · 3 位老師</div>
+        <div class="sec-label" id="label-today"></div>
       </div>
       <div class="card-row" id="cards-today"></div>
     </div>
     <div class="pane" id="pane-staff">
       <div class="status-row">
         <div class="status-bar" id="status-staff"></div>
-        <div class="sec-label" id="label-staff">最早可約 3 筆</div>
+        <div class="sec-label" id="label-staff"></div>
       </div>
       <div class="card-row" id="cards-staff"></div>
     </div>
   </div>
   <div class="footer">
-    <div class="ft-note">本儀表板可能有誤差，實際以預約系統為準。</div>
-    <span id="ft-fetched" style="font-family:'DM Mono',monospace;font-size:9.5px;color:var(--gray3);flex-shrink:0;white-space:nowrap"></span>
-    <div class="ft-disc" onclick="openSheet(null)">注意事項</div>
+    <div class="ft-note" id="i-foot">本儀表板可能有誤差，實際以預約系統為準。</div>
+    <span id="ft-fetched" style="font-family:var(--mono);font-size:9.5px;color:var(--gray3);flex-shrink:0;white-space:nowrap"></span>
+    <div class="ft-disc" id="i-notice" onclick="LANG==='zh' ? openSheet(null) : openFAQ()">注意事項</div>
   </div>
 </div>
 <div class="mask" id="mask" onclick="handleMaskClick(event)">
@@ -307,7 +412,35 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Noto San
       本工具僅供查詢，<b>未與預約系統連動</b>。請點下方按鈕前往預約系統完成預約，實際空位以預約系統為準。
     </div>
     <button class="sheet-btn" id="sheet-btn" onclick="goBooking()">前往預約系統</button>
-    <span class="sheet-close" onclick="closeSheet()">關閉</span>
+    <span class="sheet-close" id="i-close" onclick="closeSheet()">關閉</span>
+  </div>
+</div>
+<div class="nt-mask" id="nt-mask" onclick="if(event.target.id==='nt-mask')closeNotes()">
+  <div class="nt-pop">
+    <div class="nt-head"><span id="nt-title"></span><span class="stx-x" onclick="closeNotes()">✕</span></div>
+    <div class="nt-body" id="nt-body" onscroll="checkNotesEnd()"></div>
+    <div class="nt-foot">
+      <button class="nt-faq" type="button" onclick="openFAQ()"><span id="nt-faq"></span><svg width="9" height="9" viewBox="0 0 8 8" fill="none"><path d="M2.6 1H7v4.4M7 1 1 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="nt-ok" id="nt-ok" type="button" onclick="confirmNotes()">OK</button>
+    </div>
+  </div>
+</div>
+<div class="mask" id="dt-mask" onclick="if(event.target.id==='dt-mask')closeDT()">
+  <div class="sheet">
+    <div class="stx-head"><span class="stx-title" id="dt-title">DATE / 日期・時段</span><span class="stx-x" onclick="closeDT()">✕</span></div>
+    <div class="dt-sec"><span id="dt-date-l">日期</span><b id="dt-date-v"></b></div>
+    <div class="dt-days" id="dt-days"></div>
+    <div class="dt-sec"><span id="dt-time-l">時段</span><b id="dt-time-v"></b></div>
+    <div class="dt-range">
+      <div class="dt-track"><div class="dt-fill" id="dt-fill"></div></div>
+      <input type="range" id="dt-from" aria-label="from" oninput="onDTRange('from')">
+      <input type="range" id="dt-to" aria-label="to" oninput="onDTRange('to')">
+    </div>
+    <div class="dt-scale"><span id="dt-lo"></span><span id="dt-hi"></span></div>
+    <div class="dt-foot">
+      <button class="dt-clear" id="dt-clear" type="button" onclick="clearDT()">清除</button>
+      <button class="sheet-btn" id="dt-done" type="button" onclick="closeDT()">完成</button>
+    </div>
   </div>
 </div>
 <div class="mask" id="stats-mask" onclick="if(event.target.id==='stats-mask')closeStats()">
@@ -330,6 +463,207 @@ const WINDOW_DAYS_2 = 14;  // 7 天內沒空位的老師，再延長問到 14 �
 const FETCH_CONCURRENCY = 6;      // 同時最多 6 支請求
 const FETCH_JITTER = [60, 120];   // 每支之間間隔 60–120ms（含隨機抖動）
 const WD = ['日','一','二','三','四','五','六'];
+// ── v5.5 語系：?lang= ＞ 使用者手動選過的 ＞ 裝置語言（中文以外且非日韓→英文）──
+const LANG_NAMES = { zh:'中文', en:'English', ja:'日本語', ko:'한국어' };
+function detectLang() {
+  let l = '';
+  try { l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('slotdash_lang') || ''; } catch(e) {}
+  l = (l || navigator.language || 'zh').toLowerCase();
+  return l.startsWith('zh') ? 'zh' : l.startsWith('ja') ? 'ja' : l.startsWith('ko') ? 'ko' : 'en';
+}
+let LANG = detectLang();
+const WD_ZH = '日一二三四五六', WD_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], WD_JA = '日月火水木金土', WD_KO = '일월화수목금토';
+const I18N = {
+  zh:{
+    app:'小泰空位儀表板', sub_pre:' / 僅供快速查詢最早的空位，更多時段請至', sub_link:'預約系統', sub_post:'',
+    tab_today:'今日 / 最早時段', tab_staff:'指定老師', dt_btn:'日期時段',
+    foot:'本儀表板可能有誤差，實際以預約系統為準。', notice:'注意事項', fetched:t=>`資料時間 ${t}`,
+    sheet_title:'本儀表板無法直接新增預約',
+    body:'本工具僅供查詢，<b>未與預約系統連動</b>。請點下方按鈕前往預約系統完成預約，實際空位以預約系統為準。',
+    body_slot:n=>`本工具僅供查詢，<b>未與預約系統連動</b>。點下方按鈕會開啟 <b>${n}</b> 的專屬預約頁（老師已選好），請記下<b>日期與時段</b>，進入後選擇方案與時間即可完成預約。實際空位以預約系統為準。`,
+    btn:'前往預約系統', btn_slot:n=>`前往預約（已選 ${n}）`, close:'關閉',
+    wd:i=>'週'+WD_ZH[i], date_s:(m,d,i)=>`${m}/${d}（${WD_ZH[i]}）`, rel:(m,i)=>`${m}/25（${WD_ZH[i]}）13:00`,
+    near:d=>d===0?'今日':d===1?'明天':d===2?'後天':`${d}天後`,
+    trainee:'培訓新師', full_badge:'今日已滿',
+    br:{'南京三民':'南京三民','中山':'中山'},
+    st_allfull:w=>(w.days>=14?'近14天已滿':`到 ${w.to.getMonth()+1}/${w.to.getDate()} 前已滿`)+'，下月預約 25 日 13:00 開放',
+    st_next:n=>`今日已滿，最早在${n}`, st_many:'今日尚有多個空位', st_left:n=>`今日剩下${n}個空位`,
+    st_pick:'請點選老師（可多選最多 3 位）', st_fail:'暫時連不上預約系統，請稍後再試', fail_card:'暫時取得不到資料，請稍後再開一次',
+    empty_open:l=>`下個月預約將於<br><b style="color:var(--cocoa);font-size:13px">${l}</b> 開放`, remind:'加入開放提醒',
+    scan:['讀取空檔資料…','連線預約系統…','查詢兩分店時段…','整理可預約時間…','即將完成…'],
+    dt_title:'DATE / 日期・時段', dt_date:'日期', dt_time:'時段', dt_any:'不限', dt_today:'今日',
+    band:['下午','傍晚','晚間'], dt_clear:'清除', dt_done:'完成',
+    dt_done_t:n=>`完成（${n} 位老師可約）`, dt_done_s:n=>`完成（${n} 個空位）`,
+    st_dt_t:(l,n)=>`${l}｜${n} 位老師可約`, st_dt_s:(l,n)=>`${l}｜${n} 個空位`, st_dt_0:l=>`${l}｜沒有空位`,
+    dt_empty:'這個日期／時段沒有符合的空位', dt_reset:'清除日期時段',
+    aria_group:b=>b+'（點按收合或展開）',
+  },
+  en:{
+    app:'小泰空位儀表板Slot Dashboard', sub_pre:' / Quick check. Book via the ', sub_link:'booking system', sub_post:'',
+    tab_today:'Today / Earliest', tab_staff:'By specialist', dt_btn:'Date & time',
+    foot:'The booking system is final.', notice:'Full FAQ', fetched:t=>`As of ${t}`,
+    sheet_title:'This board cannot take bookings',
+    body:'This board is for checking only and is <b>not linked to the booking system</b>. Tap below to book there; actual availability follows the booking system.',
+    body_slot:n=>`This board is for checking only and is <b>not linked to the booking system</b>. The button below opens the booking page for <b>${n}</b>. <b>Note the date and time</b>, then pick your course and time there.`,
+    btn:'Go to booking system', btn_slot:n=>`Book with ${n}`, close:'Close',
+    wd:i=>WD_EN[i], date_s:(m,d,i)=>`${WD_EN[i]} ${m}/${d}`, rel:(m,i)=>`${WD_EN[i]} ${m}/25, 13:00`,
+    near:d=>d===0?'Today':d===1?'Tomorrow':`In ${d} days`,
+    trainee:'Trainee', full_badge:'',
+    br:{'南京三民':'Nanjing Sanming','中山':'Zhongshan'},
+    st_allfull:w=>(w.days>=14?'Fully booked for 14 days':`Fully booked through ${w.to.getMonth()+1}/${w.to.getDate()}`)+' · next month opens on the 25th, 13:00',
+    st_next:n=>`Full today · earliest ${n.toLowerCase()}`, st_many:'Several slots open today', st_left:n=>`${n} slot${n>1?'s':''} left today`,
+    st_pick:'Pick specialists (up to 3)', st_fail:'Cannot reach the booking data. Please try again later', fail_card:'Could not load the data. Please reopen in a moment.',
+    empty_open:l=>`Bookings for next month open<br><b style="color:var(--cocoa);font-size:13px">${l}</b>`, remind:'Add reminder',
+    scan:['Loading slot data…','Connecting…','Checking both branches…','Sorting open times…','Almost there…'],
+    dt_title:'DATE / TIME', dt_date:'Date', dt_time:'Time of day', dt_any:'Any', dt_today:'Today',
+    band:['Afternoon','Evening','Night'], dt_clear:'Clear', dt_done:'Done',
+    dt_done_t:n=>`Done (${n} specialist${n===1?'':'s'} available)`, dt_done_s:n=>`Done (${n} slot${n===1?'':'s'})`,
+    st_dt_t:(l,n)=>`${l}｜${n} specialist${n===1?'':'s'} free`, st_dt_s:(l,n)=>`${l}｜${n} slot${n===1?'':'s'}`, st_dt_0:l=>`${l}｜No open slots`,
+    dt_empty:'No open slots match this date / time', dt_reset:'Clear date & time',
+    aria_group:b=>b+' (tap to collapse or expand)',
+    bk_title:'Request this slot via LINE', bk_dur:'Duration', bk_name:'Name', bk_tel:'Phone number', bk_cc:'+',
+    bk_note:'This opens our LINE chat with your request filled in. Press Send there. Your booking is confirmed only after we reply.',
+    nt_link:'Please read: booking notes', nt_title:'Before you book', nt_faq:'Full FAQ', nt_ok:'I have read and agree', nt_scroll:'Scroll to the end to continue ↓',
+    nt_items:[
+      ['Double-check your booking date and time','So you do not make a wasted trip.'],
+      ['Please do not arrive more than 10 minutes early','That time is for your specialist to clean up, eat and rest.'],
+      ['More than 10 minutes late','Your session may be shortened so the next guest is not affected.'],
+      ['No credit cards','Cash or bank transfer only.'],
+      ['Cancellation','24+ hours ahead: cancel in the booking system or message us on LINE. Within 24 hours: message us on LINE.'],
+      ['No-show policy','After one no-show or one cancellation within 1 hour of the appointment, we will no longer accept your bookings, out of respect for our specialists and other guests.'],
+      ['Zero tolerance for sexual harassment','If a specialist feels that physical boundaries were crossed beyond what traditional Thai massage requires, that specialist will no longer serve you.'],
+    ],
+    nt_end:'We are by appointment only, and your slot is reserved for you. We look forward to seeing you!',
+    bk_send:'Continue in LINE', bk_hello:'Hello, I would like to book this slot.',
+    bk_e_dur:'Please choose a duration.', bk_e_name:'Please enter your name.', bk_e_tel:'Please enter your phone number with country code (e.g. +1).',
+  },
+  ja:{
+    app:'小泰空位儀表板Slot Dashboard', sub_pre:' / 確認用です。ご予約は', sub_link:'予約システム', sub_post:'で',
+    tab_today:'本日 / 最短', tab_staff:'セラピスト指名', dt_btn:'日時',
+    foot:'実際の空きは予約システムが優先です。', notice:'Full FAQ', fetched:t=>`取得 ${t}`,
+    sheet_title:'この画面からは予約できません',
+    body:'このボードは確認専用で、<b>予約システムとは連動していません</b>。下のボタンから予約システムでご予約ください。実際の空き状況は予約システムが優先です。',
+    body_slot:n=>`このボードは確認専用で、<b>予約システムとは連動していません</b>。下のボタンで <b>${n}</b> の予約ページ（セラピスト選択済み）が開きます。<b>日付と時間</b>を控えてから、コースと時間を選んでご予約ください。`,
+    btn:'予約システムへ', btn_slot:n=>`予約へ進む（${n}）`, close:'閉じる',
+    wd:i=>WD_JA[i]+'曜', date_s:(m,d,i)=>`${m}/${d}（${WD_JA[i]}）`, rel:(m,i)=>`${m}/25（${WD_JA[i]}）13:00`,
+    near:d=>d===0?'今日':d===1?'明日':d===2?'明後日':`${d}日後`,
+    trainee:'研修生', full_badge:'本日満席',
+    br:{'南京三民':'南京三民','中山':'中山'},
+    st_allfull:w=>(w.days>=14?'この先14日間は満席':`${w.to.getMonth()+1}/${w.to.getDate()}まで満席`)+'・翌月分は25日13:00受付開始',
+    st_next:n=>`本日は満席・最短は${n}`, st_many:'本日はまだ空きがあります', st_left:n=>`本日は残り${n}枠`,
+    st_pick:'セラピストを選択（最大3名）', st_fail:'予約データに接続できません。後ほどお試しください', fail_card:'データを取得できませんでした。少し時間をおいて開き直してください',
+    empty_open:l=>`翌月分のご予約は<br><b style="color:var(--cocoa);font-size:13px">${l}</b> 受付開始`, remind:'リマインダー追加',
+    scan:['空き枠データを読込中…','接続中…','両店舗を確認中…','空き時間を整理中…','まもなく完了…'],
+    dt_title:'DATE / 日付・時間帯', dt_date:'日付', dt_time:'時間帯', dt_any:'指定なし', dt_today:'今日',
+    band:['午後','夕方','夜'], dt_clear:'クリア', dt_done:'完了',
+    dt_done_t:n=>`完了（${n}名が予約可）`, dt_done_s:n=>`完了（空き${n}枠）`,
+    st_dt_t:(l,n)=>`${l}｜${n}名が予約可`, st_dt_s:(l,n)=>`${l}｜空き${n}枠`, st_dt_0:l=>`${l}｜空きなし`,
+    dt_empty:'この日付・時間帯に空きはありません', dt_reset:'日時指定をクリア',
+    aria_group:b=>b+'（タップで開閉）',
+    bk_title:'LINEでこの枠を予約依頼', bk_dur:'コース', bk_name:'お名前', bk_tel:'電話番号', bk_cc:'+81',
+    bk_note:'内容が入力された状態でLINEトークが開きます。そのまま送信してください。当店からの返信をもって予約確定となります。',
+    nt_link:'ご予約前の注意事項（必読）', nt_title:'ご予約前にお読みください', nt_faq:'よくある質問（英語）', nt_ok:'確認・同意しました', nt_scroll:'最後までスクロールしてください ↓',
+    nt_items:[
+      ['ご予約の日時をもう一度ご確認ください','無駄足にならないようご注意ください。'],
+      ['10分以上前のご来店はご遠慮ください','セラピストの清掃・食事・休憩の時間です。'],
+      ['10分以上遅れた場合','次のお客様に影響しないよう、施術時間を短縮することがあります。'],
+      ['クレジットカード不可','お支払いは現金または銀行振込のみです。'],
+      ['キャンセルについて','24時間前まで：予約システムまたはLINEでキャンセルしてください。24時間以内：LINEでご連絡ください。'],
+      ['出入り禁止について','無断キャンセル、または1時間以内の直前キャンセルが1回でもあった場合、セラピストと他のお客様への配慮から、以後のご予約はお受けできません。'],
+      ['セクハラ厳禁','タイ古式の施術に必要な範囲を超えて身体的な境界を越えたとセラピストが判断した場合、そのセラピストは今後の担当をお断りします。'],
+    ],
+    nt_end:'当店は完全予約制で、ご予約の時間はお客様のために確保しています。ご来店をお待ちしております。',
+    bk_send:'LINEで送信へ進む', bk_hello:'こんにちは、こちらの枠を予約したいです。',
+    bk_e_dur:'コース（時間）を選択してください。', bk_e_name:'お名前を入力してください。', bk_e_tel:'国番号つきの電話番号を入力してください（例：+81）。',
+  },
+  ko:{
+    app:'小泰空位儀表板Slot Dashboard', sub_pre:' / 조회 전용 · 예약은 ', sub_link:'예약 시스템', sub_post:'에서',
+    tab_today:'오늘 / 가장 빠른', tab_staff:'테라피스트 지정', dt_btn:'날짜·시간',
+    foot:'실제 현황은 예약 시스템 기준입니다.', notice:'Full FAQ', fetched:t=>`기준 ${t}`,
+    sheet_title:'이 화면에서는 예약할 수 없습니다',
+    body:'이 보드는 조회 전용이며 <b>예약 시스템과 연동되어 있지 않습니다</b>. 아래 버튼을 눌러 예약 시스템에서 예약해 주세요. 실제 예약 가능 여부는 예약 시스템 기준입니다.',
+    body_slot:n=>`이 보드는 조회 전용이며 <b>예약 시스템과 연동되어 있지 않습니다</b>. 아래 버튼을 누르면 <b>${n}</b>의 예약 페이지(테라피스트 선택 완료)가 열립니다. <b>날짜와 시간</b>을 기억해 두었다가 코스와 시간을 선택해 예약해 주세요.`,
+    btn:'예약 시스템으로 이동', btn_slot:n=>`예약하기 (${n})`, close:'닫기',
+    wd:i=>WD_KO[i]+'요일', date_s:(m,d,i)=>`${m}/${d}(${WD_KO[i]})`, rel:(m,i)=>`${m}/25(${WD_KO[i]}) 13:00`,
+    near:d=>d===0?'오늘':d===1?'내일':d===2?'모레':`${d}일 후`,
+    trainee:'수습', full_badge:'오늘 마감',
+    br:{'南京三民':'난징싼민','中山':'중산'},
+    st_allfull:w=>(w.days>=14?'앞으로 14일간 예약 마감':`${w.to.getMonth()+1}/${w.to.getDate()}까지 예약 마감`)+' · 다음 달 예약은 25일 13:00 오픈',
+    st_next:n=>`오늘은 마감 · 가장 빠른 시간은 ${n}`, st_many:'오늘 아직 여유가 있습니다', st_left:n=>`오늘 ${n}자리 남음`,
+    st_pick:'테라피스트를 선택하세요 (최대 3명)', st_fail:'예약 데이터에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요', fail_card:'데이터를 불러오지 못했습니다. 잠시 후 다시 열어 주세요',
+    empty_open:l=>`다음 달 예약은<br><b style="color:var(--cocoa);font-size:13px">${l}</b> 오픈`, remind:'오픈 알림 추가',
+    scan:['빈 시간 데이터 불러오는 중…','연결 중…','두 지점 확인 중…','예약 가능 시간 정리 중…','거의 완료…'],
+    dt_title:'DATE / 날짜·시간대', dt_date:'날짜', dt_time:'시간대', dt_any:'전체', dt_today:'오늘',
+    band:['오후','저녁','밤'], dt_clear:'초기화', dt_done:'완료',
+    dt_done_t:n=>`완료 (${n}명 예약 가능)`, dt_done_s:n=>`완료 (${n}자리)`,
+    st_dt_t:(l,n)=>`${l}｜${n}명 예약 가능`, st_dt_s:(l,n)=>`${l}｜${n}자리`, st_dt_0:l=>`${l}｜빈 시간 없음`,
+    dt_empty:'이 날짜·시간대에는 빈 시간이 없습니다', dt_reset:'날짜·시간 초기화',
+    aria_group:b=>b+' (탭하여 접기/펼치기)',
+    bk_title:'LINE으로 이 시간 예약 요청', bk_dur:'코스', bk_name:'이름', bk_tel:'전화번호', bk_cc:'+82',
+    bk_note:'내용이 입력된 상태로 LINE 채팅이 열립니다. 그대로 전송해 주세요. 저희 답장을 받으셔야 예약이 확정됩니다.',
+    nt_link:'예약 전 유의사항 (필독)', nt_title:'예약 전 꼭 읽어 주세요', nt_faq:'자주 묻는 질문 (영어)', nt_ok:'확인 및 동의합니다', nt_scroll:'끝까지 스크롤해 주세요 ↓',
+    nt_items:[
+      ['예약 날짜와 시간을 다시 확인해 주세요','헛걸음하지 않도록 확인 부탁드립니다.'],
+      ['10분 이상 일찍 도착하지 말아 주세요','테라피스트의 정리·식사·휴식 시간입니다.'],
+      ['10분 이상 늦으실 경우','다음 손님께 영향이 없도록 시술 시간이 단축될 수 있습니다.'],
+      ['카드 결제 불가','현금 또는 계좌이체만 가능합니다.'],
+      ['취소 규정','24시간 전까지: 예약 시스템 또는 LINE으로 취소해 주세요. 24시간 이내: LINE으로 연락해 주세요.'],
+      ['예약 제한 규정','노쇼 또는 1시간 이내 임박 취소가 1회라도 있으면, 테라피스트와 다른 손님을 위해 이후 예약을 받지 않습니다.'],
+      ['성희롱 엄금','태국 전통 마사지에 필요한 범위를 넘어 신체적 경계를 침범했다고 테라피스트가 판단하면, 해당 테라피스트는 이후 서비스를 제공하지 않습니다.'],
+    ],
+    nt_end:'저희는 100% 예약제로 운영되며, 예약하신 시간은 고객님을 위해 비워 둡니다. 방문을 기다리겠습니다!',
+    bk_send:'LINE에서 보내기', bk_hello:'안녕하세요, 이 시간으로 예약하고 싶습니다.',
+    bk_e_dur:'코스(시간)를 선택해 주세요.', bk_e_name:'이름을 입력해 주세요.', bk_e_tel:'국가번호를 포함한 전화번호를 입력해 주세요 (예: +82).',
+  },
+};
+function T(k, ...a) {
+  const v = (I18N[LANG][k] !== undefined) ? I18N[LANG][k] : I18N.zh[k];
+  return typeof v === 'function' ? v(...a) : v;
+}
+function brName(b) { return T('br')[b] || b; }
+function setText(id, txt) { const el = document.getElementById(id); if (el) el.textContent = txt; }
+function applyStatic() {
+  document.documentElement.lang = { zh:'zh-TW', en:'en', ja:'ja', ko:'ko' }[LANG];
+  if ((LANG==='ja' || LANG==='ko') && !document.getElementById('font-'+LANG)) {
+    const l = document.createElement('link'); l.id = 'font-'+LANG; l.rel = 'stylesheet';
+    l.href = `https://fonts.googleapis.com/css2?family=Noto+Sans+${LANG==='ja'?'JP':'KR'}:wght@400;500;700&display=swap`;
+    document.head.appendChild(l);
+  }
+  document.title = T('app');
+  setText('i-app', T('app'));
+  const sub = document.getElementById('i-sub');
+  if (sub) { sub.style.display = LANG === 'zh' ? '' : 'none'; const a = sub.querySelector('a'); a.textContent = T('sub_link'); sub.replaceChildren(T('sub_pre'), a, T('sub_post')); }
+  setText('i-tab-today', T('tab_today')); setText('i-tab-staff', T('tab_staff'));
+  document.querySelectorAll('.cbx-branch').forEach(el => { el.querySelector('.cbx-label').textContent = brName(el.dataset.branch); });
+  setText('i-foot', LANG === 'zh' ? T('foot') : ''); { const nt = document.getElementById('i-notice');   // 外語版＝外開 FAQ 的連結，加上外開箭頭
+    if (LANG === 'zh') nt.textContent = T('notice');
+    else nt.innerHTML = `${T('notice')}<svg width="8" height="8" viewBox="0 0 8 8" fill="none" style="margin-left:3px;vertical-align:1px"><path d="M2.6 1H7v4.4M7 1 1 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+  setText('sheet-title', T('sheet_title')); setText('i-close', T('close'));
+  setText('dt-title', T('dt_title')); setText('dt-date-l', T('dt_date')); setText('dt-time-l', T('dt_time')); setText('dt-clear', T('dt_clear'));
+  const lr = document.getElementById('lang-row');
+  if (lr) lr.innerHTML = Object.keys(LANG_NAMES).map(l => `<a class="${l===LANG?'on':''}" onclick="setLang('${l}')">${LANG_NAMES[l]}</a>`).join('');
+  updateDTBtn();
+}
+let _sheetIdx = null;
+function toggleLangMenu(e) {
+  if (e) e.stopPropagation();
+  const on = document.getElementById('lang-row').classList.toggle('show');
+  document.getElementById('lang-btn').classList.toggle('open', on);
+}
+function closeLangMenu() {
+  document.getElementById('lang-row').classList.remove('show');
+  document.getElementById('lang-btn').classList.remove('open');
+}
+document.addEventListener('click', e => { if (!e.target.closest('#lang-row')) closeLangMenu(); });
+function setLang(l) {
+  closeLangMenu(); closeNotes();
+  LANG = l;
+  try { localStorage.setItem('slotdash_lang', l); } catch(e) {}
+  applyStatic();
+  if (!allData) return;
+  buildStaffTabs(); renderToday(); renderStaff(); setFetchedAt(allData.fetchedAt);
+  if (document.getElementById('mask').classList.contains('show')) openSheet(_sheetIdx);
+}
 const BRANCH_SHORT = { '南京三民':'南京三民', '中山':'中山' }; // 南京三民為整體，不簡稱
 const BRANCH_MAP = {
   '南京三民':'https://maps.app.goo.gl/i3ZkLhMTygNhrhEs7',
@@ -370,8 +704,8 @@ function dateMeta(dateKey) {
   const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const diff = Math.round((date - base) / 86400000);
   const mmdd = `${date.getMonth()+1}月${date.getDate()}日`;
-  const wd   = `週${WD[date.getDay()]}`;
-  const nearLabel = diff===0?'今日':diff===1?'明天':diff===2?'後天':`${diff}天後`;
+  const wd   = T('wd', date.getDay());
+  const nearLabel = T('near', diff);
   return { mmdd, wd, nearLabel, diff };
 }
 function todayKey() {
@@ -622,8 +956,8 @@ function showScanning(containerId, statusId) {
   overlay.innerHTML = `
     <div class="scan-spin"></div>
     <div style="text-align:center">
-      <div id="${msgId}" style="font-size:12px;color:var(--gray);transition:opacity .2s">${SCAN_STEPS[0].msg}</div>
-      <div id="${subId}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
+      <div id="${msgId}" style="font-size:12px;color:var(--gray);transition:opacity .2s">${T('scan')[0]}</div>
+      <div id="${subId}" style="font-family:var(--mono);font-size:10px;color:var(--gray3);letter-spacing:.04em;margin-top:2px">${SCAN_STEPS[0].sub}</div>
     </div>
     <div style="width:100px;height:2px;background:var(--bg2);border-radius:2px;overflow:hidden">
       <div id="${barId}" style="height:100%;width:5%;background:var(--clay);border-radius:2px;transition:width 1.8s cubic-bezier(.4,0,.2,1)"></div>
@@ -638,7 +972,7 @@ function showScanning(containerId, statusId) {
     const msg = document.getElementById(msgId);
     const sub = document.getElementById(subId);
     const bar = document.getElementById(barId);
-    if (msg) { msg.style.opacity='0'; setTimeout(()=>{ msg.textContent=s.msg; msg.style.opacity='1'; },180); }
+    if (msg) { msg.style.opacity='0'; setTimeout(()=>{ msg.textContent=T('scan')[step]; msg.style.opacity='1'; },180); }
     if (sub) sub.textContent = s.sub;
     if (bar) bar.style.width = s.pct + '%';
   }, 2000);
@@ -748,23 +1082,23 @@ function renderStatus(elId, text, color) {
   const step = () => {
     if (i >= text.length) { _statusTyper[elId] = null; _scheduleCaretFreeze(elId, caret); return; }
     span.textContent += text.charAt(i++);
-    _statusTyper[elId] = setTimeout(step, 55 + Math.random() * 70); // 約 55–125ms/字
+    _statusTyper[elId] = setTimeout(step, LANG==='en' ? 20 + Math.random() * 30 : 55 + Math.random() * 70); // 約 55–125ms/字（英文字母多，加快）
   };
   step();
 }
 function branchPrefix() {
-  return selectedBranches.length===1 ? `${selectedBranches[0]}｜` : '';
+  return selectedBranches.length===1 ? `${brName(selectedBranches[0])}｜` : '';
 }
 function computeTodayStatus(slots) {
   const tk = todayKey();
   const todaySlots = slots.filter(s => s.dateKey === tk);
   if (todaySlots.length === 0) {
     const fut = slots.find(s => s.dateKey !== tk);
-    if (!fut) return { text:branchPrefix()+fullHead()+'，下月預約 25 日 13:00 開放', color:'var(--red)' };
-    return { text:`${branchPrefix()}今日已滿，最早在${dateMeta(fut.dateKey).nearLabel}`, color:'var(--red)' };
+    if (!fut) return { text:branchPrefix()+T('st_allfull', windowInfo()), color:'var(--red)' };
+    return { text:branchPrefix()+T('st_next', dateMeta(fut.dateKey).nearLabel), color:'var(--red)' };
   }
-  if (todaySlots.length >= 4) return { text:branchPrefix()+'今日尚有多個空位', color:'var(--green)' };
-  return { text:`${branchPrefix()}今日剩下${todaySlots.length}個空位`, color:'var(--red)' };
+  if (todaySlots.length >= 4) return { text:branchPrefix()+T('st_many'), color:'var(--green)' };
+  return { text:branchPrefix()+T('st_left', todaySlots.length), color:'var(--red)' };
 }
 function computeStaffStatus(slots, staffName) {
   const tk = todayKey();
@@ -787,9 +1121,9 @@ function cardHTML(slot, rank, flipCls, todayFull) {
   const durPills = slot.durations.map(d =>
     `<span class="dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
   ).join('');
-  const badgeHTML  = slot.isTrainee ? `<span class="trainee-badge">培訓新師</span>` : '';
+  const badgeHTML  = slot.isTrainee ? `<span class="trainee-badge">${T('trainee')}</span>` : '';
   const bcCls      = slot.branch==='南京三民' ? 'bc-nj' : 'bc-zs';
-  const branchName = BRANCH_SHORT[slot.branch] || slot.branch;
+  const branchName = brName(slot.branch);
   return `
   <div class="card">
     <div class="card-inner ${flipCls}" onclick="openSheet(${rank-1})">
@@ -801,7 +1135,7 @@ function cardHTML(slot, rank, flipCls, todayFull) {
       <div class="card-body">
         <div class="card-near-row">
           <span class="near-badge ${isToday?'today':'other'}">${nearLabel}</span>
-          ${(!isToday&&todayFull)?'<span class="full-badge">今日已滿</span>':''}
+          ${(!isToday&&todayFull&&T('full_badge'))?`<span class="full-badge">${T('full_badge')}</span>`:''}
         </div>
         <div class="card-when">
           <span class="card-date"><span class="card-mmdd">${mShort}</span><span class="card-wd">${wd}</span></span>
@@ -813,23 +1147,82 @@ function cardHTML(slot, rank, flipCls, todayFull) {
     </div>
   </div>`;
 }
+// v5.5：卡片列可左右滑動看全部。一次先畫 CARD_CHUNK 張，滑到尾端再補（指定老師可能有數百筆）
+const CARD_CHUNK = 12;
+const FLIP = ['flip-1','flip-2','flip-3'];
 function paintCards(containerId, slots) {
+  const el = document.getElementById(containerId);
   const tk = todayKey();
-  const todayFull = !slots.some(s => s.dateKey === tk);
-  const padded = [...slots]; while(padded.length<3) padded.push(null);
-  const classes = ['flip-1','flip-2','flip-3'];
-  document.getElementById(containerId).innerHTML =
-    padded.map((s,i) => cardHTML(s, i+1, classes[i], todayFull)).join('');
+  el._slots = slots;
+  el._todayFull = !dtActive() && !slots.some(s => s.dateKey === tk);
+  const first = slots.slice(0, CARD_CHUNK);
+  el._painted = first.length;
+  const padded = [...first]; while(padded.length<3) padded.push(null);
+  el.innerHTML = padded.map((s,i) => cardHTML(s, i+1, FLIP[i]||'', el._todayFull)).join('');
+  el.scrollLeft = 0;
+  updatePager(containerId);
+}
+// 卡片區放非卡片內容（空狀態／錯誤訊息）時，一併清掉分頁指示
+function setRowHTML(containerId, html) {
+  const el = document.getElementById(containerId);
+  el._slots = []; el._painted = 0;
+  el.innerHTML = html; el.scrollLeft = 0;
+  updatePager(containerId);
+}
+function cardStep(el) { const c = el.querySelector('.card'); return c ? c.getBoundingClientRect().width + 6 : 0; }
+function appendCards(el) {
+  const all = el._slots || [];
+  if (el._painted >= all.length) return;
+  const from = el._painted, to = Math.min(from + CARD_CHUNK, all.length);
+  let html = '';
+  for (let i = from; i < to; i++) html += cardHTML(all[i], i+1, '', el._todayFull);
+  el.insertAdjacentHTML('beforeend', html);
+  el._painted = to;
+}
+// 狀態列右側：‹ 1–3 / 15 ›（目前看到第幾張／共幾張，箭頭可點）
+function updatePager(containerId) {
+  const el = document.getElementById(containerId);
+  const label = document.getElementById(containerId==='cards-today' ? 'label-today' : 'label-staff');
+  if (!label) return;
+  const n = (el._slots || []).length;
+  if (!n) { label.innerHTML = ''; return; }
+  const step = cardStep(el);
+  const i = step ? Math.min(Math.max(Math.round(el.scrollLeft / step), 0), Math.max(n-3, 0)) : 0;
+  const a = i+1, b = Math.min(i+3, n);
+  label.innerHTML = `<span class="pg"><span class="pg-a${i>0?'':' off'}" onclick="pageCards('${containerId}',-1)">‹</span>` +
+    `<span class="pg-n">${a===b ? a : a+'–'+b} / ${n}</span>` +
+    `<span class="pg-a${b<n?'':' off'}" onclick="pageCards('${containerId}',1)">›</span></span>`;
+}
+function pageCards(containerId, dir) {
+  const el = document.getElementById(containerId);
+  if (dir > 0) appendCards(el);
+  el.scrollBy({ left: dir * 3 * cardStep(el), behavior:'smooth' });
+}
+function onCardsScroll(containerId) {
+  const el = document.getElementById(containerId);
+  if (el._raf) return;
+  el._raf = requestAnimationFrame(() => {
+    el._raf = 0;
+    if (el.scrollLeft + el.clientWidth * 2 > el.scrollWidth) appendCards(el);
+    updatePager(containerId);
+  });
 }
 // 近 14 天完全沒空位時的空狀態（附開放時間 +「前往預約系統」+「加入開放提醒」）
 function emptyStateHTML() {
   const lbl = releaseLabel(nextReleaseDate());
   return `<div style="width:100%;padding:16px 16px 10px;text-align:center">
-    <div class="empty-open">下個月預約將於<br><b style="color:var(--cocoa);font-size:13px">${lbl}</b> 開放</div>
+    <div class="empty-open">${T('empty_open', lbl)}</div>
     <div class="empty-actions">
-      <button class="empty-book-btn" onclick="openSheet(null)">前往預約系統</button>
-      <button class="empty-remind-btn" onclick="addReminder()">${BELL}加入開放提醒</button>
+      <button class="empty-book-btn" onclick="openSheet(null)">${T('btn')}</button>
+      <button class="empty-remind-btn" onclick="addReminder()">${BELL}${T('remind')}</button>
     </div>
+  </div>`;
+}
+// 有套日期／時段篩選卻沒結果時的空狀態（附一鍵清除）
+function dtEmptyHTML() {
+  return `<div style="width:100%;padding:26px 16px 10px;text-align:center">
+    <div class="empty-open">${T('dt_empty')}</div>
+    <div class="empty-actions"><button class="empty-remind-btn" onclick="clearDT()">${T('dt_reset')}</button></div>
   </div>`;
 }
 function setFetchedAt(isoString) {
@@ -839,7 +1232,7 @@ function setFetchedAt(isoString) {
   const hhmm = d.toLocaleTimeString('zh-TW', {
     timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', hour12: false
   });
-  el.textContent = `資料時間 ${hhmm}`;
+  el.textContent = T('fetched', hhmm);
 }
 function applyFilters(slots) {
   return (slots || [])
@@ -849,7 +1242,7 @@ function applyFilters(slots) {
 
 // ── 今日 / 最早時段 ──────────────────────────────────────────
 function renderToday() {
-  const allSlots = applyFilters(allData.slots).filter(s => todayStaff.has(s.staffId));
+  const allSlots = applyDT(applyFilters(allData.slots)).filter(s => todayStaff.has(s.staffId));
   const seen = new Set();
   const earliestPerTeacher = allSlots.filter(s => {
     const k = s.staffId || s.teacher;
@@ -861,18 +1254,15 @@ function renderToday() {
     if (a.dateKey !== b.dateKey) return a.dateKey < b.dateKey ? -1 : 1;
     return a.time < b.time ? -1 : 1;
   });
-  const status = computeTodayStatus(earliestPerTeacher);
+  const n = earliestPerTeacher.length;
+  const status = !dtActive() ? computeTodayStatus(earliestPerTeacher)
+    : n ? { text:T('st_dt_t', dtLabel(), n), color:'var(--green)' }
+        : { text:T('st_dt_0', dtLabel()), color:'var(--red)' };
   renderStatus('status-today', status.text, status.color);
-  const label = document.getElementById('label-today');
-  const top3 = earliestPerTeacher.slice(0, 3);
-  tabSlots.today = top3;
-  if (top3.length === 0) {
-    if (label) label.textContent = '';
-    document.getElementById('cards-today').innerHTML = emptyStateHTML();
-    return;
-  }
-  if (label) label.textContent = `最早可約 · ${top3.length} 位老師`;
-  paintCards('cards-today', top3);
+  // v5.5：不再只取前 3 位——每位老師最早一筆全部列出，左右滑動瀏覽
+  tabSlots.today = earliestPerTeacher;
+  if (n === 0) { setRowHTML('cards-today', dtActive() ? dtEmptyHTML() : emptyStateHTML()); return; }
+  paintCards('cards-today', earliestPerTeacher);
 }
 
 // ── 培訓新師時長鎖定 ─────────────────────────────────────────
@@ -932,40 +1322,136 @@ function syncCapsuleSelection() {
   });
 }
 function renderStaff() {
-  const label = document.getElementById('label-staff');
   if (staffPicked.length === 0) {
-    renderStatus('status-staff', '請點選老師（可多選最多 3 位）', 'var(--gray)');
-    if (label) label.textContent = '';
+    renderStatus('status-staff', T('st_pick'), 'var(--gray)');
     tabSlots.staff = [];
     paintCards('cards-staff', []); // 顯示虛線空卡片，不重複文字
     return;
   }
   const durOk = x => x.durations.some(d => selectedDurs.includes(d));
-  const pool = allData.slots
-    .filter(x => staffPicked.includes(x.staffId) && durOk(x))
+  // v5.5：所選老師的全部空位依時間排列，左右滑動瀏覽（原本只取最早 3 筆）
+  const pool = applyDT(allData.slots.filter(x => staffPicked.includes(x.staffId) && durOk(x)))
     .sort((a,b) => a.dateKey!==b.dateKey ? (a.dateKey<b.dateKey?-1:1) : (a.time<b.time?-1:1));
-  // 先讓每位所選老師至少出現最早一筆，名額未滿再用最早的往下補，最多 3 張
-  const chosen = [], seen = new Set();
-  for (const x of pool) { if (!seen.has(x.staffId)) { chosen.push(x); seen.add(x.staffId); } if (chosen.length>=3) break; }
-  if (chosen.length < 3) { for (const x of pool) { if (chosen.indexOf(x)>=0) continue; chosen.push(x); if (chosen.length>=3) break; } }
-  chosen.sort((a,b) => a.dateKey!==b.dateKey ? (a.dateKey<b.dateKey?-1:1) : (a.time<b.time?-1:1));
   const tk = todayKey();
   const todayN = pool.filter(x => x.dateKey===tk).length;
   let status;
-  if (pool.length === 0)  status = { text:fullHead()+'，下月預約 25 日 13:00 開放', color:'var(--red)' };
-  else if (todayN === 0)  status = { text:`今日已滿，最早在${dateMeta(pool[0].dateKey).nearLabel}`, color:'var(--red)' };
-  else if (todayN >= 4)   status = { text:'今日尚有多個空位', color:'var(--green)' };
-  else                    status = { text:`今日剩下${todayN}個空位`, color:'var(--red)' };
+  if (dtActive())         status = pool.length ? { text:T('st_dt_s', dtLabel(), pool.length), color:'var(--green)' }
+                                               : { text:T('st_dt_0', dtLabel()), color:'var(--red)' };
+  else if (pool.length === 0) status = { text:T('st_allfull', windowInfo()), color:'var(--red)' };
+  else if (todayN === 0)  status = { text:T('st_next', dateMeta(pool[0].dateKey).nearLabel), color:'var(--red)' };
+  else if (todayN >= 4)   status = { text:T('st_many'), color:'var(--green)' };
+  else                    status = { text:T('st_left', todayN), color:'var(--red)' };
   renderStatus('status-staff', status.text, status.color);
-  tabSlots.staff = chosen;
-  if (chosen.length === 0) {
-    if (label) label.textContent = '';
-    document.getElementById('cards-staff').innerHTML = emptyStateHTML();
-    return;
-  }
-  if (label) label.textContent = `已選 ${staffPicked.length} 位 · 最早 ${chosen.length} 筆`;
-  paintCards('cards-staff', chosen);
+  tabSlots.staff = pool;
+  if (pool.length === 0) { setRowHTML('cards-staff', dtActive() ? dtEmptyHTML() : emptyStateHTML()); return; }
+  paintCards('cards-staff', pool);
 }
+
+// ── v5.5 日期／時段篩選（兩個分頁共用；面板開著時即時套用）──────────
+let filterDate = null;                    // 'YYYY-MM-DD' 或 null＝不限
+let filterFrom = null, filterTo = null;   // 開始時間區間（分鐘）；null＝該端不限
+let T_MIN = 13*60, T_MAX = 23*60 + 30;    // 拉桿兩端，載入資料後依實際最早／最晚時段校正
+const T_STEP = 30;
+const toMin = t => { const [h, m] = t.split(':').map(Number); return h*60 + m; };
+const fmtMin = v => `${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;
+function timeBounds() {
+  let lo = Infinity, hi = 0;
+  for (const s of (allData ? allData.slots : [])) { const v = toMin(s.time); if (v < lo) lo = v; if (v > hi) hi = v; }
+  if (hi) { T_MIN = Math.floor(lo/60)*60; T_MAX = Math.ceil(hi/T_STEP)*T_STEP; }
+}
+function timeActive() { return filterFrom !== null || filterTo !== null; }
+function timeLabel() { return `${fmtMin(filterFrom === null ? T_MIN : filterFrom)}–${fmtMin(filterTo === null ? T_MAX : filterTo)}`; }
+function dtActive() { return !!filterDate || timeActive(); }
+function inBands(time) {
+  if (!timeActive()) return true;
+  const v = toMin(time);
+  return (filterFrom === null || v >= filterFrom) && (filterTo === null || v <= filterTo);
+}
+function applyDT(slots) {
+  return dtActive() ? slots.filter(s => (!filterDate || s.dateKey === filterDate) && inBands(s.time)) : slots;
+}
+function dateShort(dateKey) {
+  const [y,m,d] = dateKey.split('-').map(Number);
+  return dateKey === todayKey() ? T('dt_today') : T('date_s', m, d, new Date(y, m-1, d).getDay());
+}
+function dtLabel() {
+  const parts = [];
+  if (filterDate) parts.push(dateShort(filterDate));
+  if (timeActive()) parts.push(timeLabel());
+  return parts.join(' ');
+}
+function updateDTBtn() {
+  const btn = document.getElementById('dt-btn'); if (!btn) return;
+  btn.classList.toggle('on', dtActive());
+  setText('dt-btn-t', dtActive() ? dtLabel() : T('dt_btn'));
+}
+// 目前分頁在「日期時段以外」的篩選條件下有哪些空位（用來把沒空位的日期／時段變淡）
+function dtBasePool() {
+  if (!allData) return [];
+  if (currentTab === 'staff' && staffPicked.length)
+    return allData.slots.filter(x => staffPicked.includes(x.staffId) && x.durations.some(d => selectedDurs.includes(d)));
+  const pool = applyFilters(allData.slots);
+  return currentTab === 'today' ? pool.filter(s => todayStaff.has(s.staffId)) : pool;
+}
+function renderDT() {
+  const pool = dtBasePool();
+  const byDate = {};
+  for (const s of pool) if (inBands(s.time)) byDate[s.dateKey] = (byDate[s.dateKey] || 0) + 1;
+  const now = new Date(), w = windowInfo(), p2 = x => String(x).padStart(2,'0');
+  let days = '';
+  for (let i = 0; i < w.days; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    const key = `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+    const num = (i === 0 || d.getDate() === 1) ? `${d.getMonth()+1}/${d.getDate()}` : d.getDate();
+    days += `<button type="button" class="dt-day${filterDate===key?' on':''}${byDate[key]?'':' none'}" onclick="toggleDTDate('${key}')">` +
+      `<span class="w">${i===0 ? T('dt_today') : T('wd', d.getDay())}</span><span class="d">${num}</span></button>`;
+  }
+  document.getElementById('dt-days').innerHTML = days;
+  setText('dt-date-v', filterDate ? dateShort(filterDate) : T('dt_any'));
+  setText('dt-time-v', timeActive() ? timeLabel() : T('dt_any'));
+  document.getElementById('dt-clear').disabled = !dtActive();
+  const n = (tabSlots[currentTab] || []).length;
+  setText('dt-done', (currentTab === 'staff' && !staffPicked.length) ? T('dt_done')
+    : T(currentTab === 'staff' ? 'dt_done_s' : 'dt_done_t', n));
+}
+function afterDT() {
+  updateDTBtn();
+  if (!allData) return;
+  renderToday(); renderStaff();
+  if (document.getElementById('dt-mask').classList.contains('show')) renderDT();
+}
+function toggleDTDate(key) { filterDate = (filterDate === key) ? null : key; afterDT(); }
+// 區間拉桿：兩個 range 疊在一起（左把手＝最早開始、右把手＝最晚開始）
+function paintRange() {
+  const a = filterFrom === null ? T_MIN : filterFrom, b = filterTo === null ? T_MAX : filterTo, span = (T_MAX - T_MIN) || 1;
+  const fill = document.getElementById('dt-fill');
+  fill.style.left  = `calc(11px + ${(a - T_MIN) / span} * (100% - 22px))`;
+  fill.style.right = `calc(11px + ${(T_MAX - b) / span} * (100% - 22px))`;
+  document.getElementById('dt-from').style.zIndex = (a > T_MIN + span / 2) ? 3 : 1;   // 兩把手疊在右端時讓左把手仍拉得動
+  document.getElementById('dt-to').style.zIndex = 2;
+}
+function setupRange() {
+  const f = document.getElementById('dt-from'), t = document.getElementById('dt-to');
+  for (const el of [f, t]) { el.min = T_MIN; el.max = T_MAX; el.step = T_STEP; }
+  f.value = filterFrom === null ? T_MIN : filterFrom;
+  t.value = filterTo === null ? T_MAX : filterTo;
+  setText('dt-lo', fmtMin(T_MIN)); setText('dt-hi', fmtMin(T_MAX));
+  paintRange();
+}
+let _dtRaf = 0;
+function onDTRange(which) {
+  const f = document.getElementById('dt-from'), t = document.getElementById('dt-to');
+  let a = +f.value, b = +t.value;
+  if (a > b) { if (which === 'from') f.value = a = b; else t.value = b = a; }
+  filterFrom = a <= T_MIN ? null : a;
+  filterTo   = b >= T_MAX ? null : b;
+  paintRange();
+  setText('dt-time-v', timeActive() ? timeLabel() : T('dt_any'));
+  if (!_dtRaf) _dtRaf = setTimeout(() => { _dtRaf = 0; afterDT(); }, 40);
+}
+function clearDT() { filterDate = null; filterFrom = filterTo = null; setupRange(); afterDT(); }
+function openDT() { if (!allData) return; setupRange(); renderDT(); document.getElementById('dt-mask').classList.add('show'); }
+function closeDT() { document.getElementById('dt-mask').classList.remove('show'); }
 
 const collapsedBranches = new Set(['南京三民','中山']); // 今日模式預設全部疊合；指定老師模式進入時展開
 function applyCollapseDefault(tab) {
@@ -994,8 +1480,8 @@ function buildStaffTabs() {
     const label = document.createElement('button');
     label.className = 'stab-group-label';
     label.type = 'button';
-    label.setAttribute('aria-label', b + '（點按收合或展開）');
-    label.appendChild(document.createTextNode(b));
+    label.setAttribute('aria-label', T('aria_group', brName(b)));
+    label.appendChild(document.createTextNode(brName(b)));
     const facepile = document.createElement('span');
     facepile.className = 'stab-facepile';
     facepile.setAttribute('aria-hidden','true');
@@ -1033,7 +1519,7 @@ function buildStaffTabs() {
       av.onerror = function(){ this.remove(); };
       btn.appendChild(av);
       btn.appendChild(document.createTextNode(s.name));
-      if (s.isTrainee) { const tg = document.createElement('span'); tg.className = 'stab-tr-tag'; tg.textContent = '培訓新師'; btn.appendChild(tg); }
+      if (s.isTrainee) { const tg = document.createElement('span'); tg.className = 'stab-tr-tag'; tg.textContent = T('trainee'); btn.appendChild(tg); }
       btn.onclick = () => onStaffCapsule(s.staffId);
       pillsInner.appendChild(btn);
     });
@@ -1051,6 +1537,7 @@ function openSheet(slotIndex) {
   const body  = document.getElementById('sheet-body');
   const btn   = document.getElementById('sheet-btn');
   const slots = tabSlots[currentTab] || [];
+  _sheetIdx = slotIndex;
   sheetSlot = (slotIndex !== null && slots[slotIndex]) ? slots[slotIndex] : null;
 
   if (sheetSlot) {
@@ -1060,7 +1547,7 @@ function openSheet(slotIndex) {
       `<span class="slot-dur-pill ${DUR_CONFIG[d].cls}">${DUR_CONFIG[d].short}</span>`
     ).join('');
     const traineeBadge = slot.isTrainee
-      ? `<span class="slot-trainee-badge">培訓新師</span>` : '';
+      ? `<span class="slot-trainee-badge">${T('trainee')}</span>` : '';
     const bcCls  = slot.branch === '南京三民' ? 'bc-nj' : 'bc-zs';
     const mapUrl = BRANCH_MAP[slot.branch] || '';
     const [,mN,dN] = slot.dateKey.split('-').map(Number);
@@ -1068,8 +1555,8 @@ function openSheet(slotIndex) {
     const avImg = slot.avatar ? `<img class="slot-av" src="${slot.avatar}" onerror="this.remove()">` : '';
     const extSvg = `<svg class="ext" width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M2.6 1H7v4.4M7 1 1 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     const branchLink = mapUrl
-      ? `<a class="slot-branch-link ${bcCls}" href="${mapUrl}" onclick="return openMap('${mapUrl}')">${slot.branch}${extSvg}</a>`
-      : `<span class="slot-branch-plain">${slot.branch}</span>`;
+      ? `<a class="slot-branch-link ${bcCls}" href="${mapUrl}" onclick="return openMap('${mapUrl}')">${brName(slot.branch)}${extSvg}</a>`
+      : `<span class="slot-branch-plain">${brName(slot.branch)}</span>`;
     wrap.innerHTML = `
       <div class="slot-summary">
         <div class="slot-timecol">
@@ -1081,17 +1568,24 @@ function openSheet(slotIndex) {
           <div class="slot-meta-name">${avImg}${slot.teacher}${traineeBadge}</div>
           <div class="slot-meta-date">${nearLabel}　${dShort}　${wd}</div>
         </div>
-        <div class="slot-dur-pills">${pills}</div>
+        ${LANG==='zh' ? `<div class="slot-dur-pills">${pills}</div>` : ''}
       </div>`;
-    body.innerHTML =
-      `本工具僅供查詢，<b>未與預約系統連動</b>。點下方按鈕會開啟 <b>${slot.teacher}</b> 的專屬預約頁（老師已選好），` +
-      `請記下<b>日期與時段</b>，進入後選擇方案與時間即可完成預約。實際空位以預約系統為準。`;
-    btn.textContent = `前往預約（已選 ${slot.teacher}）`;
+    if (LANG === 'zh') {
+      body.innerHTML = T('body_slot', slot.teacher);
+      btn.textContent = T('btn_slot', slot.teacher);
+    } else {
+      // v5.6：外語客人不導去預約系統，改填姓名＋含國碼電話，帶到 LINE 官方帳號由 AI 小編代客登記
+      _bkDur = slot.durations.length === 1 ? slot.durations[0] : null;
+      body.innerHTML = bookingFormHTML(slot);
+      btn.textContent = T('bk_send');
+      autoNotesOnce();
+    }
+    setText('sheet-title', LANG === 'zh' ? T('sheet_title') : T('bk_title'));
   } else {
     wrap.innerHTML = '';
-    body.innerHTML =
-      `本工具僅供查詢，<b>未與預約系統連動</b>。請點下方按鈕前往預約系統完成預約，實際空位以預約系統為準。`;
-    btn.textContent = '前往預約系統';
+    body.innerHTML = T('body');
+    btn.textContent = T('btn');
+    setText('sheet-title', T('sheet_title'));
   }
   document.getElementById('mask').classList.add('show');
 }
@@ -1118,8 +1612,7 @@ function nextReleaseDate() {
   return d;
 }
 function releaseLabel(d) {
-  const wd = ['日','一','二','三','四','五','六'][d.getDay()];
-  return `${d.getMonth()+1}/25（${wd}）13:00`;
+  return T('rel', d.getMonth()+1, d.getDay());
 }
 // 靜態每月循環 .ics（LINE 內強制外開 Safari 才能穩定跳「加入行事曆」；桌面直接開）
 function addReminder() {
@@ -1130,7 +1623,106 @@ function addReminder() {
     else window.open(url, '_blank');
   } catch(e) { window.open(url, '_blank'); }
 }
+// ── v5.6 外語代客登記：表單 → 一段文字 → LINE 官方帳號聊天室（客人按送出）→ AI 小編接手登記 ──
+const OA_ID = '@270vnkfr';   // 小泰空 LINE 官方帳號（AI 小編收訊的那一個）
+let _bkDur = null;
+function bookingFormHTML(slot) {
+  const durs = slot.durations.map(d =>
+    `<button type="button" class="bk-dur${_bkDur===d?' on':''}" data-d="${d}" onclick="pickBkDur(${d})">${d}min</button>`).join('');
+  return `<div class="bk">
+    <div class="bk-row"><span class="bk-l">${T('bk_dur')}</span>${durs}</div>
+    <div class="bk-row"><input class="bk-in" id="bk-name" type="text" autocomplete="name" maxlength="40" placeholder="${T('bk_name')}"></div>
+    <div class="bk-row"><input class="bk-in cc" id="bk-cc" type="tel" maxlength="5" value="${T('bk_cc')}" aria-label="Country code"><input class="bk-in" id="bk-tel" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="15" placeholder="${T('bk_tel')}"></div>
+    <div class="bk-err" id="bk-err"></div>
+    <div class="bk-note">${T('bk_note')}</div>
+    <div class="bk-notes${_notesRead?' read':''}" id="bk-notes" onclick="openNotes()"><span>${_notesRead?'✓':'ⓘ'}</span><span>${T('nt_link')}</span><span class="go">›</span></div>
+  </div>`;
+}
+// 注意事項泡泡：外語預約表單第一次打開時自動跳出一次（每次開啟工具一次），之後點紅色那一列可再看
+const FAQ_URL = 'https://nick810303.github.io/spacethai_FAQ/?lang=en';   // FAQ 頁目前只有中／英，日韓也導英文版
+function openNotes() {
+  setText('nt-title', T('nt_title')); setText('nt-faq', T('nt_faq'));
+  const body = document.getElementById('nt-body');
+  body.innerHTML = T('nt_items').map(x => `<div class="nt-item"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('') +
+    `<div class="nt-end">${T('nt_end')}</div>`;
+  body.scrollTop = 0;
+  document.getElementById('nt-mask').classList.add('show');
+  _notesEnd = _notesRead;                    // 已確認過的人再打開，不用重滑
+  checkNotesEnd();
+  // 保險：除了 scroll 事件，彈窗開著時每 250ms 也量一次（有些內嵌瀏覽器的捲動事件不可靠；大螢幕不用捲時也靠這個直接亮）
+  clearInterval(_notesTimer);
+  _notesTimer = setInterval(() => {
+    if (_notesEnd || !document.getElementById('nt-mask').classList.contains('show')) return clearInterval(_notesTimer);
+    checkNotesEnd();
+  }, 250);
+}
+let _notesTimer = 0;
+// v5.10：強制讀完——滑到最底「確認」才亮；按了確認才算讀過，沒讀過不能送出預約
+let _notesRead = false, _notesEnd = false;
+function checkNotesEnd() {
+  const body = document.getElementById('nt-body'), ok = document.getElementById('nt-ok');
+  if (!_notesEnd && body.clientHeight > 0 && body.scrollTop + body.clientHeight >= body.scrollHeight - 6) _notesEnd = true;
+  ok.disabled = !_notesEnd;
+  ok.textContent = _notesEnd ? T('nt_ok') : T('nt_scroll');
+}
+function confirmNotes() {
+  if (!_notesEnd) return;
+  _notesRead = true;
+  const row = document.getElementById('bk-notes');
+  if (row) { row.classList.add('read'); row.firstElementChild.textContent = '✓'; }
+  setText('bk-err', '');
+  closeNotes();
+}
+function closeNotes() { document.getElementById('nt-mask').classList.remove('show'); }
+function openFAQ() {
+  try {
+    if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) liff.openWindow({ url:FAQ_URL, external:true });   // 一律用外部瀏覽器開
+    else window.open(FAQ_URL, '_blank', 'noopener');
+  } catch(e) { window.open(FAQ_URL, '_blank', 'noopener'); }
+}
+let _notesShown = false;
+function autoNotesOnce() {
+  if (_notesShown) return;
+  _notesShown = true;
+  setTimeout(openNotes, 260);
+}
+function pickBkDur(d) {
+  _bkDur = d;
+  document.querySelectorAll('.bk-dur').forEach(b => b.classList.toggle('on', Number(b.dataset.d) === d));
+}
+// 給 AI 小編讀的固定格式：欄位名英中並列；第一行用客人的語言，小編才會用對的語言回覆
+function buildBookingText(slot, dur, name, phone) {
+  const [y,m,d] = slot.dateKey.split('-').map(Number), wi = new Date(y, m-1, d).getDay();
+  return [
+    T('bk_hello'),
+    '[Booking request 預約申請]',
+    `Name 姓名: ${name}`,
+    `Phone 電話: ${phone}`,
+    `Specialist 老師: ${slot.teacher}`,
+    `Location 分店: ${slot.branch}`,
+    `Date 日期: ${slot.dateKey} (${WD_EN[wi]} 週${WD_ZH[wi]})`,
+    `Time 時間: ${slot.time}`,
+    `Duration 時長: ${dur} min`,
+  ].join('\n');
+}
+function sendBooking() {
+  const err = m => { setText('bk-err', m); };
+  const name = (document.getElementById('bk-name').value || '').replace(/\s+/g, ' ').trim();
+  const cc   = (document.getElementById('bk-cc').value || '').replace(/[^\d+]/g, '');
+  const tel  = (document.getElementById('bk-tel').value || '').replace(/\D/g, '').replace(/^0+/, ''); // 含國碼時去掉開頭的 0
+  if (!_bkDur) return err(T('bk_e_dur'));
+  if (!name)   return err(T('bk_e_name'));
+  if (!/^\+\d{1,4}$/.test(cc) || tel.length < 6) return err(T('bk_e_tel'));
+  if (!_notesRead) return openNotes();       // 還沒讀完並確認注意事項 → 先跳出來，不送出
+  const text = buildBookingText(sheetSlot, _bkDur, name, `${cc} ${tel}`);
+  const url  = `https://line.me/R/oaMessage/${encodeURIComponent(OA_ID)}/?${encodeURIComponent(text)}`;
+  sbTrack('convert');
+  closeSheet();
+  if (typeof liff !== 'undefined' && liff.isInClient && liff.isInClient()) location.href = url;
+  else window.open(url, '_blank', 'noopener');
+}
 function goBooking() {
+  if (sheetSlot && LANG !== 'zh') return sendBooking();
   closeSheet();
   sbTrack('convert');
   const url = (sheetSlot && sheetSlot.staffId)
@@ -1174,10 +1766,14 @@ async function loadFromEngine(days) {
   for (const t of CATALOG) { for (const j of t.jobs) FETCHED[`${t.staffId}:${j.dur}`] = days; teacherDays[t.staffId] = days; }
   allData = { slots:[], roster, fetchedAt:new Date().toISOString() };
   rebuildSlots();
+  timeBounds();
 }
 
 async function init() {
   if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
+  applyStatic();
+  ['cards-today','cards-staff'].forEach(id =>
+    document.getElementById(id).addEventListener('scroll', () => onCardsScroll(id), { passive:true }));
   trackVisit(); trackMode('today');
   showScanning('cards-today', 'status-today');
   showScanning('cards-staff', 'status-staff');
@@ -1195,11 +1791,11 @@ async function init() {
   } catch(e) {
     stopScanning('cards-today');
     stopScanning('cards-staff');
-    renderStatus('status-today', '暫時連不上預約系統，請稍後再試', 'var(--red)');
-    renderStatus('status-staff', '暫時連不上預約系統，請稍後再試', 'var(--red)');
-    const failHTML = `<div style="width:100%;padding:22px 14px;text-align:center;font-size:12px;color:var(--gray);line-height:1.7">暫時取得不到資料，請稍後再開一次</div>`;
-    document.getElementById('cards-today').innerHTML = failHTML;
-    document.getElementById('cards-staff').innerHTML = failHTML;
+    renderStatus('status-today', T('st_fail'), 'var(--red)');
+    renderStatus('status-staff', T('st_fail'), 'var(--red)');
+    const failHTML = `<div style="width:100%;padding:22px 14px;text-align:center;font-size:12px;color:var(--gray);line-height:1.7">${T('fail_card')}</div>`;
+    setRowHTML('cards-today', failHTML);
+    setRowHTML('cards-staff', failHTML);
   }
 }
 
