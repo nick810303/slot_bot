@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.12.2（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.13.0（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -1361,14 +1361,16 @@ function renderStaff() {
 // ── v5.5 日期／時段篩選（兩個分頁共用；面板開著時即時套用）──────────
 let filterDate = null;                    // 'YYYY-MM-DD' 或 null＝不限
 let filterFrom = null, filterTo = null;   // 開始時間區間（分鐘）；null＝該端不限
-let T_MIN = 13*60, T_MAX = 23*60 + 30;    // 拉桿兩端，載入資料後依實際最早／最晚時段校正
+let T_MIN = 13*60, T_MAX = 22*60 + 30;    // 拉桿兩端，載入資料後依實際最早／最晚時段校正
 const T_STEP = 30;
+const LAST_START = '22:30';                // 店規：最晚開始時間（時間卡與拉桿都以此為上限）
 const toMin = t => { const [h, m] = t.split(':').map(Number); return h*60 + m; };
 const fmtMin = v => `${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;
 function timeBounds() {
   let lo = Infinity, hi = 0;
   for (const s of (allData ? allData.slots : [])) { const v = toMin(s.time); if (v < lo) lo = v; if (v > hi) hi = v; }
   if (hi) { T_MIN = Math.floor(lo/60)*60; T_MAX = Math.ceil(hi/T_STEP)*T_STEP; }
+  T_MAX = Math.min(T_MAX, toMin(LAST_START));
 }
 function timeActive() { return filterFrom !== null || filterTo !== null; }
 function timeLabel() { return `${fmtMin(filterFrom === null ? T_MIN : filterFrom)}–${fmtMin(filterTo === null ? T_MAX : filterTo)}`; }
@@ -1771,6 +1773,7 @@ async function loadFromEngine(days) {
   // GROUPED：沿用原本 key 格式，rebuildSlots 等照舊運作
   GROUPED = {};
   for (const s of (data.slots || [])) {
+    if (s.time > LAST_START) continue;   // 店規：每項服務最晚 22:30 開始，之後的時段不顯示
     const key = `${s.staffId}__${s.branch}__${s.dateKey}__${s.time}`;
     GROUPED[key] = { teacher:s.teacher, staffId:s.staffId, avatar:s.avatar||'', branch:s.branch, time:s.time, dateKey:s.dateKey, durations:[...s.durations], isTrainee:!!s.isTrainee };
   }
