@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.13.0（2026-11-17 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.14.0（2026-11-23 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -20,9 +20,9 @@
   --red:#C24D3F;--red-bg:rgba(194,77,63,.07);--red-bdr:rgba(194,77,63,.2);
   /* 狀態綠：品牌暖綠 */
   --green:#5C7A50;
-  /* 分店識別色（南京三民＝深松綠；中山＝棗磚紅）*/
-  --nj:#4E5D3E;--nj-bg:rgba(78,93,62,.10);--nj-bdr:rgba(78,93,62,.30);
-  --zs:#96382E;--zs-bg:rgba(150,56,46,.10);--zs-bdr:rgba(150,56,46,.30);
+  /* 分店識別色（2026-11-23 比照顧客檔案系統時間軸 r151：南京三民＝深森綠 #2F5E4A；中山＝赤陶橘 #B84E2C）*/
+  --nj:#2F5E4A;--nj-bg:rgba(47,94,74,.10);--nj-bdr:rgba(47,94,74,.30);
+  --zs:#B84E2C;--zs-bg:rgba(184,78,44,.10);--zs-bdr:rgba(184,78,44,.30);
   /* 老師膠囊：正規＝陶土棕、培訓＝橄欖綠（同大地色系、和諧可辨）*/
   --pill-reg:#AE6C56;--pill-reg-bg:rgba(174,108,86,.10);--pill-reg-bdr:rgba(174,108,86,.42);
   --pill-tr:#6E7B4E;--pill-tr-bg:rgba(110,123,78,.12);--pill-tr-bdr:rgba(110,123,78,.46);
@@ -145,8 +145,8 @@ html,body{font-variant-numeric:tabular-nums;height:100%;overflow:hidden;backgrou
 .card-body{flex:1;padding:4px 7px 4px;display:flex;flex-direction:column;background:var(--card)}
 .card-near-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;flex-shrink:0}
 .card-branch-banner{flex-shrink:0;text-align:center;font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.06em;line-height:1.5;padding:2px 6px}
-.card-branch-banner.bc-nj{background:#E3DED3;color:var(--nj);border-bottom:1px solid var(--nj-bdr)}
-.card-branch-banner.bc-zs{background:#EBDAD1;color:var(--zs);border-bottom:1px solid var(--zs-bdr)}
+.card-branch-banner.bc-nj{background:#E0DED4;color:var(--nj);border-bottom:1px solid var(--nj-bdr)}
+.card-branch-banner.bc-zs{background:#EEDCD1;color:var(--zs);border-bottom:1px solid var(--zs-bdr)}
 .near-badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;line-height:1.6}
 .near-badge.today{background:var(--black);color:#fff}
 .near-badge.other{background:#e7ddce;color:#6b5d4d}
