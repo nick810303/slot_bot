@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.14.0（2026-11-23 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.14.1（2026-11-23 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -17,9 +17,9 @@
   /* 卡片頭統一色（深可可）＋卡片亮面 */
   --header:#91563E;--card:#FCF8F3;--card-bdr:#E4D8C7;
   /* 通知/提醒紅：品牌莓陶紅 */
-  --red:#C24D3F;--red-bg:rgba(194,77,63,.07);--red-bdr:rgba(194,77,63,.2);
+  --red:#B84E2C;--red-bg:rgba(184,78,44,.07);--red-bdr:rgba(184,78,44,.2);
   /* 狀態綠：品牌暖綠 */
-  --green:#5C7A50;
+  --green:#2F5E4A;
   /* 分店識別色（2026-11-23 比照顧客檔案系統時間軸 r151：南京三民＝深森綠 #2F5E4A；中山＝赤陶橘 #B84E2C）*/
   --nj:#2F5E4A;--nj-bg:rgba(47,94,74,.10);--nj-bdr:rgba(47,94,74,.30);
   --zs:#B84E2C;--zs-bg:rgba(184,78,44,.10);--zs-bdr:rgba(184,78,44,.30);
@@ -327,7 +327,7 @@ html:not([lang=zh-TW]) .slot-summary{margin:6px 0 8px;padding:7px 11px}
 .nt-foot{flex-shrink:0;display:flex;gap:8px;padding:8px 14px 12px}
 .nt-faq{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:10px 8px;border-radius:9px;border:1px solid var(--clay);background:var(--card);color:var(--cocoa);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer}
 .nt-ok:disabled{opacity:.45;cursor:default}
-.bk-notes.read{background:rgba(92,122,80,.09);border-color:rgba(92,122,80,.3);color:var(--green)}
+.bk-notes.read{background:rgba(47,94,74,.09);border-color:rgba(47,94,74,.3);color:var(--green)}
 .nt-ok{flex:1.25;padding:10px 8px;border-radius:9px;border:1px solid #7d4a37;background:var(--cocoa);color:var(--cream);font-family:var(--sans);font-size:12.5px;font-weight:500;cursor:pointer}
 html:not([lang=zh-TW]) .status-text{font-size:12px}
 html[lang=en] .tab,html[lang=ko] .tab{font-size:11px}
@@ -507,7 +507,7 @@ const I18N = {
     aria_group:b=>b+'（點按收合或展開）',
   },
   en:{
-    app:'小泰空位儀表板Slot Dashboard', sub_pre:' / Quick check. Book via the ', sub_link:'booking system', sub_post:'',
+    app:'小泰空位儀表板 Slot Dashboard', sub_pre:' / Quick check. Book via the ', sub_link:'booking system', sub_post:'',
     tab_today:'Today / Earliest', tab_staff:'By specialist', dt_btn:'Date & time',
     foot:'The booking system is final.', notice:'Full FAQ', fetched:t=>`As of ${t}`,
     sheet_title:'This board cannot take bookings',
@@ -547,7 +547,7 @@ const I18N = {
     bk_e_dur:'Please choose a duration.', bk_e_name:'Please enter your name.', bk_e_tel:'Please enter your phone number with country code (e.g. +1).',
   },
   ja:{
-    app:'小泰空位儀表板Slot Dashboard', sub_pre:' / 確認用です。ご予約は', sub_link:'予約システム', sub_post:'で',
+    app:'小泰空位儀表板 Slot Dashboard', sub_pre:' / 確認用です。ご予約は', sub_link:'予約システム', sub_post:'で',
     tab_today:'本日 / 最短', tab_staff:'セラピスト指名', dt_btn:'日時',
     foot:'実際の空きは予約システムが優先です。', notice:'Full FAQ', fetched:t=>`取得 ${t}`,
     sheet_title:'この画面からは予約できません',
@@ -587,7 +587,7 @@ const I18N = {
     bk_e_dur:'コース（時間）を選択してください。', bk_e_name:'お名前を入力してください。', bk_e_tel:'国番号つきの電話番号を入力してください（例：+81）。',
   },
   ko:{
-    app:'小泰空位儀表板Slot Dashboard', sub_pre:' / 조회 전용 · 예약은 ', sub_link:'예약 시스템', sub_post:'에서',
+    app:'小泰空位儀表板 Slot Dashboard', sub_pre:' / 조회 전용 · 예약은 ', sub_link:'예약 시스템', sub_post:'에서',
     tab_today:'오늘 / 가장 빠른', tab_staff:'테라피스트 지정', dt_btn:'날짜·시간',
     foot:'실제 현황은 예약 시스템 기준입니다.', notice:'Full FAQ', fetched:t=>`기준 ${t}`,
     sheet_title:'이 화면에서는 예약할 수 없습니다',
