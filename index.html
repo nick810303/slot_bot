@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.14.1（2026-11-23 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.14.2（2026-11-23 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -473,9 +473,18 @@ const FETCH_JITTER = [60, 120];   // 每支之間間隔 60–120ms（含隨機�
 const WD = ['日','一','二','三','四','五','六'];
 // ── v5.5 語系：?lang= ＞ 使用者手動選過的 ＞ 裝置語言（中文以外且非日韓→英文）──
 const LANG_NAMES = { zh:'中文', en:'English', ja:'日本語', ko:'한국어' };
+// 網址指定的語言：直接開 ?lang=en，或從 LIFF 連結帶進來（liff.line.me/{LIFF_ID}?lang=en 會先變成 ?liff.state=%3Flang%3Den 再轉址）
+function urlLang() {
+  try {
+    const q = new URLSearchParams(location.search);
+    let l = q.get('lang');
+    if (!l && q.get('liff.state')) l = new URLSearchParams(q.get('liff.state').replace(/^[^?]*\?/, '')).get('lang');
+    return l || '';
+  } catch(e) { return ''; }
+}
 function detectLang() {
-  let l = '';
-  try { l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('slotdash_lang') || ''; } catch(e) {}
+  let l = urlLang();
+  try { l = l || localStorage.getItem('slotdash_lang') || ''; } catch(e) {}
   l = (l || navigator.language || 'zh').toLowerCase();
   return l.startsWith('zh') ? 'zh' : l.startsWith('ja') ? 'ja' : l.startsWith('ko') ? 'ko' : 'en';
 }
@@ -1786,7 +1795,12 @@ async function loadFromEngine(days) {
 }
 
 async function init() {
-  if (typeof liff !== 'undefined') { liff.init({ liffId: LIFF_ID }).catch(() => {}); }
+  if (typeof liff !== 'undefined') {
+    liff.init({ liffId: LIFF_ID }).then(() => {       // LIFF 轉址完成後網址才會出現 ?lang=，再對一次
+      const l = urlLang() ? detectLang() : LANG;
+      if (l !== LANG) { LANG = l; applyStatic(); if (allData) { buildStaffTabs(); renderToday(); renderStaff(); setFetchedAt(allData.fetchedAt); } }
+    }).catch(() => {});
+  }
   applyStatic();
   ['cards-today','cards-staff'].forEach(id =>
     document.getElementById(id).addEventListener('scroll', () => onCardsScroll(id), { passive:true }));
