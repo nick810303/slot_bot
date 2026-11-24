@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.14.2（2026-11-23 卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.15.0（2026-11-24 開到已開放月份月底・日期每兩週一頁可滑動＋卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -264,7 +264,17 @@ html,body{font-variant-numeric:tabular-nums;height:100%;overflow:hidden;backgrou
 .dt-btn.on{border-color:var(--clay);background:rgba(174,108,86,.10);color:var(--cocoa);font-weight:500;box-shadow:inset 0 1px 2px rgba(62,42,33,.17)}
 .dt-sec{display:flex;align-items:baseline;justify-content:space-between;font-size:10px;color:var(--gray2);margin:12px 0 6px}
 .dt-sec b{font-weight:500;color:var(--cocoa);font-size:11px}
-.dt-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dt-days{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+.dt-days::-webkit-scrollbar{display:none}
+.dt-page{flex:0 0 100%;min-width:0;display:grid;grid-template-columns:repeat(7,1fr);gap:5px;align-content:start;scroll-snap-align:start;scroll-snap-stop:always}
+.dt-pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.dt-pager[hidden]{display:none}
+.dt-pg{width:30px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--cocoa);font-size:14px;line-height:1;cursor:pointer;font-family:var(--sans);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.dt-pg:disabled{opacity:.3;pointer-events:none}
+.dt-pg-l{min-width:96px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--gray)}
+.dt-dots{display:flex;gap:4px;justify-content:center;margin-top:5px}
+.dt-dots i{width:5px;height:5px;border-radius:50%;background:var(--sand);opacity:.55}
+.dt-dots i.on{background:var(--cocoa);opacity:1}
 .dt-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0 6px;border-radius:7px;border:1.5px solid var(--line);background:var(--bg3);cursor:pointer;font-family:var(--sans);color:var(--black);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
 .dt-day .w{font-size:9px;line-height:1.2;color:var(--gray);white-space:nowrap}
 .dt-day .d{font-family:var(--mono);font-size:14px;font-weight:500;line-height:1}
@@ -437,7 +447,13 @@ html[lang=en] .card-branch-banner{letter-spacing:.02em}
   <div class="sheet">
     <div class="stx-head"><span class="stx-title" id="dt-title">DATE / 日期・時段</span><span class="stx-x" onclick="closeDT()">✕</span></div>
     <div class="dt-sec"><span id="dt-date-l">日期</span><b id="dt-date-v"></b></div>
-    <div class="dt-days" id="dt-days"></div>
+    <div class="dt-days" id="dt-days" onscroll="dtPagerSync()"></div>
+    <div class="dt-pager" id="dt-pager" hidden>
+      <button class="dt-pg" id="dt-prev" type="button" aria-label="Previous" onclick="dtGoPage(-1)">‹</button>
+      <span class="dt-pg-l" id="dt-pg-l"></span>
+      <button class="dt-pg" id="dt-next" type="button" aria-label="Next" onclick="dtGoPage(1)">›</button>
+    </div>
+    <div class="dt-dots" id="dt-dots"></div>
     <div class="dt-sec"><span id="dt-time-l">時段</span><b id="dt-time-v"></b></div>
     <div class="dt-range">
       <div class="dt-track"><div class="dt-fill" id="dt-fill"></div></div>
@@ -503,7 +519,7 @@ const I18N = {
     near:d=>d===0?'今日':d===1?'明天':d===2?'後天':`${d}天後`,
     trainee:'培訓新師', full_badge:'今日已滿',
     br:{'南京三民':'南京三民','中山':'中山'},
-    st_allfull:w=>(w.days>=14?'近14天已滿':`到 ${w.to.getMonth()+1}/${w.to.getDate()} 前已滿`)+'，下月預約 25 日 13:00 開放',
+    st_allfull:w=>`到 ${w.to.getMonth()+1}/${w.to.getDate()} 前已滿`+'，下月預約 25 日 13:00 開放',
     st_next:n=>`今日已滿，最早在${n}`, st_many:'今日尚有多個空位', st_left:n=>`今日剩下${n}個空位`,
     st_pick:'請點選老師（可多選最多 3 位）', st_fail:'暫時連不上預約系統，請稍後再試', fail_card:'暫時取得不到資料，請稍後再開一次',
     empty_open:l=>`下個月預約將於<br><b style="color:var(--cocoa);font-size:13px">${l}</b> 開放`, remind:'加入開放提醒',
@@ -527,7 +543,7 @@ const I18N = {
     near:d=>d===0?'Today':d===1?'Tomorrow':`In ${d} days`,
     trainee:'Trainee', full_badge:'',
     br:{'南京三民':'Nanjing Sanming','中山':'Zhongshan'},
-    st_allfull:w=>(w.days>=14?'Fully booked for 14 days':`Fully booked through ${w.to.getMonth()+1}/${w.to.getDate()}`)+' · next month opens on the 25th, 13:00',
+    st_allfull:w=>`Fully booked through ${w.to.getMonth()+1}/${w.to.getDate()}`+' · next month opens on the 25th, 13:00',
     st_next:n=>`Full today · earliest ${n.toLowerCase()}`, st_many:'Several slots open today', st_left:n=>`${n} slot${n>1?'s':''} left today`,
     st_pick:'Pick specialists (up to 3)', st_fail:'Cannot reach the booking data. Please try again later', fail_card:'Could not load the data. Please reopen in a moment.',
     empty_open:l=>`Bookings for next month open<br><b style="color:var(--cocoa);font-size:13px">${l}</b>`, remind:'Add reminder',
@@ -567,7 +583,7 @@ const I18N = {
     near:d=>d===0?'今日':d===1?'明日':d===2?'明後日':`${d}日後`,
     trainee:'研修生', full_badge:'本日満席',
     br:{'南京三民':'南京三民','中山':'中山'},
-    st_allfull:w=>(w.days>=14?'この先14日間は満席':`${w.to.getMonth()+1}/${w.to.getDate()}まで満席`)+'・翌月分は25日13:00受付開始',
+    st_allfull:w=>`${w.to.getMonth()+1}/${w.to.getDate()}まで満席`+'・翌月分は25日13:00受付開始',
     st_next:n=>`本日は満席・最短は${n}`, st_many:'本日はまだ空きがあります', st_left:n=>`本日は残り${n}枠`,
     st_pick:'セラピストを選択（最大3名）', st_fail:'予約データに接続できません。後ほどお試しください', fail_card:'データを取得できませんでした。少し時間をおいて開き直してください',
     empty_open:l=>`翌月分のご予約は<br><b style="color:var(--cocoa);font-size:13px">${l}</b> 受付開始`, remind:'リマインダー追加',
@@ -607,7 +623,7 @@ const I18N = {
     near:d=>d===0?'오늘':d===1?'내일':d===2?'모레':`${d}일 후`,
     trainee:'수습', full_badge:'오늘 마감',
     br:{'南京三民':'난징싼민','中山':'중산'},
-    st_allfull:w=>(w.days>=14?'앞으로 14일간 예약 마감':`${w.to.getMonth()+1}/${w.to.getDate()}까지 예약 마감`)+' · 다음 달 예약은 25일 13:00 오픈',
+    st_allfull:w=>`${w.to.getMonth()+1}/${w.to.getDate()}까지 예약 마감`+' · 다음 달 예약은 25일 13:00 오픈',
     st_next:n=>`오늘은 마감 · 가장 빠른 시간은 ${n}`, st_many:'오늘 아직 여유가 있습니다', st_left:n=>`오늘 ${n}자리 남음`,
     st_pick:'테라피스트를 선택하세요 (최대 3명)', st_fail:'예약 데이터에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요', fail_card:'데이터를 불러오지 못했습니다. 잠시 후 다시 열어 주세요',
     empty_open:l=>`다음 달 예약은<br><b style="color:var(--cocoa);font-size:13px">${l}</b> 오픈`, remind:'오픈 알림 추가',
@@ -732,21 +748,21 @@ function todayKey() {
   const n = new Date();
   return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
-// 實際可查詢窗口：要 14 天，但被「班表邊界」卡住（每月 25 日 13:00 才開放下月）→ 月底前只到本月底
+// 實際可查詢窗口：今天起到「已開放月份」的月底（每月 25 日 13:00 才開放下月）
 function windowInfo() {
   const now = new Date();
   const y = now.getFullYear(), m = now.getMonth(), d = now.getDate(), h = now.getHours();
   const bm = (d > 25 || (d === 25 && h >= 13)) ? m + 1 : m;   // 已開放到哪個月
   const boundary = new Date(y, bm + 1, 0);                     // 該月最後一天
-  const plan14   = new Date(y, m, d + 13);                     // 今天 +13 = 14 天
-  const to = plan14 < boundary ? plan14 : boundary;
+  const cap      = new Date(y, m, d + 39);                     // 引擎單次上限 40 天
+  const to = cap < boundary ? cap : boundary;                  // v5.15：不再卡 14 天，直接開到已開放月份的月底
   const days = Math.round((new Date(to.getFullYear(), to.getMonth(), to.getDate()) - new Date(y, m, d)) / 86400000) + 1;
   return { days, to };
 }
 // 全窗口皆滿時的動態文案頭：滿 14 天說「近14天」，被月底卡住就講到幾號
 function fullHead() {
   const w = windowInfo();
-  return w.days >= 14 ? '近14天已滿' : `到 ${w.to.getMonth() + 1}/${w.to.getDate()} 前已滿`;
+  return `到 ${w.to.getMonth() + 1}/${w.to.getDate()} 前已滿`;
 }
 // ── 客立樂 API 資料層（原 worker 邏輯搬到前端）────────────────
 function tpeTodayParts() {
@@ -1415,20 +1431,49 @@ function dtBasePool() {
   const pool = applyFilters(allData.slots);
   return currentTab === 'today' ? pool.filter(s => todayStaff.has(s.staffId)) : pool;
 }
+// v5.15：日期每 14 天一頁（2 列×7），左右滑或按 ‹ › 換頁
+const DT_PAGE = 14;
+let _dtPages = [];
+function dtPageNow() {
+  const box = document.getElementById('dt-days');
+  const step = box.clientWidth + 10;                      // 頁寬 + gap
+  return Math.max(0, Math.min(_dtPages.length - 1, Math.round(box.scrollLeft / (step || 1))));
+}
+function dtPagerSync() {
+  if (!_dtPages.length) return;
+  const i = dtPageNow(), pg = _dtPages[i], md = d => `${d.getMonth()+1}/${d.getDate()}`;
+  setText('dt-pg-l', `${md(pg.from)} – ${md(pg.to)}`);
+  document.getElementById('dt-prev').disabled = i === 0;
+  document.getElementById('dt-next').disabled = i === _dtPages.length - 1;
+  document.querySelectorAll('#dt-dots i').forEach((el, k) => el.classList.toggle('on', k === i));
+}
+function dtScrollToPage(i, smooth) {
+  const box = document.getElementById('dt-days');
+  box.scrollTo({ left: i * (box.clientWidth + 10), behavior: smooth ? 'smooth' : 'auto' });
+}
+function dtGoPage(delta) { dtScrollToPage(dtPageNow() + delta, true); }
 function renderDT() {
   const pool = dtBasePool();
   const byDate = {};
   for (const s of pool) if (inBands(s.time)) byDate[s.dateKey] = (byDate[s.dateKey] || 0) + 1;
   const now = new Date(), w = windowInfo(), p2 = x => String(x).padStart(2,'0');
   let days = '';
+  _dtPages = [];
   for (let i = 0; i < w.days; i++) {
     const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
     const key = `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
-    const num = (i === 0 || d.getDate() === 1) ? `${d.getMonth()+1}/${d.getDate()}` : d.getDate();
+    const num = (i % DT_PAGE === 0 || d.getDate() === 1) ? `${d.getMonth()+1}/${d.getDate()}` : d.getDate();
+    if (i % DT_PAGE === 0) { days += (i ? '</div>' : '') + '<div class="dt-page">'; _dtPages.push({ from:d, to:d, keys:[] }); }
+    const pg = _dtPages[_dtPages.length - 1]; pg.to = d; pg.keys.push(key);
     days += `<button type="button" class="dt-day${filterDate===key?' on':''}${byDate[key]?'':' none'}" onclick="toggleDTDate('${key}')">` +
       `<span class="w">${i===0 ? T('dt_today') : T('wd', d.getDay())}</span><span class="d">${num}</span></button>`;
   }
-  document.getElementById('dt-days').innerHTML = days;
+  const box = document.getElementById('dt-days'), keep = box.scrollLeft;
+  box.innerHTML = days + (w.days ? '</div>' : '');
+  box.scrollLeft = keep;                                  // 重畫不跳頁
+  document.getElementById('dt-pager').hidden = _dtPages.length < 2;
+  document.getElementById('dt-dots').innerHTML = _dtPages.length < 2 ? '' : _dtPages.map(() => '<i></i>').join('');
+  dtPagerSync();
   setText('dt-date-v', filterDate ? dateShort(filterDate) : T('dt_any'));
   setText('dt-time-v', timeActive() ? timeLabel() : T('dt_any'));
   document.getElementById('dt-clear').disabled = !dtActive();
@@ -1472,7 +1517,11 @@ function onDTRange(which) {
   if (!_dtRaf) _dtRaf = setTimeout(() => { _dtRaf = 0; afterDT(); }, 40);
 }
 function clearDT() { filterDate = null; filterFrom = filterTo = null; setupRange(); afterDT(); }
-function openDT() { if (!allData) return; setupRange(); renderDT(); document.getElementById('dt-mask').classList.add('show'); }
+function openDT() {
+  if (!allData) return; setupRange(); renderDT(); document.getElementById('dt-mask').classList.add('show');
+  const i = filterDate ? _dtPages.findIndex(p => p.keys.includes(filterDate)) : 0;   // 開啟時停在已選日期那一頁
+  dtScrollToPage(Math.max(0, i), false); dtPagerSync();
+}
 function closeDT() { document.getElementById('dt-mask').classList.remove('show'); }
 
 const collapsedBranches = new Set(['南京三民','中山']); // 今日模式預設全部疊合；指定老師模式進入時展開
@@ -1809,7 +1858,7 @@ async function init() {
   showScanning('cards-staff', 'status-staff');
   try {
     // 一次向我們的引擎拿全部老師 14 天資料（完全不碰客立樂）
-    await loadFromEngine(WINDOW_DAYS_2);
+    await loadFromEngine(windowInfo().days);   // v5.15：一次拿到已開放月份月底
     todayStaff = new Set(visibleRoster().map(s=>s.staffId)); // 今日模式預設全選
     buildStaffTabs(); // 需在 todayStaff 設好後才建，膠囊才會標成已選
     rebuildSlots();
