@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.15.2（2026-11-24 外語申請訊息重新排版＋申請時間戳記＋開到已開放月份月底・日期每兩週一頁可滑動＋卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.15.3（2026-11-24 外語申請訊息：分店譯名＋該店 Google Map 連結＋重新排版＋申請時間戳記＋開到已開放月份月底・日期每兩週一頁可滑動＋卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -1767,6 +1767,8 @@ function tpeStamp(t) {
     .formatToParts(new Date(t || Date.now())).forEach(x => p[x.type] = x.value);
   return `${p.month}/${p.day} ${p.hour}:${p.minute}`;
 }
+// 訊息裡的分店：外語顯示譯名，後面括號保留中文原名（內部與 AI 小編用中文名辨識）；日文譯名與中文相同就不重複
+function bkBranch(b) { const n = brName(b); return n === b ? b : `${n}（${b}）`; }
 function buildBookingText(slot, dur, name, phone) {
   // v5.15.2：短行＋圖示當標籤（LINE 對話框窄，長標籤會折行）；最上面一行就是「哪天幾點」
   const [y,m,d] = slot.dateKey.split('-').map(Number), wi = new Date(y, m-1, d).getDay();
@@ -1776,9 +1778,10 @@ function buildBookingText(slot, dur, name, phone) {
     `【預約申請 Booking request】(${tpeStamp(Date.now())} UTC+8)`,   // 申請生成時間（按下送出的時刻，台北時間）
     `📅 ${y}/${m}/${d}（${WD_ZH[wi]} ${WD_EN[wi]}）${slot.time}`,
     `⏳ ${dur} min`,
-    `💆 ${slot.teacher}｜${slot.branch}`,
+    `💆 ${slot.teacher}｜${bkBranch(slot.branch)}`,
     `👤 ${name}`,
     `📞 ${phone}`,
+    ...(BRANCH_MAP[slot.branch] ? [`📍 ${BRANCH_MAP[slot.branch]}`] : []),   // 該分店的 Google Map（引導外語客人到店）
     '',
     T('bk_remind'),
   ].join('\n');
