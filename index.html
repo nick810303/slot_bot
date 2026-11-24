@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 小泰空位儀表板 v5.15.0（2026-11-24 開到已開放月份月底・日期每兩週一頁可滑動＋卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
+<!-- 小泰空位儀表板 v5.15.1（2026-11-24 外語申請訊息加查詢／申請時間戳記＋開到已開放月份月底・日期每兩週一頁可滑動＋卡片橫向滑動＋日期時段篩選＋英日韓語系＋地球語言選單＋外語 LINE 代客登記表單） -->
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -1762,6 +1762,11 @@ function pickBkDur(d) {
   document.querySelectorAll('.bk-dur').forEach(b => b.classList.toggle('on', Number(b.dataset.d) === d));
 }
 // 給 AI 小編讀的固定格式：欄位名英中並列；第一行用客人的語言，小編才會用對的語言回覆
+function tpeStamp(t) {
+  const p = {}; new Intl.DateTimeFormat('en-US', { timeZone:'Asia/Taipei', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit', hourCycle:'h23' })
+    .formatToParts(new Date(t || Date.now())).forEach(x => p[x.type] = x.value);
+  return `${p.month}/${p.day} ${p.hour}:${p.minute}`;
+}
 function buildBookingText(slot, dur, name, phone) {
   const [y,m,d] = slot.dateKey.split('-').map(Number), wi = new Date(y, m-1, d).getDay();
   return [
@@ -1774,6 +1779,7 @@ function buildBookingText(slot, dur, name, phone) {
     `Date 日期: ${slot.dateKey} (${WD_EN[wi]} 週${WD_ZH[wi]})`,
     `Time 時間: ${slot.time}`,
     `Duration 時長: ${dur} min`,
+    `⏱ 查詢 ${tpeStamp(allData && allData.fetchedAt)}｜申請 ${tpeStamp(Date.now())}`,   // 台北時間；查詢＝空位資料載入時刻、申請＝按下送出時刻
     '',
     T('bk_remind'),
   ].join('\n');
